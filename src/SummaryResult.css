@@ -1,0 +1,238 @@
+/* SummaryResult.css - Dark Purple Theme */
+
+:root {
+  --bg-dark: #0d0b18;
+  --bg-sidebar: #130f26;
+  --bg-card: #181332;
+  --purple-accent: #8b5cf6;
+  --purple-hover: #7c3aed;
+  --purple-light: #c084fc;
+  --text-white: #ffffff;
+  --text-gray: #a1a1aa;
+  --border-subtle: rgba(139, 92, 246, 0.2);
+}
+
+.summary-body-area {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 32px;
+}
+
+.summary-card-purple {
+  width: 100%;
+  max-width: 900px;
+  background-color: var(--bg-sidebar);
+  border: 1px solid var(--border-subtle);
+  border-radius: 20px;
+  padding: 28px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+.summary-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.header-status-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.header-status-title h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-white);
+}
+
+.green-status-dot {
+  width: 10px;
+  height: 10px;
+  background-color: #22c55e;
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(34, 197, 94, 0.6);
+}
+
+/* ปุ่มย้อนกลับ */
+.btn-back-purple {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(139, 92, 246, 0.15);
+  border: 1px solid var(--border-subtle);
+  color: var(--purple-light);
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-back-purple:hover {
+  background: var(--purple-accent);
+  color: white;
+}
+
+/* กล่องแสดงผลความสำเร็จ */
+.result-box-purple {
+  position: relative;
+  background-color: rgba(24, 19, 50, 0.7);
+  border: 2px solid rgba(139, 92, 246, 0.4);
+  border-radius: 18px;
+  padding: 28px 24px;
+}
+
+/* ปุ่มลบ */
+.btn-delete-purple {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s, background-color 0.2s;
+}
+
+.btn-delete-purple:hover {
+  background-color: #dc2626;
+  transform: scale(1.08);
+}
+
+.result-content-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 28px;
+}
+
+/* วงกลมไอคอนติ๊กถูก */
+.check-icon-circle-purple {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background-color: #22c55e;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 38px;
+  box-shadow: 0 0 20px rgba(34, 197, 94, 0.4);
+  flex-shrink: 0;
+}
+
+.result-info-text .success-title-text {
+  font-size: 20px;
+  font-weight: 700;
+  color: #4ade80;
+  margin-bottom: 6px;
+}
+
+.result-info-text .job-title-text {
+  font-size: 15px;
+  color: #e4e4e7;
+  font-weight: 500;
+}
+
+.result-info-text .company-title-text {
+  font-size: 14px;
+  color: var(--text-gray);
+  margin-top: 2px;
+}
+
+/* กลุ่มปุ่ม Action ด้านล่าง */
+.result-actions-group {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.btn-action {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-action:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.1);
+}
+
+/* สีของแต่ละปุ่มตาม Theme */
+.btn-edit {
+  background-color: #eab308;
+  color: #18181b;
+}
+
+.btn-share {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.btn-view {
+  background-color: #10b981;
+  color: white;
+}
+
+.btn-download {
+  background-color: #16a34a;
+  color: white;
+}
+/* ส่วนตัวเลือก อัลกอริทึม ในหน้า SummaryResult */
+.algo-selector-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 20px 0;
+  padding-top: 16px;
+  border-top: 1px dashed rgba(139, 92, 246, 0.25);
+}
+
+.algo-label {
+  font-size: 14px;
+  color: #a1a1aa;
+}
+
+.algo-button-group {
+  display: flex;
+  background-color: #130f26;
+  padding: 4px;
+  border-radius: 10px;
+  border: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+.algo-btn {
+  padding: 6px 16px;
+  border: none;
+  background: transparent;
+  color: #a1a1aa;
+  font-size: 13px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.algo-btn.active {
+  background-color: #8b5cf6;
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.4);
+}

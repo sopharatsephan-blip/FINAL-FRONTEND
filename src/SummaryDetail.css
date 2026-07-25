@@ -1,0 +1,239 @@
+/* ==========================================
+   1. โค้ดเดิมของคุณ (สไตล์หน้า Detail)
+   ========================================== */
+.detail-body-area {
+  padding: 24px;
+}
+
+.detail-card-purple {
+  background-color: #15102a;
+  border: 1px solid rgba(139, 92, 246, 0.25);
+  border-radius: 16px;
+  padding: 24px;
+  color: #ffffff;
+}
+
+.detail-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+.algorithm-toggle-group {
+  display: flex;
+  background-color: #1d1739;
+  padding: 4px;
+  border-radius: 10px;
+  border: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+.toggle-btn {
+  padding: 8px 20px;
+  border: none;
+  background: transparent;
+  color: #9ca3af;
+  font-size: 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.toggle-btn.active {
+  background-color: #8b5cf6;
+  color: white;
+  font-weight: 600;
+}
+
+.summary-text-box {
+  color: #e2e8f0;
+}
+
+.summary-title-head {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+}
+
+.summary-content-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.summary-item h4 {
+  font-size: 15px;
+  color: #c084fc;
+  margin-bottom: 6px;
+}
+
+.summary-item p {
+  font-size: 14px;
+  color: #cbd5e1;
+  line-height: 1.6;
+}
+
+.summary-item ul {
+  margin: 6px 0 0 20px;
+  color: #cbd5e1;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* ==========================================
+   2. โค้ดที่เพิ่มใหม่: ปุ่มลบ & Pop-up ยืนยันลบ
+   ========================================== */
+
+/* ปุ่มถังขยะลบสรุป */
+.btn-delete-purple {
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
+}
+
+.btn-delete-purple:hover {
+  background-color: #dc2626;
+  transform: scale(1.08);
+}
+
+/* Backdrop ฉากหลังสีดำใสตอน Pop-up เด้ง */
+.modal-overlay-purple {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  backdrop-filter: blur(4px);
+}
+
+/* กล่อง Pop-up สีขาวตรงกลาง (สไตล์รูปที่ 2 ใน Figma) */
+.modal-content-purple {
+  background-color: #ffffff;
+  width: 90%;
+  max-width: 420px;
+  padding: 32px 24px;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+  text-align: center;
+  border: 1px solid #e5e7eb;
+  animation: modalPopIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes modalPopIn {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* วงกลมไอคอนเตือน/สำเร็จ */
+.modal-icon-circle {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 18px auto;
+  font-size: 30px;
+}
+
+.modal-icon-circle.warning {
+  background-color: #fef3c7;
+  color: #f59e0b;
+}
+
+.modal-icon-circle.success {
+  background-color: #dcfce7;
+  color: #10b981;
+}
+
+/* หัวข้อคำถาม */
+.modal-content-purple h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 8px;
+}
+
+/* ข้อความอธิบาย */
+.modal-content-purple p {
+  font-size: 14px;
+  color: #6b7280;
+  line-height: 1.5;
+  margin-bottom: 24px;
+}
+
+/* ปุ่ม ยกเลิก / ยืนยัน */
+.modal-actions-group {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.btn-modal-cancel {
+  flex: 1;
+  padding: 10px 16px;
+  background-color: #f3f4f6;
+  color: #374151;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-modal-cancel:hover {
+  background-color: #e5e7eb;
+}
+
+.btn-modal-confirm {
+  flex: 1;
+  padding: 10px 16px;
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+  transition: background-color 0.2s;
+}
+
+.btn-modal-confirm:hover {
+  background-color: #dc2626;
+}
+/* ป้ายแสดง LexRank แบบป้ายเดี่ยว */
+.algorithm-badge-single {
+  background-color: #8b5cf6;
+  color: #ffffff;
+  padding: 8px 22px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.4);
+}

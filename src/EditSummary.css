@@ -1,0 +1,156 @@
+.edit-body-area {
+  padding: 24px;
+}
+
+.edit-card-purple {
+  background-color: #15102a;
+  border: 1px solid rgba(139, 92, 246, 0.25);
+  border-radius: 20px;
+  padding: 32px;
+  color: #ffffff;
+  max-width: 900px;
+  margin: 0 auto;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.edit-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 28px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.edit-card-header h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #f3f4f6;
+  margin: 0;
+}
+
+.orange-dot {
+  color: #f59e0b;
+  font-size: 14px;
+}
+
+.edit-form-purple {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group-purple {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.form-group-purple label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #e2e8f0;
+}
+
+.req-star {
+  color: #ef4444;
+}
+
+.form-row-purple {
+  display: flex;
+  gap: 20px;
+}
+
+/* Input, Select, Textarea ในธีมม่วง */
+.input-purple,
+.select-purple,
+.textarea-purple {
+  width: 100%;
+  background-color: #1e183a;
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  border-radius: 12px;
+  padding: 12px 16px;
+  color: #ffffff;
+  font-size: 15px;
+  outline: none;
+  transition: all 0.2s ease-in-out;
+  box-sizing: border-box;
+}
+
+.select-purple {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c084fc' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  background-size: 16px;
+  padding-right: 40px;
+}
+
+.select-purple option {
+  background-color: #15102a;
+  color: #ffffff;
+}
+
+.textarea-purple {
+  line-height: 1.6;
+  resize: vertical;
+}
+
+.input-purple:focus,
+.select-purple:focus,
+.textarea-purple:focus {
+  border-color: #a855f7;
+  box-shadow: 0 0 12px rgba(168, 85, 247, 0.3);
+  background-color: #241d45;
+}
+
+/* ปุ่ม Action */
+.form-actions-purple {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.btn-cancel-purple {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: rgba(255, 255, 255, 0.08);
+  color: #cbd5e1;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-cancel-purple:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+
+.btn-save-purple {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #8b5cf6;
+  color: #ffffff;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+}
+
+.btn-save-purple:hover {
+  background-color: #7c3aed;
+  transform: translateY(-1px);
+}

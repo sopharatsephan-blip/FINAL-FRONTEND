@@ -1,16 +1,41 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Login.css";
 
 function Login() {
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    console.log({ email, password });
-    alert(`Logging in with: ${email}`);
+    setErrorMessage("");
+
+    try {
+      const response = await fetch("http://localhost:5000/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // ✅ บันทึกข้อมูลผู้ใช้
+        localStorage.setItem("user", JSON.stringify(data.user));
+
+        // 🚀 วาร์ปพุ่งตรงไปหน้า Admin Dashboard ทันที!
+        navigate("/admin");
+      } else {
+        setErrorMessage(data.message || "เกิดข้อผิดพลาดในการเข้าสู่ระบบ");
+      }
+    } catch (error) {
+      console.error("Login Error:", error);
+      setErrorMessage("ไม่สามารถเชื่อมต่อ Server ได้ (ตรวจสอบการรัน node server.js)");
+    }
   };
 
   return (
@@ -42,10 +67,10 @@ function Login() {
         </div>
 
         <input
-          type="email"
-          placeholder="Email Address"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          type="text"
+          placeholder="Username or Email Address"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
           required
         />
 
@@ -56,6 +81,12 @@ function Login() {
           onChange={(e) => setPassword(e.target.value)}
           required
         />
+
+        {errorMessage && (
+          <p style={{ color: "#ff4d4f", fontSize: "14px", margin: "5px 0 10px 0", textAlign: "left" }}>
+            ⚠️ {errorMessage}
+          </p>
+        )}
 
         <button type="submit" className="btn-login-now">
           Login Now
