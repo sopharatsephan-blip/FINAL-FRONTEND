@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useLanguage } from './LanguageContext';
 import './SummaryDetail.css';
 
 import { 
@@ -12,11 +13,13 @@ import {
   FaSearch, 
   FaAsterisk,
   FaArrowLeft,
-  FaFileAlt
+  FaFileAlt,
+  FaGlobeAmericas
 } from 'react-icons/fa';
 
 export default function SummaryDetail() {
   const navigate = useNavigate();
+  const { t, lang, toggleLanguage } = useLanguage();
   const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {
@@ -33,12 +36,12 @@ export default function SummaryDetail() {
 
   return (
     <div className="admin-purple-container">
-      {/* Sidebar */}
+      {/* ===== Sidebar ===== */}
       <aside className="sidebar-purple">
         <div>
           <div className="brand-logo-purple" onClick={() => navigate('/admin')} style={{ cursor: 'pointer' }}>
             <FaAsterisk style={{ color: '#c084fc' }} />
-            <span>ICT Video Summary</span>
+            <span>{t.appName || 'ICT Video Summary'}</span>
           </div>
 
           <div className="user-profile-purple">
@@ -54,122 +57,210 @@ export default function SummaryDetail() {
           <nav className="menu-list-purple">
             <button className="menu-item-purple" onClick={() => navigate('/admin')}>
               <FaHome size={16} />
-              <span>แดชบอร์ด</span>
+              <span>{t.dashboard || 'Dashboard'}</span>
             </button>
 
             <button className="menu-item-purple active" onClick={() => navigate('/upload-video')}>
               <FaVideo size={16} />
-              <span>อัปโหลดวิดีโอ</span>
+              <span>{t.uploadVideo || 'Upload Video'}</span>
             </button>
 
             <button className="menu-item-purple" onClick={() => navigate('/edit-summary')}>
               <FaEdit size={16} />
-              <span>แก้ไขข้อมูลสรุป</span>
+              <span>{t.editSummary || 'Edit Summary'}</span>
             </button>
 
-            <button className="menu-item-purple">
+            <button className="menu-item-purple" onClick={() => navigate('/publish')}>
               <FaGlobe size={16} />
-              <span>เผยแพร่</span>
+              <span>{t.publish || 'Publish'}</span>
             </button>
 
-            <button className="menu-item-purple">
+            <button className="menu-item-purple" onClick={() => navigate('/users')}>
               <FaUsers size={16} />
-              <span>จัดการผู้ใช้</span>
+              <span>{t.userManagement || 'User Management'}</span>
             </button>
           </nav>
         </div>
 
-        <button className="logout-btn-purple" onClick={handleLogout}>
-          <FaSignOutAlt size={16} />
-          <span>ออกจากระบบ</span>
-        </button>
+        <div className="sidebar-footer-purple">
+          <button className="logout-btn-purple" onClick={handleLogout}>
+            <FaSignOutAlt size={16} />
+            <span>{t.logout || 'Logout'}</span>
+          </button>
+        </div>
       </aside>
 
-      {/* Main Content */}
+      {/* ===== Main Content ===== */}
       <main className="main-content-purple">
-        <header className="top-header-purple">
-          <div className="header-title-box">
-            <div className="header-icon-badge">
-              <FaVideo size={18} />
+        {/* Top Header: แก้ชื่อตรงนี้ไม่ให้ซ้ำกับ Upload Video */}
+        <header className="top-header-purple" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div className="header-title-box" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div className="header-icon-badge" style={{ background: 'rgba(139, 92, 246, 0.2)', color: '#c084fc', padding: '10px', borderRadius: '10px', display: 'flex' }}>
+              <FaFileAlt size={18} />
             </div>
-            <h2>รายละเอียดสรุปวิดีโอ</h2>
+            <h2 style={{ margin: 0, fontSize: '20px', fontWeight: 'bold' }}>
+              {lang === 'en' ? 'Summary Details' : 'รายละเอียดการสรุป'}
+            </h2>
           </div>
 
-          <div className="search-box-purple">
-            <FaSearch className="search-icon-purple" />
-            <input 
-              type="text" 
-              className="search-input-purple" 
-              placeholder="ค้นหาสรุป, ตำแหน่งงาน" 
-            />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div className="search-box-purple">
+              <FaSearch className="search-icon-purple" style={{ color: '#9ca3af', fontSize: '14px' }} />
+              <input 
+                type="text" 
+                className="search-input-purple" 
+                placeholder={t.searchPlaceholder || 'Search summary, position...'} 
+              />
+            </div>
+
+            {/* 🌐 ปุ่มสลับภาษาขนาดเล็กมุมขวาบน */}
+            <button 
+              type="button" 
+              onClick={toggleLanguage}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '6px 12px',
+                borderRadius: '20px',
+                border: '1px solid rgba(192, 132, 252, 0.4)',
+                background: 'rgba(139, 92, 246, 0.15)',
+                color: '#c084fc',
+                fontSize: '12px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                whiteSpace: 'nowrap'
+              }}
+            >
+              <FaGlobeAmericas size={12} />
+              <span>{lang ? lang.toUpperCase() : 'EN'}</span>
+            </button>
           </div>
         </header>
 
-        <div className="detail-body-area">
-          <div className="detail-card-purple">
+        {/* Content Body Area */}
+        <div className="detail-body-area" style={{ marginTop: '20px' }}>
+          <div className="purple-card">
             
-            {/* Header & ปุ่มย้อนกลับ (เอาปุ่ม TextRank ออกเรียบร้อย) */}
-            <div className="detail-card-header">
-              <button className="btn-back-purple" onClick={() => navigate('/summary-result')}>
-                <FaArrowLeft /> ย้อนกลับ
+            {/* Header: เหลือเฉพาะปุ่มย้อนกลับ (ลบปุ่มเลือก TextRank/LexRank ออก) */}
+            <div className="result-header-purple" style={{ marginBottom: '20px' }}>
+              <button 
+                className="reset-btn-purple" 
+                onClick={() => navigate('/summary-result')} 
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+              >
+                <FaArrowLeft /> {lang === 'en' ? 'Back' : 'ย้อนกลับ'}
               </button>
-
-              <div className="algorithm-badge-single">
-                LexRank
-              </div>
             </div>
 
-            {/* เนื้อหาสรุป LexRank เท่านั้น */}
+            {/* เนื้อหาสรุป (ใช้ข้อมูลเฉพาะ LexRank ตัด TextRank ออกสมบูรณ์) */}
             <div className="summary-text-box">
-              <h3 className="summary-title-head">
-                <FaFileAlt style={{ color: '#c084fc', marginRight: '8px' }} />
-                สรุปตามหัวข้อ (LexRank)
+              <h3 className="card-title-purple" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px', fontSize: '18px' }}>
+                <FaFileAlt style={{ color: '#c084fc' }} />
+                {lang === 'en' ? 'Topic Summary' : 'สรุปตามหัวข้อ'}
               </h3>
 
-              <div className="summary-content-list">
+              <div className="summary-content-list" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                 <section className="summary-item">
-                  <h4>1) ชื่อหน่วยงานและสถานประกอบการ</h4>
-                  <p>บริษัทเอกชนด้านการออกแบบและพัฒนาซอฟต์แวร์เว็บไซต์ และ Mobile Application ตั้งอยู่ที่จังหวัดภูเก็ต</p>
+                  <h4 style={{ color: '#c084fc', marginBottom: '6px', fontSize: '15px' }}>
+                    {lang === 'en' ? '1) Company / Organization Name' : '1) ชื่อหน่วยงานและสถานประกอบการ'}
+                  </h4>
+                  <p style={{ color: '#e2e8f0', margin: 0, lineHeight: '1.6' }}>
+                    {lang === 'en'
+                      ? 'A private company specializing in software design, website, and mobile application development located in Phuket.'
+                      : 'บริษัทเอกชนด้านการออกแบบและพัฒนาซอฟต์แวร์เว็บไซต์และ Mobile Application ตั้งอยู่ที่จังหวัดภูเก็ต'
+                    }
+                  </p>
                 </section>
 
                 <section className="summary-item">
-                  <h4>2) ตำแหน่งและลักษณะงานที่ทำ</h4>
-                  <p>ตำแหน่งที่ฝึกงานเกี่ยวกับการออกแบบ UI/UX โดยมีหน้าที่วิเคราะห์ความต้องการของผู้ใช้งาน ออกแบบ Wireframe และหน้าตาเว็บไซต์ รวมถึงทดสอบและปรับปรุงดีไซน์ตามข้อเสนอแนะ</p>
+                  <h4 style={{ color: '#c084fc', marginBottom: '6px', fontSize: '15px' }}>
+                    {lang === 'en' ? '2) Position and Job Responsibilities' : '2) ตำแหน่งและลักษณะงานที่ทำ'}
+                  </h4>
+                  <p style={{ color: '#e2e8f0', margin: 0, lineHeight: '1.6' }}>
+                    {lang === 'en'
+                      ? 'Internship position in UI/UX design, responsible for analyzing user requirements, creating wireframes and web interfaces, as well as testing and making design improvements based on feedback.'
+                      : 'ตำแหน่งที่ฝึกงานเกี่ยวกับการออกแบบ UI/UX โดยมีหน้าที่วิเคราะห์ความต้องการของผู้ใช้งาน ออกแบบ Wireframe และหน้าตาเว็บไซต์ รวมถึงทดสอบและปรับปรุงดีไซน์ตามข้อเสนอแนะ'
+                    }
+                  </p>
                 </section>
 
                 <section className="summary-item">
-                  <h4>3) Project หรือ งานที่ทำระหว่างฝึกงาน</h4>
-                  <p>ออกแบบเว็บไซต์ระบบหลังบ้านจำนวน 3 ระบบ โดยใช้ Figma เช่น</p>
-                  <ul>
-                    <li>ระบบจัดการข้อมูลบริษัท</li>
-                    <li>ระบบจัดการข้อมูลคนขับและรถ</li>
-                    <li>ระบบ Booking การจองรถ รวมถึงระบบ Spa สำหรับจัดการหมอนวด การจองคิว และสินค้า</li>
+                  <h4 style={{ color: '#c084fc', marginBottom: '6px', fontSize: '15px' }}>
+                    {lang === 'en' ? '3) Projects or Tasks During Internship' : '3) Project หรือ งานที่ทำระหว่างฝึกงาน'}
+                  </h4>
+                  <p style={{ color: '#e2e8f0', margin: '0 0 8px 0', lineHeight: '1.6' }}>
+                    {lang === 'en'
+                      ? 'Designed 3 back-end web systems using Figma, including:'
+                      : 'ออกแบบเว็บไซต์ระบบหลังบ้านจำนวน 3 ระบบ โดยใช้ Figma เช่น'
+                    }
+                  </p>
+                  <ul style={{ color: '#e2e8f0', paddingLeft: '20px', margin: 0, lineHeight: '1.6' }}>
+                    <li>{lang === 'en' ? 'Company Data Management System' : 'ระบบจัดการข้อมูลบริษัท'}</li>
+                    <li>{lang === 'en' ? 'Driver & Vehicle Management System' : 'ระบบจัดการข้อมูลคนขับและรถ'}</li>
+                    <li>{lang === 'en' ? 'Car Booking System & Spa System for masseuse management, queue booking, and products' : 'ระบบ Booking การจองรถ รวมถึงระบบ Spa สำหรับจัดการหมอนวด การจองคิว และสินค้า'}</li>
                   </ul>
                 </section>
 
                 <section className="summary-item">
-                  <h4>4) ปัญหาที่พบและวิธีการแก้ไข (ถ้ามี)</h4>
-                  <p>พบปัญหาในการออกแบบให้ตรงกับความต้องการผู้ใช้ จึงแก้ไขโดยการรับ Feedback จากทีมและปรับปรุงดีไซน์อย่างต่อเนื่อง</p>
+                  <h4 style={{ color: '#c084fc', marginBottom: '6px', fontSize: '15px' }}>
+                    {lang === 'en' ? '4) Problems Encountered and Solutions' : '4) ปัญหาที่พบและวิธีการแก้ไข (ถ้ามี)'}
+                  </h4>
+                  <p style={{ color: '#e2e8f0', margin: 0, lineHeight: '1.6' }}>
+                    {lang === 'en'
+                      ? 'Encountered issues in aligning designs with user expectations; solved by continuously receiving team feedback and iteratively improving designs.'
+                      : 'พบปัญหาในการออกแบบให้ตรงกับความต้องการผู้ใช้ จึงแก้ไขโดยการรับ Feedback จากทีมและปรับปรุงดีไซน์อย่างต่อเนื่อง'
+                    }
+                  </p>
                 </section>
 
                 <section className="summary-item">
-                  <h4>5) สิ่งที่ได้รับจากการไปฝึกงานในครั้งนี้</h4>
-                  <p>ได้เรียนรู้การทำงานจริง การทำงานเป็นทีม และการสื่อสารกับผู้อื่น รวมถึงพัฒนาทักษะด้านการออกแบบและการคิดวิเคราะห์</p>
+                  <h4 style={{ color: '#c084fc', marginBottom: '6px', fontSize: '15px' }}>
+                    {lang === 'en' ? '5) Key Takeaways & Experience Gained' : '5) สิ่งที่ได้รับจากการไปฝึกงานในครั้งนี้'}
+                  </h4>
+                  <p style={{ color: '#e2e8f0', margin: 0, lineHeight: '1.6' }}>
+                    {lang === 'en'
+                      ? 'Learned practical teamwork, effective communication, and enhanced skills in design and analytical thinking.'
+                      : 'ได้เรียนรู้การทำงานจริง การทำงานเป็นทีม และการสื่อสารกับผู้อื่น รวมถึงพัฒนาทักษะด้านการออกแบบและการคิดวิเคราะห์'
+                    }
+                  </p>
                 </section>
 
                 <section className="summary-item">
-                  <h4>6) แนวคิดต่ออาชีพในอนาคต</h4>
-                  <p>มีแนวโน้มที่จะสนใจสายงานด้าน UI/UX และการออกแบบระบบมากขึ้น จากประสบการณ์ฝึกงานที่ได้รับ</p>
+                  <h4 style={{ color: '#c084fc', marginBottom: '6px', fontSize: '15px' }}>
+                    {lang === 'en' ? '6) Future Career Outlook' : '6) แนวคิดต่ออาชีพในอนาคต'}
+                  </h4>
+                  <p style={{ color: '#e2e8f0', margin: 0, lineHeight: '1.6' }}>
+                    {lang === 'en'
+                      ? 'Inclined toward pursuing a career path in UI/UX and system design based on internship experiences.'
+                      : 'มีแนวโน้มที่จะสนใจสายงานด้าน UI/UX และการออกแบบระบบมากขึ้น จากประสบการณ์ฝึกงานที่ได้รับ'
+                    }
+                  </p>
                 </section>
 
                 <section className="summary-item">
-                  <h4>7) ควรแนะนำที่ฝึกงานนี้หรือไม่ เพราะอะไร</h4>
-                  <p>แนะนำให้ไปฝึกงาน เพราะได้ทำงานจริง ได้รับคำแนะนำจากพี่ในทีม และบรรยากาศการทำงานเป็นกันเอง ไม่กดดัน</p>
+                  <h4 style={{ color: '#c084fc', marginBottom: '6px', fontSize: '15px' }}>
+                    {lang === 'en' ? '7) Recommendation for This Internship Site' : '7) ควรแนะนำที่ฝึกงานนี้หรือไม่ เพราะอะไร'}
+                  </h4>
+                  <p style={{ color: '#e2e8f0', margin: 0, lineHeight: '1.6' }}>
+                    {lang === 'en'
+                      ? 'Highly recommended due to hands-on projects, helpful team mentorship, and a welcoming atmosphere.'
+                      : 'แนะนำให้ไปฝึกงาน เพราะได้ทำงานจริง ได้รับคำแนะนำจากพี่ในทีม และบรรยากาศการทำงานเป็นกันเอง ไม่กดดัน'
+                    }
+                  </p>
                 </section>
 
                 <section className="summary-item">
-                  <h4>8) ข้อเสนอแนะสำหรับรุ่นน้อง</h4>
-                  <p>ควรเปิดใจเรียนรู้ ฝึกทักษะให้หลากหลาย กล้าถาม กล้าคิด กล้าแสดงออก เพื่อพัฒนาตัวเองให้มากขึ้น</p>
+                  <h4 style={{ color: '#c084fc', marginBottom: '6px', fontSize: '15px' }}>
+                    {lang === 'en' ? '8) Suggestions for Juniors' : '8) ข้อเสนอแนะสำหรับรุ่นน้อง'}
+                  </h4>
+                  <p style={{ color: '#e2e8f0', margin: 0, lineHeight: '1.6' }}>
+                    {lang === 'en'
+                      ? 'Stay open to continuous learning, build diverse skill sets, and actively express ideas to grow professionally.'
+                      : 'ควรเปิดใจเรียนรู้ ฝึกทักษะให้หลากหลาย กล้าถาม กล้าคิด กล้าแสดงออก เพื่อพัฒนาตัวเองให้มากขึ้น'
+                    }
+                  </p>
                 </section>
               </div>
             </div>

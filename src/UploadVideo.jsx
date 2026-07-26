@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useLanguage } from './LanguageContext';
 import './UploadVideo.css';
 
 import { 
@@ -11,21 +12,21 @@ import {
   FaSignOutAlt, 
   FaSearch, 
   FaCloudUploadAlt, 
-  FaAsterisk 
+  FaAsterisk,
+  FaGlobeAmericas
 } from 'react-icons/fa';
 
 export default function UploadVideo() {
   const navigate = useNavigate();
+  const { t, lang, toggleLanguage } = useLanguage();
   const [selectedFile, setSelectedFile] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
 
-  // Logout Handler
   const handleLogout = () => {
     localStorage.removeItem('user');
     navigate('/login');
   };
 
-  // Drag & Drop Handlers
   const handleDragOver = (e) => {
     e.preventDefault();
     setIsDragging(true);
@@ -60,7 +61,7 @@ export default function UploadVideo() {
             style={{ cursor: 'pointer' }}
           >
             <FaAsterisk style={{ color: '#c084fc' }} />
-            <span>ICT Video Summary</span>
+            <span>{t.appName || 'ICT Video Summary'}</span>
           </div>
 
           <div className="user-profile-purple">
@@ -72,60 +73,84 @@ export default function UploadVideo() {
           </div>
 
           <nav className="menu-list-purple">
-            <button 
-              className="menu-item-purple" 
-              onClick={() => navigate('/admin')}
-            >
+            <button className="menu-item-purple" onClick={() => navigate('/admin')}>
               <FaHome size={16} />
-              <span>แดชบอร์ด</span>
+              <span>{t.dashboard || 'Dashboard'}</span>
             </button>
 
             <button className="menu-item-purple active" onClick={() => navigate('/upload-video')}>
               <FaVideo size={16} />
-              <span>อัปโหลดวิดีโอ</span>
+              <span>{t.uploadVideo || 'Upload Video'}</span>
             </button>
 
-            {/* เพิ่ม onClick สำหรับนำทางไปยังหน้าแก้ไขข้อมูลสรุป */}
             <button className="menu-item-purple" onClick={() => navigate('/edit-summary')}>
               <FaEdit size={16} />
-              <span>แก้ไขข้อมูลสรุป</span>
+              <span>{t.editSummary || 'Edit Summary'}</span>
             </button>
 
             <button className="menu-item-purple" onClick={() => navigate('/publish')}>
               <FaGlobe size={16} />
-              <span>เผยแพร่</span>
+              <span>{t.publish || 'Publish'}</span>
             </button>
 
-            <button className="menu-item-purple">
+            <button className="menu-item-purple" onClick={() => navigate('/users')}>
               <FaUsers size={16} />
-              <span>จัดการผู้ใช้</span>
+              <span>{t.userManagement || 'User Management'}</span>
             </button>
           </nav>
         </div>
 
-        <button className="logout-btn-purple" onClick={handleLogout}>
-          <FaSignOutAlt size={16} />
-          <span>ออกจากระบบ</span>
-        </button>
+        <div className="sidebar-footer-purple">
+          <button className="logout-btn-purple" onClick={handleLogout}>
+            <FaSignOutAlt size={16} />
+            <span>{t.logout || 'Logout'}</span>
+          </button>
+        </div>
       </aside>
 
       {/* Main Content Area */}
       <main className="main-content-purple">
-        <header className="top-header-purple">
+        <header className="top-header-purple" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div className="header-title-box">
             <div className="header-icon-badge">
               <FaVideo size={18} />
             </div>
-            <h2>อัปโหลดวิดีโอ</h2>
+            <h2>{t.uploadVideo || 'Upload Video'}</h2>
           </div>
 
-          <div className="search-box-purple">
-            <FaSearch className="search-icon-purple" />
-            <input 
-              type="text" 
-              className="search-input-purple" 
-              placeholder="ค้นหาสรุป, ตำแหน่งงาน" 
-            />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div className="search-box-purple">
+              <FaSearch className="search-icon-purple" />
+              <input 
+                type="text" 
+                className="search-input-purple" 
+                placeholder={t.searchPlaceholder || 'Search summary, position...'} 
+              />
+            </div>
+
+            {/* 🌐 ปุ่มสลับภาษาขนาดเล็กขวาบน */}
+            <button 
+              type="button" 
+              onClick={toggleLanguage}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '6px 12px',
+                borderRadius: '20px',
+                border: '1px solid rgba(192, 132, 252, 0.4)',
+                background: 'rgba(139, 92, 246, 0.15)',
+                color: '#c084fc',
+                fontSize: '12px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                whiteSpace: 'nowrap'
+              }}
+            >
+              <FaGlobeAmericas size={12} />
+              <span>{lang ? lang.toUpperCase() : 'EN'}</span>
+            </button>
           </div>
         </header>
 
@@ -134,10 +159,9 @@ export default function UploadVideo() {
           <div className="upload-card-purple">
             <div className="upload-card-header">
               <span className="red-status-dot"></span>
-              <h3>อัปโหลดวิดีโอใหม่</h3>
+              <h3>{lang === 'en' ? 'Upload New Video' : 'อัปโหลดวิดีโอใหม่'}</h3>
             </div>
 
-            {/* Drag & Drop Area */}
             <div 
               className={`drop-zone-purple ${isDragging ? 'dragging' : ''}`}
               onDragOver={handleDragOver}
@@ -147,12 +171,16 @@ export default function UploadVideo() {
               <div className="upload-icon-circle-purple">
                 <FaCloudUploadAlt />
               </div>
-              <p className="drop-title-text">ลากและวางไฟล์วิดีโอที่นี่</p>
-              <span className="drop-sub-text">รองรับ MP4, MOV - สูงสุด 2GB</span>
+              <p className="drop-title-text">
+                {lang === 'en' ? 'Drag and drop video files here' : 'ลากและวางไฟล์วิดีโอที่นี่'}
+              </p>
+              <span className="drop-sub-text">
+                {lang === 'en' ? 'Supports MP4, MOV - Max size 2GB' : 'รองรับ MP4, MOV - สูงสุด 2GB'}
+              </span>
 
               {selectedFile && (
                 <div className="file-name-badge">
-                  📁 เลือกไฟล์แล้ว: <strong>{selectedFile.name}</strong>
+                  📁 {lang === 'en' ? 'Selected file:' : 'เลือกไฟล์แล้ว:'} <strong>{selectedFile.name}</strong>
                 </div>
               )}
 
@@ -165,11 +193,10 @@ export default function UploadVideo() {
               />
               
               <label htmlFor="video-file-input" className="btn-select-file-purple">
-                เลือกไฟล์
+                {lang === 'en' ? 'Select File' : 'เลือกไฟล์'}
               </label>
             </div>
 
-            {/* Submit Action */}
             <div className="action-area-purple">
               <button 
                 type="button"
@@ -177,7 +204,7 @@ export default function UploadVideo() {
                 disabled={!selectedFile}
                 onClick={() => navigate('/summary-result')}
               >
-                <span>เริ่มสรุป</span>
+                <span>{lang === 'en' ? 'Start Summarizing' : 'เริ่มสรุป'}</span>
                 <span className="lets-go-tag">LET'S GO!</span>
               </button>
             </div>

@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useLanguage } from "./LanguageContext";
 import "./Login.css";
 
 function Login() {
+  const { t, lang, toggleLanguage } = useLanguage();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -24,23 +26,52 @@ function Login() {
       const data = await response.json();
 
       if (response.ok) {
-        // ✅ บันทึกข้อมูลผู้ใช้
         localStorage.setItem("user", JSON.stringify(data.user));
-
-        // 🚀 วาร์ปพุ่งตรงไปหน้า Admin Dashboard ทันที!
         navigate("/admin");
       } else {
-        setErrorMessage(data.message || "เกิดข้อผิดพลาดในการเข้าสู่ระบบ");
+        setErrorMessage(data.message || (lang === 'en' ? "Login failed" : "เกิดข้อผิดพลาดในการเข้าสู่ระบบ"));
       }
     } catch (error) {
       console.error("Login Error:", error);
-      setErrorMessage("ไม่สามารถเชื่อมต่อ Server ได้ (ตรวจสอบการรัน node server.js)");
+      setErrorMessage(
+        lang === 'en' 
+          ? "Unable to connect to server." 
+          : "ไม่สามารถเชื่อมต่อ Server ได้"
+      );
     }
   };
 
   return (
-    <div className="login-container">
-      {/* ฝั่งซ้าย: แผงข้อมูลธีมเดียวกับ Home */}
+    <div className="login-container" style={{ position: "relative" }}>
+      {/* 🌐 ปุ่มสลับภาษาบังคับลอยหน้าสุด */}
+      <button 
+        type="button"
+        onClick={toggleLanguage}
+        style={{
+          position: "fixed",
+          top: "24px",
+          right: "24px",
+          padding: "8px 18px",
+          background: "#8b5cf6",
+          border: "2px solid #ffffff",
+          color: "#ffffff",
+          borderRadius: "30px",
+          cursor: "pointer",
+          display: "flex",
+          alignItems: "center",
+          gap: "8px",
+          fontWeight: "bold",
+          fontSize: "0.9rem",
+          boxShadow: "0 4px 15px rgba(0,0,0,0.5)",
+          zIndex: 999999,
+          outline: "none"
+        }}
+      >
+        <span style={{ fontSize: "1.1rem" }}>🌐</span>
+        <span>{lang ? lang.toUpperCase() : 'EN'}</span>
+      </button>
+
+      {/* ฝั่งซ้าย: แผงข้อมูล */}
       <div className="info-panel">
         <div className="content-wrapper">
           <div className="logo-icon" onClick={() => navigate("/")} style={{ cursor: "pointer" }}>✻</div>
@@ -49,26 +80,28 @@ function Login() {
             Summary System
           </h1>
           <p>
-            Platform for teachers to upload lesson videos and students to watch, 
-            read summaries, and download notes efficiently.
+            {lang === 'en' 
+              ? "Platform for teachers to upload lesson videos and students to watch, read summaries, and download notes efficiently."
+              : "แพลตฟอร์มสำหรับอาจารย์ในการอัปโหลดวิดีโอบทเรียน และนิสิตสามารถรับชม อ่านบทสรุป และดาวน์โหลดโน้ตได้อย่างมีประสิทธิภาพ"}
           </p>
           <footer>© 2026 Video Summary System. All rights reserved.</footer>
         </div>
       </div>
 
-      {/* ฝั่งขวา: ฟอร์ม Login โทนสีเข้ม */}
+      {/* ฝั่งขวา: ฟอร์ม Login */}
       <form className="login-box" onSubmit={handleLogin}>
         <div className="form-header">
           <h2>Video Summary</h2>
-          <h3>Welcome Back!</h3>
+          <h3>{t.loginTitle}</h3>
           <p className="subtitle">
-            Don't have an account? <a href="/register">Sign up now</a>
+            {t.dontHaveAccount}{" "}
+            <a href="/register">{t.signUpNow}</a>
           </p>
         </div>
 
         <input
           type="text"
-          placeholder="Username or Email Address"
+          placeholder={t.usernameLabel}
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           required
@@ -76,7 +109,7 @@ function Login() {
 
         <input
           type="password"
-          placeholder="Password"
+          placeholder={t.passwordLabel}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
@@ -89,18 +122,19 @@ function Login() {
         )}
 
         <button type="submit" className="btn-login-now">
-          Login Now
+          {t.loginBtn}
         </button>
 
-        <div className="divider">or</div>
+        <div className="divider">{t.or}</div>
 
         <button type="button" className="btn-google">
           <span className="google-icon">G</span>
-          Login with Google
+          {t.loginWithGoogle}
         </button>
 
         <p className="forgot-password">
-          Forgot password? <a href="/reset-password">Click here</a>
+          {t.forgotPassword}{" "}
+          <a href="/reset-password">{t.clickHere}</a>
         </p>
       </form>
     </div>

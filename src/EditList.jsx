@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useLanguage } from './LanguageContext'; // 🌐 นำเข้า useLanguage เหมือนหน้า Dashboard
 import './PublishSummary.css';
 
 import { 
@@ -11,11 +12,13 @@ import {
   FaSignOutAlt, 
   FaSearch, 
   FaPlay,
-  FaAsterisk
+  FaAsterisk,
+  FaGlobeAmericas // 🌐 ไอคอนโลกสำหรับปุ่มภาษา
 } from 'react-icons/fa';
 
 export default function EditList() {
   const navigate = useNavigate();
+  const { t, lang, toggleLanguage } = useLanguage(); // 🌐 ดึงข้อมูลภาษาและฟังก์ชันสลับภาษา
   const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {
@@ -41,7 +44,7 @@ export default function EditList() {
         <div>
           <div className="brand-logo-dark" onClick={() => navigate('/admin')} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px', color: '#fff', fontSize: '1.1rem', fontWeight: 'bold', marginBottom: '30px' }}>
             <FaAsterisk style={{ color: '#c084fc' }} />
-            <span>ICT Video Summary</span>
+            <span>{t.appName || 'ICT Video Summary'}</span>
           </div>
 
           <div className="user-profile-dark" style={{ background: 'rgba(255,255,255,0.05)', padding: '12px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '25px' }}>
@@ -57,54 +60,84 @@ export default function EditList() {
           <nav className="menu-list-dark" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             <button className="menu-item-dark" onClick={() => navigate('/admin')} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px', background: 'transparent', border: 'none', color: '#94a3b8', borderRadius: '10px', cursor: 'pointer' }}>
               <FaHome size={18} />
-              <span>แดชบอร์ด</span>
+              <span>{t.dashboard || 'แดชบอร์ด'}</span>
             </button>
 
             <button className="menu-item-dark" onClick={() => navigate('/upload-video')} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px', background: 'transparent', border: 'none', color: '#94a3b8', borderRadius: '10px', cursor: 'pointer' }}>
               <FaVideo size={18} />
-              <span>อัปโหลดวิดีโอ</span>
+              <span>{t.uploadVideo || 'อัปโหลดวิดีโอ'}</span>
             </button>
 
             <button className="menu-item-dark active" onClick={() => navigate('/edit-summary')} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px', background: '#8b5cf6', border: 'none', color: '#fff', borderRadius: '10px', cursor: 'pointer', fontWeight: 'bold' }}>
               <FaEdit size={18} />
-              <span>แก้ไขข้อมูลสรุป</span>
+              <span>{t.editSummary || 'แก้ไขข้อมูลสรุป'}</span>
             </button>
 
             <button className="menu-item-dark" onClick={() => navigate('/publish')} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px', background: 'transparent', border: 'none', color: '#94a3b8', borderRadius: '10px', cursor: 'pointer' }}>
               <FaGlobe size={18} />
-              <span>เผยแพร่</span>
+              <span>{t.publish || 'เผยแพร่'}</span>
             </button>
 
             <button className="menu-item-dark" onClick={() => navigate('/users')} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px', background: 'transparent', border: 'none', color: '#94a3b8', borderRadius: '10px', cursor: 'pointer' }}>
               <FaUsers size={18} />
-              <span>จัดการผู้ใช้</span>
+              <span>{t.userManagement || 'จัดการผู้ใช้'}</span>
             </button>
           </nav>
         </div>
 
         <button className="logout-btn-dark" onClick={handleLogout} style={{ display: 'flex', alignItems: 'center', gap: '10px', background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '10px' }}>
           <FaSignOutAlt size={16} />
-          <span>ออกจากระบบ</span>
+          <span>{t.logout || 'ออกจากระบบ'}</span>
         </button>
       </aside>
 
       {/* Main Content */}
       <main style={{ flex: 1, padding: '30px', overflowY: 'auto' }}>
+        {/* Header พร้อมช่องค้นหาและปุ่มสลับภาษามุมขวา */}
         <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '25px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div style={{ background: 'rgba(168,85,247,0.2)', padding: '10px', borderRadius: '10px', color: '#c084fc' }}>
               <FaEdit size={20} />
             </div>
-            <h2 style={{ color: '#fff', margin: 0, fontSize: '1.4rem' }}>แก้ไขข้อมูลสรุปเนื้อหา</h2>
+            <h2 style={{ color: '#fff', margin: 0, fontSize: '1.4rem' }}>
+              {lang === 'en' ? 'Edit Summary Data' : 'แก้ไขข้อมูลสรุปเนื้อหา'}
+            </h2>
           </div>
 
-          <div style={{ position: 'relative', width: '300px' }}>
-            <FaSearch style={{ position: 'absolute', left: '15px', top: '50%', transform: 'translateY(-50%)', color: '#64748b' }} />
-            <input 
-              type="text" 
-              placeholder="ค้นหาสรุป..." 
-              style={{ width: '100%', background: '#120b24', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '20px', padding: '10px 15px 10px 40px', color: '#fff', outline: 'none' }}
-            />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+            {/* ช่องค้นหา */}
+            <div style={{ position: 'relative', width: '280px' }}>
+              <FaSearch style={{ position: 'absolute', left: '15px', top: '50%', transform: 'translateY(-50%)', color: '#64748b' }} />
+              <input 
+                type="text" 
+                placeholder={t.searchPlaceholder || 'ค้นหาสรุป...'} 
+                style={{ width: '100%', background: '#120b24', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '20px', padding: '10px 15px 10px 40px', color: '#fff', outline: 'none' }}
+              />
+            </div>
+
+            {/* 🌐 ปุ่มสลับภาษา UI (มุมขวาบน) */}
+            <button 
+              type="button" 
+              onClick={toggleLanguage}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '8px 16px',
+                borderRadius: '20px',
+                border: '1px solid rgba(192, 132, 252, 0.4)',
+                background: 'rgba(139, 92, 246, 0.15)',
+                color: '#c084fc',
+                fontSize: '13px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                whiteSpace: 'nowrap'
+              }}
+            >
+              <FaGlobeAmericas size={14} />
+              <span>{lang ? lang.toUpperCase() : 'EN'}</span>
+            </button>
           </div>
         </header>
 
@@ -114,12 +147,12 @@ export default function EditList() {
             onClick={() => navigate('/edit-summary-detail')}
             style={{ 
               background: 'linear-gradient(145deg, #160d2e 0%, #0f0821 100%)',
-              border: '1.5px solid rgba(168, 85, 247, 0.4)', // 🟢 เพิ่มเส้นกรอบสีม่วง
+              border: '1.5px solid rgba(168, 85, 247, 0.4)',
               borderRadius: '20px',
               padding: '24px',
               cursor: 'pointer',
               transition: 'all 0.3s ease',
-              boxShadow: '0 8px 25px rgba(139, 92, 246, 0.15)' // 🟢 เงาเรืองแสงสีม่วง
+              boxShadow: '0 8px 25px rgba(139, 92, 246, 0.15)'
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.borderColor = '#c084fc';
@@ -133,7 +166,9 @@ export default function EditList() {
             {/* สถานะ สรุปเสร็จสิ้น */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '18px' }}>
               <span style={{ width: '9px', height: '9px', background: '#22c55e', borderRadius: '50%', display: 'inline-block' }}></span>
-              <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 'bold', color: '#fff' }}>สรุปเสร็จสิ้น</h3>
+              <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 'bold', color: '#fff' }}>
+                {lang === 'en' ? 'Summary Completed' : 'สรุปเสร็จสิ้น'}
+              </h3>
             </div>
 
             {/* รายละเอียดการ์ด */}
@@ -165,7 +200,7 @@ export default function EditList() {
                     UX/UI
                   </span>
                   <span style={{ background: 'rgba(34, 197, 94, 0.15)', color: '#4ade80', border: '1px solid rgba(34, 197, 94, 0.3)', padding: '3px 10px', borderRadius: '8px', fontSize: '0.8rem', fontWeight: '500' }}>
-                    สรุปเสร็จแล้ว
+                    {lang === 'en' ? 'Completed' : 'สรุปเสร็จแล้ว'}
                   </span>
                 </div>
               </div>

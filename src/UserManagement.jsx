@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './PublishSummary.css';
-import './UserManagement.css';
-
+import { useLanguage } from './LanguageContext';
 import { 
   FaHome, 
   FaVideo, 
@@ -14,39 +12,24 @@ import {
   FaAsterisk,
   FaUserShield,
   FaUserMinus,
-  FaChevronLeft,
-  FaChevronRight,
-  FaTimes,
-  FaCheck,
-  FaUserCheck
+  FaGlobeAmericas
 } from 'react-icons/fa';
 
 export default function UserManagement() {
   const navigate = useNavigate();
+  const { t, lang, toggleLanguage } = useLanguage();
   const [currentUser, setCurrentUser] = useState(null);
-  
-  // State รายชื่อผู้ใช้
+  const [searchTerm, setSearchTerm] = useState('');
+  const [roleFilter, setRoleFilter] = useState('All');
+
+  // ตัวอย่างข้อมูลผู้ใช้งาน
   const [users, setUsers] = useState([
     { id: '660110791', name: 'น้ำทิพย์', username: 's(uname)', role: 'Admin' },
-    { id: '660110792', name: 'โสภารัตน์ ศรีปาน', username: 'a(uname)', role: 'นักศึกษา' },
-    { id: '660110793', name: 'โสภารัตน์ ศรีปาน', username: 'g(uname)', role: 'นักศึกษา' },
-    { id: '660110794', name: 'โสภารัตน์ ศรีปาน', username: 'h(uname)', role: 'นักศึกษา' },
-    { id: '660110795', name: 'โสภารัตน์ ศรีปาน', username: 's(uname)', role: 'นักศึกษา' },
-    { id: '660110796', name: 'โสภารัตน์ ศรีปาน', username: 'l(uname)', role: 'นักศึกษา' },
-    { id: '660110797', name: 'โสภารัตน์ ศรีปาน', username: 'm(uname)', role: 'นักศึกษา' },
-    { id: '660110798', name: 'โสภารัตน์ ศรีปาน', username: 'n(uname)', role: 'นักศึกษา' },
+    { id: '660110792', name: 'โสภารัตน์ ศรีปาน', username: 'a(uname)', role: 'Student' },
+    { id: '660110793', name: 'โสภารัตน์ ศรีปาน', username: 'g(uname)', role: 'Student' },
+    { id: '660110794', name: 'โสภารัตน์ ศรีปาน', username: 'h(uname)', role: 'Student' },
+    { id: '660110795', name: 'โสภารัตน์ ศรีปาน', username: 's(uname)', role: 'Student' },
   ]);
-
-  // State สำหรับตารางหลัก
-  const [selectedUserTable, setSelectedUserTable] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterRole, setFilterRole] = useState('ทั้งหมด');
-
-  // State สำหรับ Popups/Modals
-  const [showAdminModal, setShowAdminModal] = useState(false);
-  const [modalType, setModalType] = useState('make'); // 'make' หรือ 'remove'
-  const [selectedInModal, setSelectedInModal] = useState(null);
-  const [modalSearch, setModalSearch] = useState('');
 
   useEffect(() => {
     const savedUser = localStorage.getItem('user');
@@ -64,293 +47,256 @@ export default function UserManagement() {
     navigate('/login');
   };
 
-  // เปิด Popup ตามประเภท (Make / Remove)
-  const openModal = (type) => {
-    setModalType(type);
-    setSelectedInModal(null);
-    setModalSearch('');
-    setShowAdminModal(true);
-  };
-
-  // ยืนยันเปลี่ยนสิทธิ์ใน Modal
-  const handleConfirmRoleChange = () => {
-    if (!selectedInModal) return;
-
-    const newRole = modalType === 'make' ? 'Admin' : 'นักศึกษา';
-    setUsers(users.map(u => u.id === selectedInModal ? { ...u, role: newRole } : u));
-    setShowAdminModal(false);
-  };
-
-  // กรองรายชื่อแสดงใน Popup
-  const filteredModalUsers = users.filter(u => {
-    const matchSearch = u.name.includes(modalSearch) || u.id.includes(modalSearch) || u.username.includes(modalSearch);
-    if (modalType === 'make') {
-      return matchSearch && u.role !== 'Admin'; // เลือกได้เฉพาะคนที่ไม่ใช่ Admin
-    } else {
-      return matchSearch && u.role === 'Admin'; // เลือกได้เฉพาะคนที่เป็น Admin
-    }
+  // กรองผู้ใช้งานตามคำค้นหา และ Role
+  const filteredUsers = users.filter(user => {
+    const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                          user.id.includes(searchTerm) || 
+                          user.username.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesRole = roleFilter === 'All' ? true : user.role === roleFilter;
+    return matchesSearch && matchesRole;
   });
 
   return (
-    <div className="user-mgmt-container">
-      {/* Sidebar เมนูด้านข้าง */}
-      <aside className="sidebar-dark-purple">
+    <div style={{ display: 'flex', minHeight: '100vh', background: '#0b0719', color: '#fff', fontFamily: "'Kanit', sans-serif" }}>
+      
+      {/* ================= SIDEBAR ================= */}
+      <aside style={{ width: '260px', background: '#120b24', padding: '24px 20px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', borderRight: '1px solid rgba(255, 255, 255, 0.05)', flexShrink: 0 }}>
         <div>
-          <div className="brand-logo-dark" onClick={() => navigate('/admin')}>
-            <FaAsterisk style={{ color: '#c084fc' }} />
-            <span>ICT Video Summary</span>
+          {/* Brand Logo */}
+          <div onClick={() => navigate('/admin')} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px', color: '#fff', fontSize: '1.1rem', fontWeight: 'bold', marginBottom: '32px' }}>
+            <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(192, 132, 252, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <FaAsterisk style={{ color: '#c084fc' }} size={16} />
+            </div>
+            <span>{t.appName || 'ICT Video Summary'}</span>
           </div>
 
-          <div className="user-profile-dark" style={{ background: 'rgba(255,255,255,0.05)', padding: '12px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '25px' }}>
-            <div className="avatar-dark" style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#8b5cf6', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 'bold' }}>
+          {/* User Profile Box (ตัดส่วนภาษาที่ทับออก) */}
+          <div style={{ background: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.08)', padding: '12px 16px', borderRadius: '14px', display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '28px' }}>
+            <div style={{ width: '38px', height: '38px', borderRadius: '50%', background: 'linear-gradient(135deg, #a855f7 0%, #7c3aed 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 'bold', fontSize: '0.95rem', boxShadow: '0 2px 8px rgba(168, 85, 247, 0.3)' }}>
               {currentUser && currentUser.firstName ? currentUser.firstName.charAt(0) : 'S'}
             </div>
-            <div className="user-info-dark">
-              <h4 style={{ margin: 0, color: '#fff', fontSize: '0.95rem' }}>{currentUser ? `${currentUser.firstName} ${currentUser.lastName}` : 'Somchai Jaidee'}</h4>
-              <span style={{ fontSize: '0.75rem', color: '#a855f7', background: 'rgba(168,85,247,0.2)', padding: '2px 8px', borderRadius: '10px' }}>Admin</span>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+              <h4 style={{ margin: 0, color: '#f8fafc', fontSize: '0.9rem', fontWeight: '600' }}>
+                {currentUser ? `${currentUser.firstName} ${currentUser.lastName}` : 'Somchai Jaidee'}
+              </h4>
+              <span style={{ fontSize: '0.7rem', color: '#c084fc', background: 'rgba(168, 85, 247, 0.15)', padding: '2px 8px', borderRadius: '10px', width: 'fit-content', border: '1px solid rgba(168, 85, 247, 0.2)' }}>
+                Admin
+              </span>
             </div>
           </div>
 
-          <nav className="menu-list-dark">
-            <button className="menu-item-dark" onClick={() => navigate('/admin')}>
+          {/* Nav Menu */}
+          <nav style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <button onClick={() => navigate('/admin')} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px', background: 'transparent', border: 'none', color: '#94a3b8', borderRadius: '12px', cursor: 'pointer', fontSize: '0.95rem', transition: 'all 0.2s' }}>
               <FaHome size={18} />
-              <span>แดชบอร์ด</span>
+              <span>{t.dashboard || 'แดชบอร์ด'}</span>
             </button>
 
-            <button className="menu-item-dark" onClick={() => navigate('/upload-video')}>
+            <button onClick={() => navigate('/upload-video')} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px', background: 'transparent', border: 'none', color: '#94a3b8', borderRadius: '12px', cursor: 'pointer', fontSize: '0.95rem', transition: 'all 0.2s' }}>
               <FaVideo size={18} />
-              <span>อัปโหลดวิดีโอ</span>
+              <span>{t.uploadVideo || 'อัปโหลดวิดีโอ'}</span>
             </button>
 
-            <button className="menu-item-dark" onClick={() => navigate('/edit-summary')}>
+            <button onClick={() => navigate('/edit-summary')} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px', background: 'transparent', border: 'none', color: '#94a3b8', borderRadius: '12px', cursor: 'pointer', fontSize: '0.95rem', transition: 'all 0.2s' }}>
               <FaEdit size={18} />
-              <span>แก้ไขข้อมูลสรุป</span>
+              <span>{t.editSummary || 'แก้ไขข้อมูลสรุป'}</span>
             </button>
 
-            <button className="menu-item-dark" onClick={() => navigate('/publish')}>
+            <button onClick={() => navigate('/publish')} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px', background: 'transparent', border: 'none', color: '#94a3b8', borderRadius: '12px', cursor: 'pointer', fontSize: '0.95rem', transition: 'all 0.2s' }}>
               <FaGlobe size={18} />
-              <span>เผยแพร่</span>
+              <span>{t.publish || 'เผยแพร่'}</span>
             </button>
 
-            <button className="menu-item-dark active" onClick={() => navigate('/users')}>
+            {/* Active Menu */}
+            <button onClick={() => navigate('/users')} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px', background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)', border: 'none', color: '#fff', borderRadius: '12px', cursor: 'pointer', fontSize: '0.95rem', fontWeight: '600', boxShadow: '0 4px 15px rgba(139, 92, 246, 0.3)' }}>
               <FaUsers size={18} />
-              <span>จัดการผู้ใช้</span>
+              <span>{t.userManagement || 'จัดการผู้ใช้'}</span>
             </button>
           </nav>
         </div>
 
-        <button className="logout-btn-dark" onClick={handleLogout}>
+        {/* Logout Button */}
+        <button onClick={handleLogout} style={{ display: 'flex', alignItems: 'center', gap: '10px', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', color: '#ef4444', cursor: 'pointer', padding: '12px 16px', borderRadius: '12px', fontWeight: '500', transition: 'all 0.2s' }}>
           <FaSignOutAlt size={16} />
-          <span>ออกจากระบบ</span>
+          <span>{t.logout || 'ออกจากระบบ'}</span>
         </button>
       </aside>
 
-      {/* Main Content */}
-      <main className="user-mgmt-main">
-        {/* Header */}
-        <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '25px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div style={{ background: 'rgba(168,85,247,0.2)', padding: '10px', borderRadius: '10px', color: '#c084fc' }}>
-              <FaUsers size={22} />
+      {/* ================= MAIN CONTENT ================= */}
+      <main style={{ flex: 1, padding: '32px 40px', overflowY: 'auto' }}>
+        
+        {/* Header Bar */}
+        <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '28px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+            <div style={{ background: 'rgba(168, 85, 247, 0.15)', border: '1px solid rgba(168, 85, 247, 0.3)', width: '42px', height: '42px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#c084fc' }}>
+              <FaUsers size={20} />
             </div>
-            <h2 style={{ color: '#fff', margin: 0, fontSize: '1.4rem' }}>จัดการผู้ใช้</h2>
+            <h2 style={{ color: '#fff', margin: 0, fontSize: '1.5rem', fontWeight: '600' }}>
+              {lang === 'en' ? 'User Management' : 'จัดการผู้ใช้งาน'}
+            </h2>
           </div>
 
-          <div style={{ position: 'relative', width: '300px' }}>
-            <FaSearch style={{ position: 'absolute', left: '15px', top: '50%', transform: 'translateY(-50%)', color: '#64748b' }} />
-            <input 
-              type="text" 
-              placeholder="ค้นหาสรุป, ตำแหน่งงาน..." 
-              style={{ width: '100%', background: '#120b24', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '20px', padding: '10px 15px 10px 40px', color: '#fff', outline: 'none' }}
-            />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            {/* Search Top Input */}
+            <div style={{ position: 'relative', width: '280px' }}>
+              <FaSearch style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: '#64748b' }} size={14} />
+              <input 
+                type="text" 
+                placeholder={lang === 'en' ? 'Search summary, roles...' : 'ค้นหาสรุป, ตำแหน่ง...'} 
+                style={{ width: '100%', background: '#120b24', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '30px', padding: '10px 18px 10px 42px', color: '#fff', fontSize: '0.88rem', outline: 'none' }}
+              />
+            </div>
+
+            {/* 🌐 ปุ่มสลับภาษา ย้ายมามุมขวาบนให้เหมือน Dashboard */}
+            <button 
+              type="button" 
+              onClick={toggleLanguage}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '9px 18px',
+                borderRadius: '30px',
+                border: '1px solid rgba(192, 132, 252, 0.4)',
+                background: 'rgba(139, 92, 246, 0.15)',
+                color: '#c084fc',
+                fontSize: '0.85rem',
+                fontWeight: '600',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                boxShadow: '0 2px 10px rgba(139, 92, 246, 0.1)'
+              }}
+            >
+              <FaGlobeAmericas size={14} />
+              <span>{lang ? lang.toUpperCase() : 'EN'}</span>
+            </button>
           </div>
         </header>
 
-        {/* ปุ่มเปิด Modal */}
-        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginBottom: '20px' }}>
-          <button className="btn-action-admin" onClick={() => openModal('make')}>
-            <FaUserShield size={16} /> Make Admin
+        {/* Action Buttons Header (ปรับเป็นสีโทนม่วง/แดงสไตล์ Dashboard) */}
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginBottom: '24px' }}>
+          <button style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            background: 'linear-gradient(135deg, #a855f7 0%, #7c3aed 100%)',
+            color: '#fff',
+            border: 'none',
+            padding: '10px 20px',
+            borderRadius: '25px',
+            fontWeight: '600',
+            fontSize: '0.9rem',
+            cursor: 'pointer',
+            boxShadow: '0 4px 15px rgba(168, 85, 247, 0.3)',
+            transition: 'all 0.2s ease'
+          }}>
+            <FaUserShield size={16} />
+            <span>{lang === 'en' ? 'Make Admin' : 'แต่งตั้ง Admin'}</span>
           </button>
 
-          <button className="btn-action-admin" onClick={() => openModal('remove')}>
-            <FaUserMinus size={16} /> Remove Admin
+          <button style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            background: 'rgba(239, 68, 68, 0.15)',
+            border: '1px solid rgba(239, 68, 68, 0.3)',
+            color: '#f87171',
+            padding: '10px 20px',
+            borderRadius: '25px',
+            fontWeight: '600',
+            fontSize: '0.9rem',
+            cursor: 'pointer',
+            transition: 'all 0.2s ease'
+          }}>
+            <FaUserMinus size={16} />
+            <span>{lang === 'en' ? 'Remove Admin' : 'ยกเลิก Admin'}</span>
           </button>
         </div>
 
-        {/* การ์ดตารางรายชื่อผู้ใช้ */}
-        <div className="user-table-card">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+        {/* User List Table Card */}
+        <div style={{
+          background: 'linear-gradient(145deg, #160d2e 0%, #0f0821 100%)',
+          border: '1px solid rgba(168, 85, 247, 0.25)',
+          borderRadius: '20px',
+          padding: '24px 28px',
+          boxShadow: '0 10px 30px rgba(0, 0, 0, 0.3)'
+        }}>
+          {/* Card Filter Bar */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ width: '8px', height: '8px', backgroundColor: '#a855f7', borderRadius: '50%', display: 'inline-block' }}></span>
-              <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 'bold', color: '#fff' }}>รายชื่อผู้ใช้</h3>
+              <span style={{ width: '8px', height: '8px', background: '#c084fc', borderRadius: '50%', boxShadow: '0 0 8px #c084fc' }}></span>
+              <h3 style={{ margin: 0, color: '#f8fafc', fontSize: '1.1rem', fontWeight: '600' }}>
+                {lang === 'en' ? 'User List' : 'รายชื่อผู้ใช้งาน'}
+              </h3>
             </div>
 
-            <div style={{ display: 'flex', gap: '10px' }}>
-              <div style={{ position: 'relative' }}>
+            <div style={{ display: 'flex', gap: '12px' }}>
+              {/* Filter Search Input */}
+              <div style={{ position: 'relative', width: '240px' }}>
+                <FaSearch style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: '#64748b' }} size={13} />
                 <input 
                   type="text" 
-                  placeholder="ค้นหาชื่อ, รหัสนิสิต..." 
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  style={{ background: '#1e1b38', border: '1px solid rgba(168, 85, 247, 0.3)', borderRadius: '12px', padding: '8px 12px 8px 32px', color: '#fff', fontSize: '0.85rem', outline: 'none' }}
+                  placeholder={lang === 'en' ? 'Search name, student ID...' : 'ค้นหาชื่อ, รหัสนิสิต...'} 
+                  style={{ width: '100%', background: '#120b24', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '18px', padding: '8px 14px 8px 36px', color: '#fff', fontSize: '0.82rem', outline: 'none' }}
                 />
-                <FaSearch style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8', fontSize: '0.85rem' }} />
               </div>
 
+              {/* Role Dropdown Filter */}
               <select 
-                value={filterRole}
-                onChange={(e) => setFilterRole(e.target.value)}
-                style={{ background: '#1e1b38', border: '1px solid rgba(168, 85, 247, 0.3)', borderRadius: '12px', padding: '8px 12px', color: '#fff', fontSize: '0.85rem', outline: 'none', cursor: 'pointer' }}
+                value={roleFilter}
+                onChange={(e) => setRoleFilter(e.target.value)}
+                style={{ background: '#120b24', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '18px', padding: '8px 16px', color: '#cbd5e1', fontSize: '0.82rem', outline: 'none', cursor: 'pointer' }}
               >
-                <option value="ทั้งหมด">บทบาท</option>
+                <option value="All">{lang === 'en' ? 'All Roles' : 'ทุกบทบาท'}</option>
                 <option value="Admin">Admin</option>
-                <option value="นักศึกษา">นักศึกษา</option>
+                <option value="Student">Student</option>
               </select>
             </div>
           </div>
 
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-              <thead>
-                <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.1)', color: '#94a3b8', fontSize: '0.9rem' }}>
-                  <th style={{ padding: '12px 16px', fontWeight: '600' }}>ชื่อ-นามสกุล</th>
-                  <th style={{ padding: '12px 16px', fontWeight: '600' }}>USERNAME</th>
-                  <th style={{ padding: '12px 16px', fontWeight: '600' }}>บทบาท</th>
+          {/* Table Area */}
+          <table style={{ width: '100%', borderCollapse: 'collapse', color: '#f8fafc' }}>
+            <thead>
+              <tr style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.08)', textTransform: 'uppercase', fontSize: '0.78rem', color: '#94a3b8', letterSpacing: '0.5px' }}>
+                <th style={{ textAlign: 'left', padding: '12px 16px' }}>Full Name</th>
+                <th style={{ textAlign: 'left', padding: '12px 16px' }}>Username</th>
+                <th style={{ textAlign: 'center', padding: '12px 16px' }}>Role</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredUsers.map((user, index) => (
+                <tr key={index} style={{ borderBottom: index !== filteredUsers.length - 1 ? '1px solid rgba(255, 255, 255, 0.04)' : 'none' }}>
+                  <td style={{ padding: '16px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                      <span style={{ fontWeight: '500', color: '#f8fafc', fontSize: '0.95rem' }}>{user.name}</span>
+                      <span style={{ fontSize: '0.78rem', color: '#a855f7', marginTop: '2px' }}>{user.id}</span>
+                    </div>
+                  </td>
+                  <td style={{ padding: '16px', color: '#cbd5e1', fontSize: '0.9rem' }}>
+                    {user.username}
+                  </td>
+                  <td style={{ padding: '16px', textAlign: 'center' }}>
+                    <span style={{
+                      display: 'inline-block',
+                      padding: '4px 16px',
+                      borderRadius: '12px',
+                      fontSize: '0.8rem',
+                      fontWeight: '600',
+                      background: user.role === 'Admin' ? 'rgba(168, 85, 247, 0.2)' : 'rgba(255, 255, 255, 0.05)',
+                      color: user.role === 'Admin' ? '#c084fc' : '#94a3b8',
+                      border: user.role === 'Admin' ? '1px solid rgba(168, 85, 247, 0.4)' : '1px solid rgba(255, 255, 255, 0.1)'
+                    }}>
+                      {user.role}
+                    </span>
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {users.map((user) => {
-                  const isSelected = selectedUserTable === user.id;
-                  return (
-                    <tr 
-                      key={user.id}
-                      onClick={() => setSelectedUserTable(user.id)}
-                      className={`user-table-row ${isSelected ? 'selected' : ''}`}
-                    >
-                      <td style={{ padding: '14px 16px' }}>
-                        <div style={{ fontWeight: '500', color: '#f8fafc' }}>{user.name}</div>
-                        <div style={{ fontSize: '0.8rem', color: '#a855f7' }}>{user.id}</div>
-                      </td>
-                      <td style={{ padding: '14px 16px', color: '#cbd5e1', fontSize: '0.9rem' }}>
-                        {user.username}
-                      </td>
-                      <td style={{ padding: '14px 16px' }}>
-                        <span style={{ 
-                          padding: '4px 12px', 
-                          borderRadius: '8px', 
-                          fontSize: '0.82rem', 
-                          fontWeight: '500',
-                          background: user.role === 'Admin' ? 'rgba(168, 85, 247, 0.2)' : 'rgba(255, 255, 255, 0.06)',
-                          color: user.role === 'Admin' ? '#c084fc' : '#94a3b8',
-                          border: user.role === 'Admin' ? '1px solid rgba(168, 85, 247, 0.4)' : '1px solid rgba(255,255,255,0.1)'
-                        }}>
-                          {user.role}
-                        </span>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        {/* Pagination */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '25px', color: '#94a3b8', fontSize: '0.85rem' }}>
-          <span>แสดง 1-{users.length} จาก {users.length} รายการ</span>
-
-          <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-            <button className="page-btn"><FaChevronLeft size={12} /></button>
-            <button className="page-btn active">1</button>
-            <button className="page-btn"><FaChevronRight size={12} /></button>
-          </div>
+              ))}
+            </tbody>
+          </table>
         </div>
       </main>
-
-      {/* 🟣 CUSTOM MODAL / POPUP เลือกสิทธิ์ผู้ใช้ */}
-      {showAdminModal && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <div className="modal-header">
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <div style={{ background: modalType === 'make' ? 'rgba(168, 85, 247, 0.2)' : 'rgba(239, 68, 68, 0.2)', padding: '8px', borderRadius: '8px', color: modalType === 'make' ? '#c084fc' : '#ef4444' }}>
-                  {modalType === 'make' ? <FaUserShield size={20} /> : <FaUserMinus size={20} />}
-                </div>
-                <h3 style={{ margin: 0, color: '#fff', fontSize: '1.15rem' }}>
-                  {modalType === 'make' ? 'แต่งตั้งสิทธิ์ Admin' : 'ถอนสิทธิ์ Admin'}
-                </h3>
-              </div>
-              <button className="btn-close-modal" onClick={() => setShowAdminModal(false)}>
-                <FaTimes />
-              </button>
-            </div>
-
-            <p style={{ color: '#94a3b8', fontSize: '0.88rem', margin: '0 0 15px 0' }}>
-              {modalType === 'make' ? 'เลือกนิสิต/ผู้ใช้ที่ต้องการเพิ่มเป็น Admin' : 'เลือก Admin ที่ต้องการปรับเปลี่ยนเป็นสิทธิ์นักศึกษา'}
-            </p>
-
-            {/* ช่องค้นหาใน Modal */}
-            <div className="modal-search-box">
-              <FaSearch style={{ color: '#94a3b8', fontSize: '0.85rem' }} />
-              <input 
-                type="text" 
-                placeholder="ค้นหาชื่อ หรือ รหัสนิสิต..." 
-                value={modalSearch}
-                onChange={(e) => setModalSearch(e.target.value)}
-              />
-            </div>
-
-            {/* รายชื่อผู้ใช้ให้เลือกใน Modal */}
-            <div className="modal-user-list">
-              {filteredModalUsers.length > 0 ? (
-                filteredModalUsers.map((u) => {
-                  const isSelected = selectedInModal === u.id;
-                  return (
-                    <div 
-                      key={u.id}
-                      onClick={() => setSelectedInModal(u.id)}
-                      className={`modal-user-item ${isSelected ? 'selected' : ''}`}
-                    >
-                      <div>
-                        <div style={{ color: '#fff', fontWeight: '500', fontSize: '0.92rem' }}>{u.name}</div>
-                        <div style={{ color: '#a855f7', fontSize: '0.8rem' }}>{u.id} · ({u.username})</div>
-                      </div>
-                      {isSelected && (
-                        <div className="modal-check-badge">
-                          <FaCheck size={12} />
-                        </div>
-                      )}
-                    </div>
-                  );
-                })
-              ) : (
-                <div style={{ textAlign: 'center', padding: '30px 10px', color: '#64748b', fontSize: '0.88rem' }}>
-                  ไม่พบข้อมูลผู้ใช้
-                </div>
-              )}
-            </div>
-
-            {/* ปุ่มกดยืนยัน Modal */}
-            <div className="modal-footer">
-              <button className="btn-modal-cancel" onClick={() => setShowAdminModal(false)}>
-                ยกเลิก
-              </button>
-              <button 
-                className="btn-modal-confirm"
-                disabled={!selectedInModal}
-                onClick={handleConfirmRoleChange}
-                style={{
-                  background: modalType === 'make' 
-                    ? 'linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%)' 
-                    : 'linear-gradient(135deg, #ef4444 0%, #b91c1c 100%)'
-                }}
-              >
-                <FaUserCheck /> ยืนยันการเปลี่ยนแปลง
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
