@@ -1,0 +1,312 @@
+/* ==========================================
+   COOP CONTENT PAGE (DARK PURPLE THEME)
+   ========================================== */
+.coop-page-container {
+  display: flex;
+  min-height: 100vh;
+  background-color: #0d0b18; /* พื้นหลังดำอมม่วง */
+  color: #e2e8f0;
+  font-family: 'Prompt', 'Kanit', sans-serif;
+}
+
+/* Sidebar */
+.coop-sidebar {
+  width: 260px;
+  background: #141026;
+  border-right: 1px solid #2a2247;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 24px 16px;
+  box-sizing: border-box;
+}
+
+.coop-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: bold;
+  font-size: 1.2rem;
+  color: #a855f7;
+  margin-bottom: 24px;
+}
+
+.coop-user-badge {
+  background: linear-gradient(135deg, #4f46e5, #9333ea);
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 12px rgba(147, 51, 234, 0.25);
+}
+
+.coop-menu-label {
+  font-size: 0.75rem;
+  color: #64748b;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  padding-left: 8px;
+}
+
+.coop-menu-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.coop-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  color: #94a3b8;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.95rem;
+}
+
+.coop-menu-item:hover {
+  background: #231b3e;
+  color: #c084fc;
+}
+
+.coop-menu-item.active {
+  background: linear-gradient(90deg, #7c3aed, #c026d3);
+  color: #ffffff;
+  font-weight: 600;
+  box-shadow: 0 4px 15px rgba(124, 58, 237, 0.35);
+}
+
+.coop-logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #f87171;
+  padding: 12px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s;
+  font-size: 0.95rem;
+}
+
+.coop-logout-btn:hover {
+  background: rgba(239, 68, 68, 0.12);
+}
+
+/* Main Area */
+.coop-main {
+  flex: 1;
+  padding: 32px;
+  overflow-y: auto;
+}
+
+/* Header & Search */
+.coop-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.coop-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #f3e8ff;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.coop-search {
+  position: relative;
+  width: 360px;
+}
+
+.coop-search input {
+  width: 100%;
+  padding: 10px 16px 10px 40px;
+  background: #19142d;
+  border: 1px solid #3b2d54;
+  border-radius: 20px;
+  color: #fff;
+  font-size: 0.88rem;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.coop-search input:focus {
+  border-color: #a855f7;
+  box-shadow: 0 0 12px rgba(168, 85, 247, 0.3);
+}
+
+.coop-search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #8b5cf6;
+}
+
+/* Card Section Outer Box */
+.coop-card-wrapper {
+  background: #141026;
+  border: 1px solid #2a2247;
+  border-radius: 16px;
+  padding: 24px;
+}
+
+.coop-section-head {
+  font-size: 1.05rem;
+  color: #c084fc;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.coop-status-dot {
+  width: 8px;
+  height: 8px;
+  background-color: #22c55e;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #22c55e;
+}
+
+/* Individual Card */
+.coop-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.coop-card {
+  background: #1c1635;
+  border: 1px solid #332854;
+  border-radius: 14px;
+  padding: 20px;
+  transition: transform 0.2s, border-color 0.2s;
+}
+
+.coop-card:hover {
+  transform: translateY(-2px);
+  border-color: #8b5cf6;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.coop-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.coop-card-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #f8fafc;
+  margin: 0 0 8px 0;
+}
+
+.coop-card-meta {
+  display: flex;
+  gap: 16px;
+  font-size: 0.85rem;
+  color: #94a3b8;
+}
+
+.coop-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.coop-fav-btn {
+  background: none;
+  border: none;
+  color: #64748b;
+  font-size: 1.3rem;
+  cursor: pointer;
+  transition: color 0.2s, transform 0.2s;
+}
+
+.coop-fav-btn:hover {
+  color: #f43f5e;
+  transform: scale(1.1);
+}
+
+.coop-fav-btn.active {
+  color: #f43f5e;
+}
+
+/* Keyword Area */
+.coop-keyword-box {
+  background: #120e24;
+  border: 1px dashed #3b2d54;
+  border-radius: 8px;
+  padding: 12px 16px;
+  color: #cbd5e1;
+  font-size: 0.88rem;
+  margin-bottom: 18px;
+}
+
+/* Action Buttons */
+.coop-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.btn-view-video {
+  flex: 1;
+  background: rgba(168, 85, 247, 0.12);
+  color: #c084fc;
+  border: 1px solid #a855f7;
+  padding: 10px;
+  border-radius: 20px;
+  font-size: 0.88rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s;
+}
+
+.btn-view-video:hover {
+  background: #a855f7;
+  color: #ffffff;
+  box-shadow: 0 0 12px rgba(168, 85, 247, 0.4);
+}
+
+.btn-download-pdf {
+  flex: 1;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #ffffff;
+  border: none;
+  padding: 10px;
+  border-radius: 20px;
+  font-size: 0.88rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+}
+
+.btn-download-pdf:hover {
+  opacity: 0.92;
+  box-shadow: 0 0 16px rgba(16, 185, 129, 0.45);
+}

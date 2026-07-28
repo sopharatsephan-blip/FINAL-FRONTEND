@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useLanguage } from './LanguageContext';
+import { useLanguage } from './LanguageContext'; // 1. Import useLanguage เข้ามา
 import './admindashboard.css';
 
+// 📌 นำเข้า React Icons
 import { 
   FaHome, 
   FaVideo, 
@@ -12,26 +13,28 @@ import {
   FaSignOutAlt, 
   FaSearch, 
   FaAsterisk,
-  FaGlobeAmericas
+  FaLanguage
 } from 'react-icons/fa';
 
 function AdminDashboard() {
   const navigate = useNavigate();
-  const { t, lang, toggleLanguage } = useLanguage();
+  const { t, lang, toggleLanguage } = useLanguage(); // 2. ดึงตารางภาษา ฟังก์ชัน และภาษาปัจจุบันมาใช้
   const [currentUser, setCurrentUser] = useState(null);
   
   const [hasSearched, setHasSearched] = useState(false);
   const resultRef = useRef(null);
 
+  // Default States สำหรับฟิลเตอร์
   const initialCategory = 'UX/UI';
   const initialWorkTypes = { onsite: true, hybrid: true, wfh: false };
 
   const [selectedCategory, setSelectedCategory] = useState(initialCategory);
   const [workTypes, setWorkTypes] = useState(initialWorkTypes);
   const [businessType, setBusinessType] = useState('Software & IT Services');
-  const [location, setLocation] = useState('กรุงเทพมหานคร');
+  const [location, setLocation] = useState('Ban');
   const [keyword, setKeyword] = useState('');
 
+  // 🔒 เช็กล็อกอิน
   useEffect(() => {
     const savedUser = localStorage.getItem('user');
     if (!savedUser) {
@@ -40,6 +43,40 @@ function AdminDashboard() {
       setCurrentUser(JSON.parse(savedUser));
     }
   }, [navigate]);
+
+  const [videoResults, setVideoResults] = useState([]);
+const [isLoading, setIsLoading] = useState(false);
+
+const handleSearch = async () => {
+  setIsLoading(true);
+  try {
+    const workTypeList = [];
+    if (workTypes.onsite) workTypeList.push('Onsite');
+    if (workTypes.hybrid) workTypeList.push('Hybrid');
+    if (workTypes.wfh) workTypeList.push('Work from Home');
+
+    const params = new URLSearchParams({
+      category: selectedCategory,
+      businessType,
+      location,
+      workType: workTypeList.join(','),
+      keyword
+    });
+
+    const res = await fetch(`http://localhost:5000/api/videos/search?${params}`);
+    const data = await res.json();
+    setVideoResults(data);
+    setHasSearched(true);
+
+    setTimeout(() => {
+      resultRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
+  } catch (err) {
+    console.error('Search error:', err);
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   const handleLogout = () => {
     localStorage.removeItem('user');
@@ -50,6 +87,7 @@ function AdminDashboard() {
     setWorkTypes({ ...workTypes, [e.target.name]: e.target.checked });
   };
 
+  // 🧹 ฟังก์ชันล้างตัวกรอง
   const handleResetFilter = () => {
     setSelectedCategory(initialCategory);
     setWorkTypes(initialWorkTypes);
@@ -59,16 +97,9 @@ function AdminDashboard() {
     setHasSearched(false);
   };
 
-  const handleSearch = () => {
-    setHasSearched(true);
-    setTimeout(() => {
-      resultRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, 100);
-  };
-
   return (
     <div className="admin-purple-container">
-      {/* ===== Sidebar ===== */}
+      {/* ===== Sidebar ม่วงเข้ม ===== */}
       <aside className="sidebar-purple">
         <div>
           <div className="brand-logo-purple" onClick={() => navigate('/admin')} style={{ cursor: 'pointer' }}>
@@ -115,6 +146,17 @@ function AdminDashboard() {
         </div>
 
         <div className="sidebar-footer-purple">
+          {/* 🌐 ปุ่มสลับภาษาตรง Sidebar */}
+          <button 
+            type="button" 
+            className="menu-item-purple" 
+            onClick={toggleLanguage}
+            style={{ marginBottom: '10px', background: 'rgba(139, 92, 246, 0.2)', color: '#c084fc' }}
+          >
+            <FaLanguage size={18} />
+            <span>{lang ? lang.toUpperCase() : 'EN'}</span>
+          </button>
+
           <button className="logout-btn-purple" onClick={handleLogout}>
             <FaSignOutAlt />
             <span>{t.logout || 'Logout'}</span>
@@ -122,10 +164,10 @@ function AdminDashboard() {
         </div>
       </aside>
 
-      {/* ===== Main Content ===== */}
+      {/* ===== Main Content ด้านขวา ===== */}
       <main className="main-content-purple">
-        <header className="top-header-purple" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div className="header-title" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <header className="top-header-purple">
+          <div className="header-title">
             <div className="header-icon-box" style={{ background: 'rgba(139, 92, 246, 0.2)', color: '#c084fc', padding: '8px', borderRadius: '8px', display: 'flex' }}>
               <FaHome size={18} />
             </div>
@@ -137,39 +179,13 @@ function AdminDashboard() {
             </div>
           </div>
           
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div className="search-box-purple">
-              <FaSearch style={{ color: '#9ca3af', fontSize: '14px' }} />
-              <input type="text" placeholder={t.searchPlaceholder || 'Search summary, position...'} />
-            </div>
-
-            {/* 🌐 ปุ่มสลับภาษาขนาดเล็กที่มุมขวาบน */}
-            <button 
-              type="button" 
-              onClick={toggleLanguage}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                padding: '6px 12px',
-                borderRadius: '20px',
-                border: '1px solid rgba(192, 132, 252, 0.4)',
-                background: 'rgba(139, 92, 246, 0.15)',
-                color: '#c084fc',
-                fontSize: '12px',
-                fontWeight: '600',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                whiteSpace: 'nowrap'
-              }}
-            >
-              <FaGlobeAmericas size={12} />
-              <span>{lang ? lang.toUpperCase() : 'EN'}</span>
-            </button>
+          <div className="search-box-purple">
+            <FaSearch style={{ color: '#9ca3af', fontSize: '14px' }} />
+            <input type="text" placeholder={t.searchPlaceholder || 'Search summary, position...'} />
           </div>
         </header>
 
-        {/* Card Content & Filters ... */}
+        {/* แถวที่ 1: ยอดฮิต + สรุปประจำสัปดาห์ */}
         <div className="grid-row-2">
           <div className="purple-card">
             <h3 className="card-title-purple text-green">
@@ -247,7 +263,7 @@ function AdminDashboard() {
           </div>
         </div>
 
-        {/* ตัวกรองข้อมูล */}
+        {/* แถวที่ 2: ตัวกรองข้อมูล */}
         <div className="purple-card filter-section-purple">
           <div className="result-header-purple" style={{ marginBottom: '15px' }}>
             <h3 className="card-title-purple" style={{ margin: 0 }}>
@@ -326,74 +342,46 @@ function AdminDashboard() {
           </div>
         </div>
 
-        {hasSearched && (
-          <div ref={resultRef} className="purple-card result-section-purple" style={{ marginTop: '25px' }}>
-            <div className="result-header-purple">
-              <h3 className="card-title-purple">
-                ⚙️ {lang === 'en' ? 'Filter found 3 positions' : 'ตัวกรองพบ 3 ตำแหน่งงาน'}
-              </h3>
-            </div>
+       {hasSearched && (
+  <div ref={resultRef} className="purple-card result-section-purple" style={{ marginTop: '25px' }}>
+    <div className="result-header-purple">
+      <h3 className="card-title-purple">
+        ⚙️ {lang === 'en'
+          ? `Filter found ${videoResults.length} positions`
+          : `ตัวกรองพบ ${videoResults.length} ตำแหน่งงาน`}
+      </h3>
+    </div>
 
-            <div className="cards-grid-purple">
-              <div className="job-card-purple">
-                <div className="card-banner-purple">
-                  <span>2026</span>
-                  <h4>INTERNSHIP</h4>
-                  <p>UX/UI DESIGN</p>
-                </div>
-                <div className="card-body-purple">
-                  <h5>
-                    {lang === 'en' 
-                      ? 'Position UX/UI Design | INVERSE SOLUTIONS CO., LTD.' 
-                      : 'ตำแหน่ง UX/UI Design | บริษัท อินเวิร์ส โซลูชันส์ จำกัด'}
-                  </h5>
-                  <p className="url-text-purple">
-                    URL: <a href="#url">{lang === 'en' ? 'UX/UI Design Position Link' : 'ตำแหน่ง UX/UI Design | บริษัท อินเวิร์ส โซลูชันส์ จำกัด'}</a>
-                  </p>
-                  <button type="button" className="click-here-purple">CLICK HERE 👆</button>
-                </div>
-              </div>
-
-              <div className="job-card-purple">
-                <div className="card-banner-purple">
-                  <span>2026</span>
-                  <h4>INTERNSHIP</h4>
-                  <p>UX/UI DESIGN</p>
-                </div>
-                <div className="card-body-purple">
-                  <h5>
-                    {lang === 'en' 
-                      ? 'Position UX/UI Design | Office of the President' 
-                      : 'ตำแหน่ง UX UI Design สำนักงานอธิการบดี กองพัฒนานักศึกษา และศิษย์เก่าสัมพันธ์'}
-                  </h5>
-                  <p className="url-text-purple">
-                    URL: <a href="#url">{lang === 'en' ? 'UX/UI Design Position Link' : 'ตำแหน่ง UX UI Design สำนักงานอธิการบดี กองพัฒนานักศึกษา และศิษย์เก่าสัมพันธ์'}</a>
-                  </p>
-                  <button type="button" className="click-here-purple">CLICK HERE 👆</button>
-                </div>
-              </div>
-
-              <div className="job-card-purple">
-                <div className="card-banner-purple">
-                  <span>2026</span>
-                  <h4>INTERNSHIP</h4>
-                  <p>UX/UI DESIGN</p>
-                </div>
-                <div className="card-body-purple">
-                  <h5>
-                    {lang === 'en' 
-                      ? 'Position UX/UI Design | Islamic Systems Corporation' 
-                      : 'ตำแหน่ง Ux ui Design บริษัท อิสลามิค ชิสเต็มส์ คอร์ปอเรชั่น จำกัด'}
-                  </h5>
-                  <p className="url-text-purple">
-                    URL: <a href="#url">{lang === 'en' ? 'UX/UI Design Position Link' : 'ตำแหน่ง Ux ui Design บริษัท อิสลามิค ชิสเต็มส์ คอร์ปอเรชั่น จำกัด'}</a>
-                  </p>
-                  <button type="button" className="click-here-purple">CLICK HERE 👆</button>
-                </div>
-              </div>
-            </div>
+    <div className="cards-grid-purple">
+      {isLoading && <p>{lang === 'en' ? 'Loading...' : 'กำลังโหลด...'}</p>}
+      {!isLoading && videoResults.length === 0 && (
+        <p>{lang === 'en' ? 'No results found.' : 'ไม่พบข้อมูลที่ตรงกับตัวกรอง'}</p>
+      )}
+      {videoResults.map((item) => (
+        <div className="job-card-purple" key={item.VideoID}>
+          <div className="card-banner-purple">
+            <span>{item.UploadDate ? new Date(item.UploadDate).getFullYear() : '2026'}</span>
+            <h4>INTERNSHIP</h4>
+            <p>{item.CategoryName || '-'}</p>
           </div>
-        )}
+          <div className="card-body-purple">
+            <h5>{`${item.Position || item.VideoTitle} | ${item.CompanyName || '-'}`}</h5>
+            <p className="url-text-purple">
+              👁️ {item.ViewCount} views · {item.WorkType}
+            </p>
+            <button
+              type="button"
+              className="click-here-purple"
+              onClick={() => navigate(`/video/${item.VideoID}`)}
+            >
+              CLICK HERE 👆
+            </button>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+)}
       </main>
     </div>
   );

@@ -1,7 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { LanguageProvider } from './LanguageContext.jsx'; // 1. นำเข้า LanguageProvider
 
 // Import เพจต่าง ๆ
 import Home from './Home.jsx';
@@ -15,12 +14,14 @@ import EditSummary from './EditSummary.jsx';
 import PublishList from './PublishList.jsx';
 import PublishSummary from './PublishSummary.jsx';
 import UserManagement from './UserManagement.jsx';
+import StudentDashboard from './student/StudentDashboard.jsx';
+import { LanguageProvider } from './LanguageContext.jsx'; 
+import { CoopContent } from './student/CoopContent.jsx';
 import './index.css';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    {/* 2. หุ้ม LanguageProvider ไว้นอกสุดก่อน BrowserContainer */}
-    <LanguageProvider>
+    <LanguageProvider> 
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Home />} />
@@ -34,8 +35,11 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           <Route path="/publish" element={<PublishList />} />
           <Route path="/publish-summary" element={<PublishSummary />} />
           <Route path="/users" element={<UserManagement />} />
+          <Route path="/dashboard" element={<StudentDashboard />} />
+          {/* ✅ แก้ไข path ให้มีเครื่องหมาย / และตรงกับลิงก์ในหน้าเว็บ */}
+          <Route path="/coop-content" element={<CoopContent />} />
         </Routes>
       </BrowserRouter>
-    </LanguageProvider>
+    </LanguageProvider> 
   </React.StrictMode>
 );

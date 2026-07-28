@@ -21,6 +21,8 @@ export default function UploadVideo() {
   const { t, lang, toggleLanguage } = useLanguage();
   const [selectedFile, setSelectedFile] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadError, setUploadError] = useState('');
 
   const handleLogout = () => {
     localStorage.removeItem('user');
@@ -47,6 +49,46 @@ export default function UploadVideo() {
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files[0]) {
       setSelectedFile(e.target.files[0]);
+    }
+  };
+
+  // 🎬 ฟังก์ชันอัปโหลดวิดีโอเข้าระบบจริง
+  const handleUpload = async () => {
+    if (!selectedFile) {
+      setUploadError(
+        lang === 'en' ? 'Please select a video file.' : 'กรุณาเลือกไฟล์วิดีโอ'
+      );
+      return;
+    }
+
+    setIsUploading(true);
+    setUploadError('');
+
+    try {
+      const savedUser = localStorage.getItem('user');
+      const currentUser = savedUser ? JSON.parse(savedUser) : null;
+
+      const formData = new FormData();
+      formData.append('videoFile', selectedFile);
+      formData.append('uid', currentUser?.uid || '');
+
+      const res = await fetch('http://localhost:5000/api/videos/upload', {
+        method: 'POST',
+        body: formData
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || 'Upload failed');
+      }
+
+      navigate('/summary-result', { state: { videoId: data.videoId } });
+    } catch (err) {
+      console.error('Upload error:', err);
+      setUploadError(`Upload failed: ${err.message}`);
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -197,14 +239,22 @@ export default function UploadVideo() {
               </label>
             </div>
 
+            {uploadError && (
+              <p style={{ color: '#f87171', marginTop: '12px', fontSize: '14px' }}>{uploadError}</p>
+            )}
+
             <div className="action-area-purple">
               <button 
                 type="button"
                 className={`btn-submit-purple ${selectedFile ? 'active' : 'disabled'}`}
-                disabled={!selectedFile}
-                onClick={() => navigate('/summary-result')}
+                disabled={!selectedFile || isUploading}
+                onClick={handleUpload}
               >
-                <span>{lang === 'en' ? 'Start Summarizing' : 'เริ่มสรุป'}</span>
+                <span>
+                  {isUploading
+                    ? (lang === 'en' ? 'Uploading...' : 'กำลังอัปโหลด...')
+                    : (lang === 'en' ? 'Start Summarizing' : 'เริ่มสรุป')}
+                </span>
                 <span className="lets-go-tag">LET'S GO!</span>
               </button>
             </div>

@@ -27,7 +27,13 @@ function Login() {
 
       if (response.ok) {
         localStorage.setItem("user", JSON.stringify(data.user));
-        navigate("/admin");
+
+        // ✅ เช็ค role แล้วค่อย navigate ตามสิทธิ์
+        if (data.user.roleId === "R001") {
+          navigate("/admin");
+        } else {
+          navigate("/dashboard");
+        }
       } else {
         setErrorMessage(data.message || (lang === 'en' ? "Login failed" : "เกิดข้อผิดพลาดในการเข้าสู่ระบบ"));
       }
@@ -123,13 +129,6 @@ function Login() {
 
         <button type="submit" className="btn-login-now">
           {t.loginBtn}
-        </button>
-
-        <div className="divider">{t.or}</div>
-
-        <button type="button" className="btn-google">
-          <span className="google-icon">G</span>
-          {t.loginWithGoogle}
         </button>
 
         <p className="forgot-password">
