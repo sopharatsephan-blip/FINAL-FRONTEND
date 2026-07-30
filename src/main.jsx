@@ -19,6 +19,7 @@ import { LanguageProvider } from './LanguageContext.jsx';
 import CoopContent from './student/CoopContent.jsx';
 import DownloadPdf from './student/DownloadPdf.jsx';
 import Favorites from './student/Favorites.jsx';
+import Register from './Register.jsx'
 
 import './index.css';
 
@@ -42,6 +43,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           <Route path="/coop-content" element={<CoopContent />} />
           <Route path="/download-pdf" element={<DownloadPdf />} />
           <Route path="/favorites" element={<Favorites />} />
+          <Route path='/Register' element={<Register />} />
         </Routes>
       </BrowserRouter>
     </LanguageProvider> 

@@ -12,7 +12,9 @@ import {
   FaAsterisk,
   FaUserShield,
   FaUserMinus,
-  FaGlobeAmericas
+  FaGlobeAmericas,
+  FaLock,
+  FaTimes
 } from 'react-icons/fa';
 
 export default function UserManagement() {
@@ -27,10 +29,24 @@ export default function UserManagement() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // ผู้ใช้ที่ถูกเลือกในตาราง (สำหรับแต่งตั้ง/ถอด Admin)
+  const [selectedUserId, setSelectedUserId] = useState(null);
+
+  // สถานะของ modal ยืนยันรหัสผ่าน
+  // action: 'makeAdmin' | 'removeAdmin' | null
+  const [confirmAction, setConfirmAction] = useState(null);
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [confirmError, setConfirmError] = useState('');
+  const [confirmLoading, setConfirmLoading] = useState(false);
+
   // แปลง RoleID จากฐานข้อมูล -> ชื่อ Role ที่แสดงผล
   const roleIdToName = {
     R001: 'Admin',
     R002: 'Student',
+  };
+  const roleNameToId = {
+    Admin: 'R001',
+    Student: 'R002',
   };
 
   useEffect(() => {
@@ -45,41 +61,41 @@ export default function UserManagement() {
   }, []);
 
   // ดึงรายชื่อผู้ใช้งานจากฐานข้อมูลผ่าน API
-  useEffect(() => {
-    const fetchUsers = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const token = localStorage.getItem('token');
-        // ใช้ URL เต็มของ backend (Express รันที่ port 5000)
-        // เพราะ React dev server (port 3000) กับ backend คนละพอร์ตกัน
-        const res = await fetch('http://localhost:5000/api/users', {
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
-        });
+  const fetchUsers = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const token = localStorage.getItem('token');
+      // ใช้ URL เต็มของ backend (Express รันที่ port 5000)
+      // เพราะ React dev server (port 3000) กับ backend คนละพอร์ตกัน
+      const res = await fetch('http://localhost:5000/api/users', {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
 
-        if (!res.ok) {
-          throw new Error(`โหลดข้อมูลผู้ใช้งานไม่สำเร็จ (status ${res.status})`);
-        }
-
-        const data = await res.json();
-
-        // แปลงข้อมูลจากตาราง customer ให้ตรงกับรูปแบบที่ตารางใช้แสดงผล
-        const mapped = data.map((row) => ({
-          id: row.UID,
-          name: `${row.FirstName} ${row.LastName}`,
-          username: row.Username,
-          role: roleIdToName[row.RoleID] || row.RoleID,
-        }));
-
-        setUsers(mapped);
-      } catch (err) {
-        console.error('Fetch users error:', err);
-        setError(err.message || 'เกิดข้อผิดพลาดในการโหลดข้อมูล');
-      } finally {
-        setLoading(false);
+      if (!res.ok) {
+        throw new Error(`โหลดข้อมูลผู้ใช้งานไม่สำเร็จ (status ${res.status})`);
       }
-    };
 
+      const data = await res.json();
+
+      // แปลงข้อมูลจากตาราง customer ให้ตรงกับรูปแบบที่ตารางใช้แสดงผล
+      const mapped = data.map((row) => ({
+        id: row.UID,
+        name: `${row.FirstName} ${row.LastName}`,
+        username: row.Username,
+        role: roleIdToName[row.RoleID] || row.RoleID,
+      }));
+
+      setUsers(mapped);
+    } catch (err) {
+      console.error('Fetch users error:', err);
+      setError(err.message || 'เกิดข้อผิดพลาดในการโหลดข้อมูล');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchUsers();
   }, []);
 
@@ -97,6 +113,88 @@ export default function UserManagement() {
     return matchesSearch && matchesRole;
   });
 
+  const selectedUser = users.find(u => u.id === selectedUserId) || null;
+
+  const handleRowClick = (userId) => {
+    setSelectedUserId(prev => (prev === userId ? null : userId));
+  };
+
+  // เปิด modal สำหรับยืนยันรหัสผ่านก่อนแต่งตั้ง/ถอด Admin
+  const openConfirm = (action) => {
+    if (!selectedUser) return;
+
+    if (action === 'makeAdmin' && selectedUser.role === 'Admin') return;
+    if (action === 'removeAdmin' && selectedUser.role !== 'Admin') return;
+
+    setConfirmAction(action);
+    setConfirmPassword('');
+    setConfirmError('');
+  };
+
+  const closeConfirm = () => {
+    if (confirmLoading) return; // กันปิด modal ระหว่างกำลังส่งคำขอ
+    setConfirmAction(null);
+    setConfirmPassword('');
+    setConfirmError('');
+  };
+
+  // ยืนยันการเปลี่ยนสิทธิ์ผู้ใช้ (เรียก backend พร้อมรหัสผ่านของผู้ทำรายการ)
+  const handleConfirmSubmit = async (e) => {
+    e.preventDefault();
+    if (!selectedUser || !confirmAction) return;
+
+    if (!currentUser || !currentUser.uid) {
+      setConfirmError('ไม่พบข้อมูลผู้ใช้งานที่ล็อกอินอยู่ กรุณาเข้าสู่ระบบใหม่');
+      return;
+    }
+
+    if (!confirmPassword) {
+      setConfirmError('กรุณากรอกรหัสผ่านของคุณ');
+      return;
+    }
+
+    const newRole = confirmAction === 'makeAdmin' ? roleNameToId.Admin : roleNameToId.Student;
+
+    setConfirmLoading(true);
+    setConfirmError('');
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`http://localhost:5000/api/users/${selectedUser.id}/role`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({
+          requesterUid: currentUser.uid,
+          password: confirmPassword,
+          newRole,
+        }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        throw new Error(data.message || 'เกิดข้อผิดพลาดในการเปลี่ยนสิทธิ์ผู้ใช้');
+      }
+
+      // ดึงรายชื่อผู้ใช้ใหม่จาก DB เพื่อยืนยันว่า UI ตรงกับข้อมูลจริงเสมอ
+      await fetchUsers();
+
+      setConfirmAction(null);
+      setConfirmPassword('');
+      setSelectedUserId(null);
+    } catch (err) {
+      console.error('Change role error:', err);
+      setConfirmError(err.message || 'เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง');
+    } finally {
+      setConfirmLoading(false);
+    }
+  };
+
+  const canMakeAdmin = !!selectedUser && selectedUser.role !== 'Admin';
+  const canRemoveAdmin = !!selectedUser && selectedUser.role === 'Admin';
+
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: '#0b0719', color: '#fff', fontFamily: "'Kanit', sans-serif" }}>
       
@@ -111,7 +209,7 @@ export default function UserManagement() {
             <span>{t.appName || 'ICT Video Summary'}</span>
           </div>
 
-          {/* User Profile Box (ตัดส่วนภาษาที่ทับออก) */}
+          {/* User Profile Box */}
           <div style={{ background: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.08)', padding: '12px 16px', borderRadius: '14px', display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '28px' }}>
             <div style={{ width: '38px', height: '38px', borderRadius: '50%', background: 'linear-gradient(135deg, #a855f7 0%, #7c3aed 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 'bold', fontSize: '0.95rem', boxShadow: '0 2px 8px rgba(168, 85, 247, 0.3)' }}>
               {currentUser && currentUser.firstName ? currentUser.firstName.charAt(0) : 'S'}
@@ -188,7 +286,7 @@ export default function UserManagement() {
               />
             </div>
 
-            {/* 🌐 ปุ่มสลับภาษา ย้ายมามุมขวาบนให้เหมือน Dashboard */}
+            {/* ปุ่มสลับภาษา */}
             <button 
               type="button" 
               onClick={toggleLanguage}
@@ -214,41 +312,65 @@ export default function UserManagement() {
           </div>
         </header>
 
-        {/* Action Buttons Header (ปรับเป็นสีโทนม่วง/แดงสไตล์ Dashboard) */}
+        {/* แถบสถานะการเลือกผู้ใช้ */}
+        <div style={{
+          marginBottom: '16px',
+          minHeight: '20px',
+          fontSize: '0.85rem',
+          color: '#94a3b8'
+        }}>
+          {selectedUser
+            ? (lang === 'en'
+                ? <>Selected: <strong style={{ color: '#c084fc' }}>{selectedUser.name}</strong> ({selectedUser.role})</>
+                : <>เลือกอยู่: <strong style={{ color: '#c084fc' }}>{selectedUser.name}</strong> ({selectedUser.role})</>)
+            : (lang === 'en' ? 'Click a row below to select a user' : 'คลิกที่แถวในตารางเพื่อเลือกผู้ใช้')}
+        </div>
+
+        {/* Action Buttons Header */}
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginBottom: '24px' }}>
-          <button style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            background: 'linear-gradient(135deg, #a855f7 0%, #7c3aed 100%)',
-            color: '#fff',
-            border: 'none',
-            padding: '10px 20px',
-            borderRadius: '25px',
-            fontWeight: '600',
-            fontSize: '0.9rem',
-            cursor: 'pointer',
-            boxShadow: '0 4px 15px rgba(168, 85, 247, 0.3)',
-            transition: 'all 0.2s ease'
-          }}>
+          <button
+            onClick={() => openConfirm('makeAdmin')}
+            disabled={!canMakeAdmin}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              background: canMakeAdmin ? 'linear-gradient(135deg, #a855f7 0%, #7c3aed 100%)' : 'rgba(168, 85, 247, 0.15)',
+              color: canMakeAdmin ? '#fff' : '#7c6a94',
+              border: 'none',
+              padding: '10px 20px',
+              borderRadius: '25px',
+              fontWeight: '600',
+              fontSize: '0.9rem',
+              cursor: canMakeAdmin ? 'pointer' : 'not-allowed',
+              boxShadow: canMakeAdmin ? '0 4px 15px rgba(168, 85, 247, 0.3)' : 'none',
+              transition: 'all 0.2s ease',
+              opacity: canMakeAdmin ? 1 : 0.6
+            }}
+          >
             <FaUserShield size={16} />
             <span>{lang === 'en' ? 'Make Admin' : 'แต่งตั้ง Admin'}</span>
           </button>
 
-          <button style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            background: 'rgba(239, 68, 68, 0.15)',
-            border: '1px solid rgba(239, 68, 68, 0.3)',
-            color: '#f87171',
-            padding: '10px 20px',
-            borderRadius: '25px',
-            fontWeight: '600',
-            fontSize: '0.9rem',
-            cursor: 'pointer',
-            transition: 'all 0.2s ease'
-          }}>
+          <button
+            onClick={() => openConfirm('removeAdmin')}
+            disabled={!canRemoveAdmin}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              background: 'rgba(239, 68, 68, 0.15)',
+              border: '1px solid rgba(239, 68, 68, 0.3)',
+              color: canRemoveAdmin ? '#f87171' : '#8a5a5a',
+              padding: '10px 20px',
+              borderRadius: '25px',
+              fontWeight: '600',
+              fontSize: '0.9rem',
+              cursor: canRemoveAdmin ? 'pointer' : 'not-allowed',
+              transition: 'all 0.2s ease',
+              opacity: canRemoveAdmin ? 1 : 0.6
+            }}
+          >
             <FaUserMinus size={16} />
             <span>{lang === 'en' ? 'Remove Admin' : 'ยกเลิก Admin'}</span>
           </button>
@@ -320,40 +442,187 @@ export default function UserManagement() {
                 </tr>
               </thead>
               <tbody>
-                {filteredUsers.map((user, index) => (
-                  <tr key={user.id || index} style={{ borderBottom: index !== filteredUsers.length - 1 ? '1px solid rgba(255, 255, 255, 0.04)' : 'none' }}>
-                    <td style={{ padding: '16px' }}>
-                      <div style={{ display: 'flex', flexDirection: 'column' }}>
-                        <span style={{ fontWeight: '500', color: '#f8fafc', fontSize: '0.95rem' }}>{user.name}</span>
-                        <span style={{ fontSize: '0.78rem', color: '#a855f7', marginTop: '2px' }}>{user.id}</span>
-                      </div>
-                    </td>
-                    <td style={{ padding: '16px', color: '#cbd5e1', fontSize: '0.9rem' }}>
-                      {user.username}
-                    </td>
-                    <td style={{ padding: '16px', textAlign: 'center' }}>
-                      <span style={{
-                        display: 'inline-block',
-                        padding: '4px 16px',
-                        borderRadius: '12px',
-                        fontSize: '0.8rem',
-                        fontWeight: '600',
-                        background: user.role === 'Admin' ? 'rgba(168, 85, 247, 0.2)' : 'rgba(255, 255, 255, 0.05)',
-                        color: user.role === 'Admin' ? '#c084fc' : '#94a3b8',
-                        border: user.role === 'Admin' ? '1px solid rgba(168, 85, 247, 0.4)' : '1px solid rgba(255, 255, 255, 0.1)'
-                      }}>
-                        {user.role}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
+                {filteredUsers.map((user, index) => {
+                  const isSelected = user.id === selectedUserId;
+                  return (
+                    <tr
+                      key={user.id || index}
+                      onClick={() => handleRowClick(user.id)}
+                      style={{
+                        borderBottom: index !== filteredUsers.length - 1 ? '1px solid rgba(255, 255, 255, 0.04)' : 'none',
+                        cursor: 'pointer',
+                        background: isSelected ? 'rgba(168, 85, 247, 0.12)' : 'transparent',
+                        outline: isSelected ? '1px solid rgba(168, 85, 247, 0.5)' : 'none',
+                        transition: 'background 0.15s ease'
+                      }}
+                    >
+                      <td style={{ padding: '16px' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                          <span style={{ fontWeight: '500', color: '#f8fafc', fontSize: '0.95rem' }}>{user.name}</span>
+                          <span style={{ fontSize: '0.78rem', color: '#a855f7', marginTop: '2px' }}>{user.id}</span>
+                        </div>
+                      </td>
+                      <td style={{ padding: '16px', color: '#cbd5e1', fontSize: '0.9rem' }}>
+                        {user.username}
+                      </td>
+                      <td style={{ padding: '16px', textAlign: 'center' }}>
+                        <span style={{
+                          display: 'inline-block',
+                          padding: '4px 16px',
+                          borderRadius: '12px',
+                          fontSize: '0.8rem',
+                          fontWeight: '600',
+                          background: user.role === 'Admin' ? 'rgba(168, 85, 247, 0.2)' : 'rgba(255, 255, 255, 0.05)',
+                          color: user.role === 'Admin' ? '#c084fc' : '#94a3b8',
+                          border: user.role === 'Admin' ? '1px solid rgba(168, 85, 247, 0.4)' : '1px solid rgba(255, 255, 255, 0.1)'
+                        }}>
+                          {user.role}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           )}
         </div>
       </main>
+
+      {/* ================= MODAL ยืนยันรหัสผ่าน ================= */}
+      {confirmAction && selectedUser && (
+        <div
+          onClick={closeConfirm}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0, 0, 0, 0.6)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              width: '380px',
+              maxWidth: '90vw',
+              background: 'linear-gradient(145deg, #160d2e 0%, #0f0821 100%)',
+              border: '1px solid rgba(168, 85, 247, 0.3)',
+              borderRadius: '18px',
+              padding: '24px',
+              boxShadow: '0 20px 50px rgba(0,0,0,0.5)'
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div style={{
+                  width: '36px', height: '36px', borderRadius: '10px',
+                  background: confirmAction === 'makeAdmin' ? 'rgba(168, 85, 247, 0.2)' : 'rgba(239, 68, 68, 0.15)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  color: confirmAction === 'makeAdmin' ? '#c084fc' : '#f87171'
+                }}>
+                  {confirmAction === 'makeAdmin' ? <FaUserShield size={16} /> : <FaUserMinus size={16} />}
+                </div>
+                <h3 style={{ margin: 0, color: '#f8fafc', fontSize: '1.05rem', fontWeight: '600' }}>
+                  {confirmAction === 'makeAdmin'
+                    ? (lang === 'en' ? 'Make Admin' : 'แต่งตั้ง Admin')
+                    : (lang === 'en' ? 'Remove Admin' : 'ยกเลิก Admin')}
+                </h3>
+              </div>
+              <button
+                onClick={closeConfirm}
+                style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: '4px' }}
+              >
+                <FaTimes size={16} />
+              </button>
+            </div>
+
+            <p style={{ color: '#cbd5e1', fontSize: '0.88rem', margin: '0 0 16px 0', lineHeight: 1.5 }}>
+              {confirmAction === 'makeAdmin'
+                ? (lang === 'en'
+                    ? <>You are about to make <strong style={{ color: '#c084fc' }}>{selectedUser.name}</strong> an Admin. Enter your password to confirm.</>
+                    : <>คุณกำลังจะแต่งตั้ง <strong style={{ color: '#c084fc' }}>{selectedUser.name}</strong> เป็น Admin กรุณาใส่รหัสผ่านของคุณเพื่อยืนยัน</>)
+                : (lang === 'en'
+                    ? <>You are about to remove Admin rights from <strong style={{ color: '#f87171' }}>{selectedUser.name}</strong>. Enter your password to confirm.</>
+                    : <>คุณกำลังจะถอดสิทธิ์ Admin ของ <strong style={{ color: '#f87171' }}>{selectedUser.name}</strong> กรุณาใส่รหัสผ่านของคุณเพื่อยืนยัน</>)}
+            </p>
+
+            <form onSubmit={handleConfirmSubmit}>
+              <div style={{ position: 'relative', marginBottom: '10px' }}>
+                <FaLock style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: '#64748b' }} size={13} />
+                <input
+                  type="password"
+                  autoFocus
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder={lang === 'en' ? 'Your password' : 'รหัสผ่านของคุณ'}
+                  style={{
+                    width: '100%',
+                    background: '#120b24',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    borderRadius: '12px',
+                    padding: '10px 14px 10px 36px',
+                    color: '#fff',
+                    fontSize: '0.88rem',
+                    outline: 'none',
+                    boxSizing: 'border-box'
+                  }}
+                />
+              </div>
+
+              {confirmError && (
+                <div style={{ color: '#f87171', fontSize: '0.8rem', marginBottom: '10px' }}>
+                  {confirmError}
+                </div>
+              )}
+
+              <div style={{ display: 'flex', gap: '10px', marginTop: '16px' }}>
+                <button
+                  type="button"
+                  onClick={closeConfirm}
+                  disabled={confirmLoading}
+                  style={{
+                    flex: 1,
+                    padding: '10px',
+                    borderRadius: '12px',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    background: 'transparent',
+                    color: '#94a3b8',
+                    fontWeight: '600',
+                    fontSize: '0.88rem',
+                    cursor: confirmLoading ? 'not-allowed' : 'pointer'
+                  }}
+                >
+                  {lang === 'en' ? 'Cancel' : 'ยกเลิก'}
+                </button>
+                <button
+                  type="submit"
+                  disabled={confirmLoading}
+                  style={{
+                    flex: 1,
+                    padding: '10px',
+                    borderRadius: '12px',
+                    border: 'none',
+                    background: confirmAction === 'makeAdmin'
+                      ? 'linear-gradient(135deg, #a855f7 0%, #7c3aed 100%)'
+                      : 'linear-gradient(135deg, #ef4444 0%, #b91c1c 100%)',
+                    color: '#fff',
+                    fontWeight: '600',
+                    fontSize: '0.88rem',
+                    cursor: confirmLoading ? 'not-allowed' : 'pointer',
+                    opacity: confirmLoading ? 0.7 : 1
+                  }}
+                >
+                  {confirmLoading
+                    ? (lang === 'en' ? 'Confirming...' : 'กำลังยืนยัน...')
+                    : (lang === 'en' ? 'Confirm' : 'ยืนยัน')}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
-
-//===

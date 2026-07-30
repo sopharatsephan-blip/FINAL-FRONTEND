@@ -101,7 +101,7 @@ function Login() {
           <h3>{t.loginTitle}</h3>
           <p className="subtitle">
             {t.dontHaveAccount}{" "}
-            <a href="/register">{t.signUpNow}</a>
+            <a href="/Register">{t.signUpNow}</a>
           </p>
         </div>
 
@@ -135,6 +135,8 @@ function Login() {
           {t.forgotPassword}{" "}
           <a href="/reset-password">{t.clickHere}</a>
         </p>
+        
+        
       </form>
     </div>
   );
