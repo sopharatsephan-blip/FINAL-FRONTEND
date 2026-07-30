@@ -20,7 +20,7 @@ import {
   FaEye,
   FaDownload,
   FaArrowLeft,
-  FaCheckCircle
+  FaCheck
 } from "react-icons/fa";
 
 function CoopContent() {
@@ -124,7 +124,7 @@ function CoopContent() {
   ]);
 
   const [viewingItem, setViewingItem] = useState(null);
-  const [showToast, setShowToast] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const summaryRef = useRef(null);
 
@@ -170,8 +170,9 @@ function CoopContent() {
       .save()
       .then(() => {
         setIsDownloading(false);
-        setShowToast(true);
-        setTimeout(() => setShowToast(false), 2500);
+        setShowSuccessModal(true);
+        // แสดง Modal 3 วินาทีแล้วซ่อนอัตโนมัติ
+        setTimeout(() => setShowSuccessModal(false), 3000);
       })
       .catch(() => {
         setIsDownloading(false);
@@ -442,29 +443,78 @@ function CoopContent() {
           </div>
         )}
 
-        {showToast && (
+        {/* ===== Pop-up Modal ดาวน์โหลดเสร็จสิ้น (ตรงกลางจอ) ===== */}
+        {showSuccessModal && (
           <div
+            onClick={() => setShowSuccessModal(false)}
             style={{
               position: "fixed",
-              bottom: "28px",
-              left: "50%",
-              transform: "translateX(-50%)",
+              top: 0,
+              left: 0,
+              width: "100vw",
+              height: "100vh",
+              backgroundColor: "rgba(0, 0, 0, 0.4)",
+              backdropFilter: "blur(4px)",
               display: "flex",
               alignItems: "center",
-              gap: "10px",
-              background: "#1f2937",
-              border: "1px solid #22c55e",
-              color: "#e5e5e5",
-              padding: "12px 20px",
-              borderRadius: "12px",
-              boxShadow: "0 10px 30px rgba(0,0,0,0.5)",
-              fontSize: "14px",
-              fontWeight: 600,
-              zIndex: 1000
+              justifyContent: "center",
+              zIndex: 9999
             }}
           >
-            <FaCheckCircle style={{ color: "#22c55e" }} />
-            {lang === "en" ? "Download complete" : "ดาวน์โหลดเสร็จสิ้นค่ะ"}
+            <div
+              onClick={(e) => e.stopPropagation()}
+              style={{
+                background: "#ffffff",
+                borderRadius: "24px",
+                padding: "40px 32px",
+                width: "90%",
+                maxWidth: "360px",
+                textAlign: "center",
+                boxShadow: "0 20px 40px rgba(0,0,0,0.2)",
+                animation: "popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)"
+              }}
+            >
+              {/* วงกลมไอคอนติ๊กถูกสีเขียวอ่อน */}
+              <div
+                style={{
+                  width: "80px",
+                  height: "80px",
+                  borderRadius: "50%",
+                  backgroundColor: "#dcfce7",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  margin: "0 auto 20px"
+                }}
+              >
+                <FaCheck size={36} style={{ color: "#10b981" }} />
+              </div>
+
+              {/* ข้อความแจ้งเตือน */}
+              <h3
+                style={{
+                  color: "#1e293b",
+                  fontSize: "20px",
+                  fontWeight: "700",
+                  margin: "0 0 10px"
+                }}
+              >
+                {lang === "en" ? "Download Complete!" : "ดาวน์โหลดเสร็จสิ้น !"}
+              </h3>
+              
+              <p
+                style={{
+                  color: "#64748b",
+                  fontSize: "14px",
+                  lineHeight: "1.5",
+                  margin: 0
+                }}
+              >
+                {lang === "en"
+                  ? "File has been saved to your device and is ready to open."
+                  : "ไฟล์ถูกบันทึกลงในอุปกรณ์ของคุณแล้ว สามารถเปิดได้ในทันที"}
+              </p>
+            </div>
           </div>
         )}
       </main>

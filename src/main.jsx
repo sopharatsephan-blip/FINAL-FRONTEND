@@ -16,7 +16,10 @@ import PublishSummary from './PublishSummary.jsx';
 import UserManagement from './UserManagement.jsx';
 import StudentDashboard from './student/StudentDashboard.jsx';
 import { LanguageProvider } from './LanguageContext.jsx'; 
-import CoopContent from './student/CoopContent.jsx'
+import CoopContent from './student/CoopContent.jsx';
+import DownloadPdf from './student/DownloadPdf.jsx';
+import Favorites from './student/Favorites.jsx';
+
 import './index.css';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
@@ -36,8 +39,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           <Route path="/publish-summary" element={<PublishSummary />} />
           <Route path="/users" element={<UserManagement />} />
           <Route path="/dashboard" element={<StudentDashboard />} />
-          {/* ✅ แก้ไข path ให้มีเครื่องหมาย / และตรงกับลิงก์ในหน้าเว็บ */}
           <Route path="/coop-content" element={<CoopContent />} />
+          <Route path="/download-pdf" element={<DownloadPdf />} />
+          <Route path="/favorites" element={<Favorites />} />
         </Routes>
       </BrowserRouter>
     </LanguageProvider> 
