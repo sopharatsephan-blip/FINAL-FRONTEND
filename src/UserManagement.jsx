@@ -22,14 +22,16 @@ export default function UserManagement() {
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState('All');
 
-  // ตัวอย่างข้อมูลผู้ใช้งาน
-  const [users, setUsers] = useState([
-    { id: '660110791', name: 'น้ำทิพย์', username: 's(uname)', role: 'Admin' },
-    { id: '660110792', name: 'โสภารัตน์ ศรีปาน', username: 'a(uname)', role: 'Student' },
-    { id: '660110793', name: 'โสภารัตน์ ศรีปาน', username: 'g(uname)', role: 'Student' },
-    { id: '660110794', name: 'โสภารัตน์ ศรีปาน', username: 'h(uname)', role: 'Student' },
-    { id: '660110795', name: 'โสภารัตน์ ศรีปาน', username: 's(uname)', role: 'Student' },
-  ]);
+  // ข้อมูลผู้ใช้งานที่ดึงมาจากฐานข้อมูลจริง
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // แปลง RoleID จากฐานข้อมูล -> ชื่อ Role ที่แสดงผล
+  const roleIdToName = {
+    R001: 'Admin',
+    R002: 'Student',
+  };
 
   useEffect(() => {
     const savedUser = localStorage.getItem('user');
@@ -40,6 +42,45 @@ export default function UserManagement() {
         console.error("User parse error", e);
       }
     }
+  }, []);
+
+  // ดึงรายชื่อผู้ใช้งานจากฐานข้อมูลผ่าน API
+  useEffect(() => {
+    const fetchUsers = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const token = localStorage.getItem('token');
+        // ใช้ URL เต็มของ backend (Express รันที่ port 5000)
+        // เพราะ React dev server (port 3000) กับ backend คนละพอร์ตกัน
+        const res = await fetch('http://localhost:5000/api/users', {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        });
+
+        if (!res.ok) {
+          throw new Error(`โหลดข้อมูลผู้ใช้งานไม่สำเร็จ (status ${res.status})`);
+        }
+
+        const data = await res.json();
+
+        // แปลงข้อมูลจากตาราง customer ให้ตรงกับรูปแบบที่ตารางใช้แสดงผล
+        const mapped = data.map((row) => ({
+          id: row.UID,
+          name: `${row.FirstName} ${row.LastName}`,
+          username: row.Username,
+          role: roleIdToName[row.RoleID] || row.RoleID,
+        }));
+
+        setUsers(mapped);
+      } catch (err) {
+        console.error('Fetch users error:', err);
+        setError(err.message || 'เกิดข้อผิดพลาดในการโหลดข้อมูล');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUsers();
   }, []);
 
   const handleLogout = () => {
@@ -257,44 +298,58 @@ export default function UserManagement() {
           </div>
 
           {/* Table Area */}
-          <table style={{ width: '100%', borderCollapse: 'collapse', color: '#f8fafc' }}>
-            <thead>
-              <tr style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.08)', textTransform: 'uppercase', fontSize: '0.78rem', color: '#94a3b8', letterSpacing: '0.5px' }}>
-                <th style={{ textAlign: 'left', padding: '12px 16px' }}>Full Name</th>
-                <th style={{ textAlign: 'left', padding: '12px 16px' }}>Username</th>
-                <th style={{ textAlign: 'center', padding: '12px 16px' }}>Role</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredUsers.map((user, index) => (
-                <tr key={index} style={{ borderBottom: index !== filteredUsers.length - 1 ? '1px solid rgba(255, 255, 255, 0.04)' : 'none' }}>
-                  <td style={{ padding: '16px' }}>
-                    <div style={{ display: 'flex', flexDirection: 'column' }}>
-                      <span style={{ fontWeight: '500', color: '#f8fafc', fontSize: '0.95rem' }}>{user.name}</span>
-                      <span style={{ fontSize: '0.78rem', color: '#a855f7', marginTop: '2px' }}>{user.id}</span>
-                    </div>
-                  </td>
-                  <td style={{ padding: '16px', color: '#cbd5e1', fontSize: '0.9rem' }}>
-                    {user.username}
-                  </td>
-                  <td style={{ padding: '16px', textAlign: 'center' }}>
-                    <span style={{
-                      display: 'inline-block',
-                      padding: '4px 16px',
-                      borderRadius: '12px',
-                      fontSize: '0.8rem',
-                      fontWeight: '600',
-                      background: user.role === 'Admin' ? 'rgba(168, 85, 247, 0.2)' : 'rgba(255, 255, 255, 0.05)',
-                      color: user.role === 'Admin' ? '#c084fc' : '#94a3b8',
-                      border: user.role === 'Admin' ? '1px solid rgba(168, 85, 247, 0.4)' : '1px solid rgba(255, 255, 255, 0.1)'
-                    }}>
-                      {user.role}
-                    </span>
-                  </td>
+          {loading ? (
+            <div style={{ padding: '40px 0', textAlign: 'center', color: '#94a3b8' }}>
+              {lang === 'en' ? 'Loading users...' : 'กำลังโหลดข้อมูล...'}
+            </div>
+          ) : error ? (
+            <div style={{ padding: '40px 0', textAlign: 'center', color: '#f87171' }}>
+              {error}
+            </div>
+          ) : filteredUsers.length === 0 ? (
+            <div style={{ padding: '40px 0', textAlign: 'center', color: '#94a3b8' }}>
+              {lang === 'en' ? 'No users found' : 'ไม่พบข้อมูลผู้ใช้งาน'}
+            </div>
+          ) : (
+            <table style={{ width: '100%', borderCollapse: 'collapse', color: '#f8fafc' }}>
+              <thead>
+                <tr style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.08)', textTransform: 'uppercase', fontSize: '0.78rem', color: '#94a3b8', letterSpacing: '0.5px' }}>
+                  <th style={{ textAlign: 'left', padding: '12px 16px' }}>Full Name</th>
+                  <th style={{ textAlign: 'left', padding: '12px 16px' }}>Username</th>
+                  <th style={{ textAlign: 'center', padding: '12px 16px' }}>Role</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {filteredUsers.map((user, index) => (
+                  <tr key={user.id || index} style={{ borderBottom: index !== filteredUsers.length - 1 ? '1px solid rgba(255, 255, 255, 0.04)' : 'none' }}>
+                    <td style={{ padding: '16px' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <span style={{ fontWeight: '500', color: '#f8fafc', fontSize: '0.95rem' }}>{user.name}</span>
+                        <span style={{ fontSize: '0.78rem', color: '#a855f7', marginTop: '2px' }}>{user.id}</span>
+                      </div>
+                    </td>
+                    <td style={{ padding: '16px', color: '#cbd5e1', fontSize: '0.9rem' }}>
+                      {user.username}
+                    </td>
+                    <td style={{ padding: '16px', textAlign: 'center' }}>
+                      <span style={{
+                        display: 'inline-block',
+                        padding: '4px 16px',
+                        borderRadius: '12px',
+                        fontSize: '0.8rem',
+                        fontWeight: '600',
+                        background: user.role === 'Admin' ? 'rgba(168, 85, 247, 0.2)' : 'rgba(255, 255, 255, 0.05)',
+                        color: user.role === 'Admin' ? '#c084fc' : '#94a3b8',
+                        border: user.role === 'Admin' ? '1px solid rgba(168, 85, 247, 0.4)' : '1px solid rgba(255, 255, 255, 0.1)'
+                      }}>
+                        {user.role}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       </main>
     </div>
