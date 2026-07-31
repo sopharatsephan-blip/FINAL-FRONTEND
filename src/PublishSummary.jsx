@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useLanguage } from './LanguageContext'; // 🌐 นำเข้า useLanguage
+import { useLanguage } from './LanguageContext';
 import './PublishSummary.css';
 
 import { 
@@ -17,22 +17,26 @@ import {
   FaChevronRight,
   FaAsterisk,
   FaCheck,
-  FaGlobeAmericas // 🌐 ไอคอนโลกสำหรับปุ่มภาษา
+  FaLanguage
 } from 'react-icons/fa';
 
 export default function PublishSummary() {
   const navigate = useNavigate();
-  const { t, lang, toggleLanguage } = useLanguage(); // 🌐 ดึงข้อมูลภาษาและฟังก์ชันสลับภาษา
+  const { t, lang, toggleLanguage } = useLanguage();
   const [currentUser, setCurrentUser] = useState(null);
   const [publishTarget, setPublishTarget] = useState('everyone'); 
   
-  // เพิ่ม State สำหรับควบคุม Success Modal
+  // State สำหรับควบคุม Success Modal
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   useEffect(() => {
     const savedUser = localStorage.getItem('user');
     if (savedUser) {
-      setCurrentUser(JSON.parse(savedUser));
+      try {
+        setCurrentUser(JSON.parse(savedUser));
+      } catch (e) {
+        console.error("User parse error", e);
+      }
     }
   }, []);
 
@@ -41,150 +45,155 @@ export default function PublishSummary() {
     navigate('/login');
   };
 
-  // เมื่อกดปุ่มเผยแพร่ ให้เปิด Modal ขึ้นมา
   const handlePublish = () => {
     setShowSuccessModal(true);
   };
 
-  // ปิด Modal แล้วพาไปหน้า Admin/Dashboard
   const handleCloseModal = () => {
     setShowSuccessModal(false);
     navigate('/admin');
   };
 
   return (
-    <div className="dark-purple-container">
-      {/* Sidebar สีม่วงดำเข้ม */}
-      <aside className="sidebar-dark-purple">
-        <div className="sidebar-top">
-          <div className="brand-logo-dark" onClick={() => navigate('/admin')} style={{ cursor: 'pointer' }}>
-            <div className="ict-logo-box-dark">
-              <FaAsterisk className="brand-icon" />
-              <span>{t.appName || 'ICT Video Summary'}</span>
+    <div className="admin-purple-container">
+      {/* ===== Sidebar ม่วงเข้ม (สไตล์ Admin Dashboard) ===== */}
+      <aside className="sidebar-purple">
+        <div>
+          {/* Brand Logo */}
+          <div className="brand-logo-purple" onClick={() => navigate('/admin')} style={{ cursor: 'pointer' }}>
+            <FaAsterisk className="logo-icon" style={{ color: '#c084fc', marginRight: '8px' }} size={18} />
+            <span>{t.appName || 'ICT Video Summary'}</span>
+          </div>
+
+          {/* User Profile Box */}
+          <div className="user-profile-purple">
+            <div className="avatar-purple">
+              {currentUser && currentUser.firstName ? currentUser.firstName.charAt(0) : 'S'}
+            </div>
+            <div className="user-info-purple">
+              <h4>{currentUser ? `${currentUser.firstName} ${currentUser.lastName}` : 'Somchai Jaidee'}</h4>
+              <span className="role-tag">Admin</span>
             </div>
           </div>
 
-          <div className="user-profile-dark">
-            <div className="avatar-dark">
-              <FaUserAlt size={16} />
-            </div>
-            <div className="user-info-dark">
-              <h4>{currentUser ? `${currentUser.firstName} ${currentUser.lastName}` : 'อาจารย์ผู้ประสานงาน'}</h4>
-              <span className="user-role">Admin</span>
-            </div>
-          </div>
-
-          <nav className="menu-list-dark">
-            <button className="menu-item-dark" onClick={() => navigate('/admin')}>
-              <FaHome size={18} />
+          {/* Nav Menu */}
+          <nav className="menu-list-purple">
+            <button className="menu-item-purple" onClick={() => navigate('/admin')}>
+              <FaHome size={16} />
               <span>{t.dashboard || 'แดชบอร์ด'}</span>
             </button>
 
-            <button className="menu-item-dark" onClick={() => navigate('/upload-video')}>
-              <FaVideo size={18} />
+            <button className="menu-item-purple" onClick={() => navigate('/upload-video')}>
+              <FaVideo size={16} />
               <span>{t.uploadVideo || 'อัปโหลดวิดีโอ'}</span>
             </button>
 
-            <button className="menu-item-dark" onClick={() => navigate('/edit-summary')}>
-              <FaEdit size={18} />
-              <span>{t.editSummary || 'แก้ไขข้อมูลของสรุป'}</span>
+            <button className="menu-item-purple" onClick={() => navigate('/edit-summary')}>
+              <FaEdit size={16} />
+              <span>{t.editSummary || 'แก้ไขข้อมูลสรุป'}</span>
             </button>
 
-            <button className="menu-item-dark active" onClick={() => navigate('/publish')}>
-              <FaGlobe size={18} />
+            {/* Active Menu */}
+            <button className="menu-item-purple active" onClick={() => navigate('/publish')}>
+              <FaGlobe size={16} />
               <span>{t.publish || 'เผยแพร่'}</span>
             </button>
 
-            <button className="menu-item-dark" onClick={() => navigate('/users')}>
-              <FaUsers size={18} />
+            <button className="menu-item-purple" onClick={() => navigate('/users')}>
+              <FaUsers size={16} />
               <span>{t.userManagement || 'จัดการผู้ใช้'}</span>
             </button>
           </nav>
         </div>
 
-        <button className="logout-btn-dark" onClick={handleLogout}>
-          <FaSignOutAlt size={16} />
-          <span>{t.logout || 'ออกจากระบบ'}</span>
-        </button>
+        {/* Sidebar Footer */}
+        <div className="sidebar-footer-purple">
+          <button
+            type="button"
+            className="menu-item-purple"
+            onClick={toggleLanguage}
+            style={{ marginBottom: '10px', background: 'rgba(139, 92, 246, 0.2)', color: '#c084fc' }}
+          >
+            <FaLanguage size={18} />
+            <span>{lang ? lang.toUpperCase() : 'EN'}</span>
+          </button>
+
+          <button className="logout-btn-purple" onClick={handleLogout}>
+            <FaSignOutAlt size={16} />
+            <span>{t.logout || 'ออกจากระบบ'}</span>
+          </button>
+        </div>
       </aside>
 
-      {/* Main Content */}
-      <main className="main-content-dark">
-        {/* Header พร้อมช่องค้นหา และปุ่มสลับภาษาขวามือ */}
-        <header className="top-header-dark" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div className="header-title-box">
-            <div className="header-icon-glow">
-              <FaGlobe size={20} />
+      {/* ===== Main Content Space ===== */}
+      <main className="main-content-purple">
+        {/* Header Bar */}
+        <header className="top-header-purple">
+          <div className="header-title">
+            <div className="header-icon-box" style={{ background: 'rgba(139, 92, 246, 0.2)', color: '#c084fc', padding: '8px', borderRadius: '8px', display: 'flex' }}>
+              <FaGlobe size={18} />
             </div>
-            <h2>{lang === 'en' ? 'Publish Summary' : 'เผยแพร่สรุปเนื้อหา'}</h2>
+            <div>
+              <h2 style={{ margin: 0, color: '#ffffff' }}>
+                {lang === 'en' ? 'Publish Summary' : 'เผยแพร่สรุปเนื้อหา'}
+              </h2>
+              <p className="subtitle-purple" style={{ margin: '4px 0 0 0' }}>
+                {lang === 'en' ? 'Review details and set audience target' : 'ตรวจสอบรายละเอียดและกำหนดกลุ่มผู้รับชม'}
+              </p>
+            </div>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-            {/* ช่องค้นหา */}
-            <div className="search-box-dark">
-              <FaSearch className="search-icon-dark" />
-              <input 
-                type="text" 
-                className="search-input-dark" 
-                placeholder={t.searchPlaceholder || 'ค้นหาสรุป, ตำแหน่งงาน...'} 
-              />
-            </div>
-
-            {/* 🌐 ปุ่มสลับภาษา UI (มุมขวาบน) */}
-            <button 
-              type="button" 
-              onClick={toggleLanguage}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                padding: '8px 16px',
-                borderRadius: '20px',
-                border: '1px solid rgba(192, 132, 252, 0.4)',
-                background: 'rgba(139, 92, 246, 0.15)',
-                color: '#c084fc',
-                fontSize: '13px',
-                fontWeight: '600',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                whiteSpace: 'nowrap'
-              }}
-            >
-              <FaGlobeAmericas size={14} />
-              <span>{lang ? lang.toUpperCase() : 'EN'}</span>
-            </button>
+          <div className="search-box-purple">
+            <FaSearch style={{ color: '#9ca3af', fontSize: '14px' }} />
+            <input 
+              type="text" 
+              placeholder={t.searchPlaceholder || 'ค้นหาสรุป, ตำแหน่งงาน...'} 
+            />
           </div>
         </header>
 
+        {/* Area เนื้อหา Publish - ใช้สไตล์และการจัดวางเดียวกับ Admin Dashboard */}
         <div className="publish-body-area">
           <div className="publish-top-grid">
-            <div className="publish-card-dark">
-              <div className="card-header-dark">
+            {/* การ์ดสรุปวิดีโอ */}
+            <div className="purple-card">
+              <div className="card-header-purple">
                 <span className="green-status-dot"></span>
-                <h3>{lang === 'en' ? 'Summary Completed' : 'สรุปเสร็จสิ้น'}</h3>
+                <h3 style={{ margin: 0, color: '#ffffff', fontSize: '1.05rem', fontWeight: '600' }}>
+                  {lang === 'en' ? 'Summary Completed' : 'สรุปเสร็จสิ้น'}
+                </h3>
               </div>
+              
               <div className="summary-video-info">
                 <div className="video-thumbnail-box-purple">
                   <FaPlay size={18} />
                 </div>
                 <div className="video-details">
-                  <h4>Internship ตำแหน่ง UX/UI Design | บริษัท อินเวิร์ส โซลูชันส์ จำกัด</h4>
-                  <p className="summary-meta-text">
+                  <h4 style={{ color: '#ffffff', margin: '0 0 6px 0', fontSize: '1rem', fontWeight: '600' }}>
+                    Internship ตำแหน่ง UX/UI Design | บริษัท อินเวิร์ส โซลูชันส์ จำกัด
+                  </h4>
+                  <p style={{ color: '#cbd5e1', fontSize: '0.85rem', margin: '0 0 10px 0' }}>
                     {lang === 'en' ? '30 Jan 2026 · 112 original sentences ➔ 5 summary sentences' : '30 ม.ค. 2569 · 112 ประโยคต้นฉบับ ➔ 5 ประโยคสรุป'}
                   </p>
-                  <div className="tag-badges">
-                    <span className="badge-purple-glow">UX/UI</span>
-                    <span className="badge-green-glow">{lang === 'en' ? 'Completed' : 'สรุปเสร็จแล้ว'}</span>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <span className="purple-badge">UX/UI</span>
+                    <span style={{ background: 'rgba(34, 197, 94, 0.2)', color: '#86efac', border: '1px solid rgba(34, 197, 94, 0.4)', padding: '4px 10px', borderRadius: '999px', fontSize: '11px', fontWeight: '600' }}>
+                      {lang === 'en' ? 'Completed' : 'สรุปเสร็จแล้ว'}
+                    </span>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="publish-card-dark">
-              <div className="card-header-dark">
+            {/* การ์ดเลือกกลุ่มเป้าหมาย */}
+            <div className="purple-card">
+              <div className="card-header-purple">
                 <span className="green-status-dot"></span>
-                <h3>{lang === 'en' ? 'Target Audience' : 'เผยแพร่ถึงใคร'}</h3>
+                <h3 style={{ margin: 0, color: '#ffffff', fontSize: '1.05rem', fontWeight: '600' }}>
+                  {lang === 'en' ? 'Target Audience' : 'เผยแพร่ถึงใคร'}
+                </h3>
               </div>
+              
               <div className="target-selection">
                 <div 
                   className={`target-box-dark ${publishTarget === 'everyone' ? 'active' : ''}`}
@@ -211,22 +220,28 @@ export default function PublishSummary() {
             </div>
           </div>
 
-          {/* แถบส่วนล่าง: บทสรุปที่จะเผยแพร่ */}
-          <div className="publish-card-dark main-summary-card-dark">
-            <div className="card-header-dark">
+          {/* การ์ดบทสรุปที่จะเผยแพร่ (กล่องใหญ่ด้านล่าง) */}
+          <div className="purple-card main-summary-card-dark">
+            <div className="card-header-purple">
               <span className="green-status-dot"></span>
-              <h3>{lang === 'en' ? 'Summary to Publish' : 'บทสรุปที่จะเผยแพร่'}</h3>
+              <h3 style={{ margin: 0, color: '#ffffff', fontSize: '1.05rem', fontWeight: '600' }}>
+                {lang === 'en' ? 'Summary to Publish' : 'บทสรุปที่จะเผยแพร่'}
+              </h3>
             </div>
 
             <div className="summary-text-box-dark">
               <div className="summary-item-header">
                 <div className="item-number">1</div>
-                <h4>ตำแหน่ง UX/UI Design | บริษัท อินเวิร์ส โซลูชันส์ จำกัด</h4>
+                <h4 style={{ margin: 0, color: '#ffffff', fontSize: '1rem', fontWeight: '600' }}>
+                  ตำแหน่ง UX/UI Design | บริษัท อินเวิร์ส โซลูชันส์ จำกัด
+                </h4>
               </div>
 
               <div className="summary-section-dark">
-                <h5>{lang === 'en' ? 'Summary Results:' : 'ผลสรุป:'}</h5>
-                <p>
+                <h5 style={{ margin: '0 0 8px 0', color: '#c084fc', fontSize: '0.95rem', fontWeight: '600' }}>
+                  {lang === 'en' ? 'Summary Results:' : 'ผลสรุป:'}
+                </h5>
+                <p style={{ margin: 0, color: '#cbd5e1', fontSize: '0.9rem', lineHeight: '1.6' }}>
                   สวัสดีค่ะ ดิฉันได้ฝึกงานในบริษัทเอกชนที่จังหวัดภูเก็ต ซึ่งให้บริการด้านการออกแบบและพัฒนาซอฟต์แวร์เว็บไซต์และ Mobile Application โดยหน้าที่หลักคือการออกแบบ UI/UX วิเคราะห์ความต้องการผู้ใช้งาน และออกแบบหน้าตาเว็บไซต์ด้วยโปรแกรม Figma รวมถึงมีส่วนร่วมในการออกแบบระบบหลังบ้าน เช่น ระบบจัดการข้อมูลและระบบจองต่าง ๆ จากการฝึกงานครั้งนี้ทำให้ได้เรียนรู้การทำงานจริงและพัฒนาทักษะหลายด้าน... <span className="read-more-purple">{lang === 'en' ? 'Read more' : 'ดูเพิ่มเติม'}</span>
                 </p>
               </div>
