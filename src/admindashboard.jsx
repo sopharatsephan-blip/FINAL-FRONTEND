@@ -172,7 +172,7 @@ function AdminDashboard() {
               <FaHome size={18} />
             </div>
             <div>
-              <h2 style={{ margin: 0 }}>{t.dashboard || 'Dashboard'}</h2>
+              <h2 className="main-title-text" style={{ margin: 0 }}>{t.dashboard || 'Dashboard'}</h2>
               <p className="subtitle-purple" style={{ margin: 0 }}>
                 {t.weeklySummarySub || 'Weekly summary data - March 2026'}
               </p>
