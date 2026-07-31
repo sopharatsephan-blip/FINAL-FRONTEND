@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useLanguage } from './LanguageContext';
 import './SummaryResult.css';
 
@@ -24,11 +24,23 @@ import {
 
 export default function SummaryResult() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { t, lang, toggleLanguage } = useLanguage();
   const [currentUser, setCurrentUser] = useState(null);
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeleted, setIsDeleted] = useState(false);
+
+  // 📌 อ่านค่าที่ส่งมาจาก location.state (พร้อมตั้งค่าเริ่มต้น fallback ถ้าไม่มี state)
+  const videoData = location.state || {};
+  const {
+    videoId = null,
+    videoTitle = '',
+    position = '',
+    company = '',
+    transcript = '',
+    summary = ''
+  } = videoData;
 
   useEffect(() => {
     const savedUser = localStorage.getItem('user');
@@ -50,8 +62,32 @@ export default function SummaryResult() {
     }, 1500);
   };
 
+  // 📌 ส่ง state ต่อไปยังหน้าดูสรุปรายละเอียด
   const handleViewSummary = () => {
-    navigate('/summary-detail?algo=LexRank');
+    navigate('/summary-detail?algo=LexRank', {
+      state: {
+        videoId,
+        videoTitle,
+        position,
+        company,
+        transcript,
+        summary
+      }
+    });
+  };
+
+  // 📌 ส่ง state ไปยังหน้าแก้ไข
+  const handleEditSummary = () => {
+    navigate('/edit-summary', {
+      state: {
+        videoId,
+        videoTitle,
+        position,
+        company,
+        transcript,
+        summary
+      }
+    });
   };
 
   return (
@@ -130,7 +166,7 @@ export default function SummaryResult() {
               />
             </div>
 
-            {/* 🌐 ปุ่มสลับภาษาขนาดเล็กขวาบน */}
+            {/* 🌐 ปุ่มสลับภาษา */}
             <button 
               type="button" 
               onClick={toggleLanguage}
@@ -187,17 +223,24 @@ export default function SummaryResult() {
                   <h4 className="success-title-text">
                     {lang === 'en' ? 'Content Summarization Completed!' : 'สรุปเนื้อหาเสร็จสิ้นแล้ว!'}
                   </h4>
+
+                  {/* 📌 แสดงผลข้อมูลแบบ Dynamic จาก location.state */}
                   <p className="job-title-text">
-                    {lang === 'en' ? 'Internship Position: UX/UI Design' : 'Internship ตำแหน่ง UX/UI Design'}
+                    {position 
+                      ? (lang === 'en' ? `Internship Position: ${position}` : `Internship ตำแหน่ง ${position}`)
+                      : (videoTitle || (lang === 'en' ? 'Video Summarized' : 'วิดีโอได้รับการสรุปแล้ว'))}
                   </p>
-                  <p className="company-title-text">
-                    {lang === 'en' ? '| INVERSE SOLUTIONS CO., LTD.' : '| บริษัท อินเวิร์ส โซลูชันส์ จำกัด'}
-                  </p>
+                  
+                  {company && (
+                    <p className="company-title-text">
+                      {`| ${company}`}
+                    </p>
+                  )}
                 </div>
               </div>
 
               <div className="result-actions-group">
-                <button className="btn-action btn-edit" onClick={() => navigate('/edit-summary')}>
+                <button className="btn-action btn-edit" onClick={handleEditSummary}>
                   <FaEdit /> {lang === 'en' ? 'Edit' : 'แก้ไข'}
                 </button>
 

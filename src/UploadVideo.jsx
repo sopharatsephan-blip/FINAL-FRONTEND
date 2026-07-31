@@ -22,6 +22,7 @@ export default function UploadVideo() {
   const [selectedFile, setSelectedFile] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [isSummarizing, setIsSummarizing] = useState(false);
   const [uploadError, setUploadError] = useState('');
 
   const handleLogout = () => {
@@ -52,7 +53,7 @@ export default function UploadVideo() {
     }
   };
 
-  // 🎬 ฟังก์ชันอัปโหลดวิดีโอเข้าระบบจริง
+  // 🎬 ฟังก์ชันอัปโหลดวิดีโอเข้าระบบจริง + เรียกสรุปด้วย Whisper + LexRank
   const handleUpload = async () => {
     if (!selectedFile) {
       setUploadError(
@@ -72,24 +73,61 @@ export default function UploadVideo() {
       formData.append('videoFile', selectedFile);
       formData.append('uid', currentUser?.uid || '');
 
-      const res = await fetch('http://localhost:5000/api/videos/upload', {
+      // 1️⃣ อัปโหลดไฟล์วิดีโอ + บันทึกข้อมูลลง DB
+      const uploadRes = await fetch('http://localhost:5000/api/videos/upload', {
         method: 'POST',
         body: formData
       });
 
-      const data = await res.json();
+      const uploadData = await uploadRes.json();
 
-      if (!res.ok) {
-        throw new Error(data.message || 'Upload failed');
+      if (!uploadRes.ok) {
+        throw new Error(uploadData.message || 'Upload failed');
       }
 
-      navigate('/summary-result', { state: { videoId: data.videoId } });
+      setIsUploading(false);
+      setIsSummarizing(true);
+
+      // 2️⃣ เรียกสรุปวิดีโอจริง (Whisper ถอดเสียง + LexRank สรุป)
+      const summarizeRes = await fetch(
+        `http://localhost:5000/api/videos/${uploadData.videoId}/summarize`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ numSentences: 5 })
+        }
+      );
+
+      const summarizeData = await summarizeRes.json();
+
+      if (!summarizeRes.ok) {
+        throw new Error(summarizeData.message || 'Summarize failed');
+      }
+
+      // 3️⃣ ไปหน้าแสดงผลพร้อมข้อมูลจริงทั้งหมด
+      navigate('/summary-result', {
+        state: {
+          videoId: uploadData.videoId,
+          videoPath: uploadData.videoPath,
+          transcript: summarizeData.transcript,
+          summary: summarizeData.summary
+        }
+      });
     } catch (err) {
-      console.error('Upload error:', err);
-      setUploadError(`Upload failed: ${err.message}`);
+      console.error('Upload/Summarize error:', err);
+      setUploadError(`${lang === 'en' ? 'Error:' : 'เกิดข้อผิดพลาด:'} ${err.message}`);
     } finally {
       setIsUploading(false);
+      setIsSummarizing(false);
     }
+  };
+
+  const isBusy = isUploading || isSummarizing;
+
+  const getButtonLabel = () => {
+    if (isUploading) return lang === 'en' ? 'Uploading...' : 'กำลังอัปโหลด...';
+    if (isSummarizing) return lang === 'en' ? 'Summarizing...' : 'กำลังสรุปเนื้อหา...';
+    return lang === 'en' ? 'Start Summarizing' : 'เริ่มสรุป';
   };
 
   return (
@@ -243,18 +281,22 @@ export default function UploadVideo() {
               <p style={{ color: '#f87171', marginTop: '12px', fontSize: '14px' }}>{uploadError}</p>
             )}
 
+            {isSummarizing && (
+              <p style={{ color: '#c084fc', marginTop: '12px', fontSize: '14px' }}>
+                {lang === 'en'
+                  ? '⏳ Transcribing and summarizing video, this may take a while...'
+                  : '⏳ กำลังถอดเสียงและสรุปวิดีโอ อาจใช้เวลาสักครู่...'}
+              </p>
+            )}
+
             <div className="action-area-purple">
               <button 
                 type="button"
                 className={`btn-submit-purple ${selectedFile ? 'active' : 'disabled'}`}
-                disabled={!selectedFile || isUploading}
+                disabled={!selectedFile || isBusy}
                 onClick={handleUpload}
               >
-                <span>
-                  {isUploading
-                    ? (lang === 'en' ? 'Uploading...' : 'กำลังอัปโหลด...')
-                    : (lang === 'en' ? 'Start Summarizing' : 'เริ่มสรุป')}
-                </span>
+                <span>{getButtonLabel()}</span>
                 <span className="lets-go-tag">LET'S GO!</span>
               </button>
             </div>
