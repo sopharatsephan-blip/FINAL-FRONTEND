@@ -13,7 +13,7 @@ import {
   FaSearch, 
   FaAsterisk,
   FaSave,
-  FaGlobeAmericas
+  FaLanguage
 } from 'react-icons/fa';
 
 export default function EditSummary() {
@@ -21,7 +21,6 @@ export default function EditSummary() {
   const { t, lang, toggleLanguage } = useLanguage();
   const [currentUser, setCurrentUser] = useState(null);
 
-  // สเตตข้อมูลตามฟอร์มรูปภาพ
   const [formData, setFormData] = useState({
     jobTitle: 'UX/UI Design',
     company: 'บริษัท อินเวิร์ส โซลูชันส์ จำกัด',
@@ -57,8 +56,12 @@ export default function EditSummary() {
       {/* ===== Sidebar ===== */}
       <aside className="sidebar-purple">
         <div>
-          <div className="brand-logo-purple" onClick={() => navigate('/admin')} style={{ cursor: 'pointer' }}>
-            <FaAsterisk style={{ color: '#c084fc' }} />
+          <div
+            className="brand-logo-purple"
+            onClick={() => navigate('/admin')}
+            style={{ cursor: 'pointer' }}
+          >
+            <FaAsterisk className="logo-icon" style={{ color: '#c084fc', marginRight: '8px' }} />
             <span>{t.appName || 'ICT Video Summary'}</span>
           </div>
 
@@ -74,259 +77,192 @@ export default function EditSummary() {
 
           <nav className="menu-list-purple">
             <button className="menu-item-purple" onClick={() => navigate('/admin')}>
-              <FaHome size={16} />
-              <span>{t.dashboard || 'แดชบอร์ด'}</span>
+              <FaHome />
+              <span>{t.dashboard || 'Dashboard'}</span>
             </button>
 
             <button className="menu-item-purple" onClick={() => navigate('/upload-video')}>
-              <FaVideo size={16} />
-              <span>{t.uploadVideo || 'อัปโหลดวิดีโอ'}</span>
+              <FaVideo />
+              <span>{t.uploadVideo || 'Upload Video'}</span>
             </button>
 
             <button className="menu-item-purple active" onClick={() => navigate('/edit-summary')}>
-              <FaEdit size={16} />
-              <span>{t.editSummary || 'แก้ไขข้อมูลของสรุป'}</span>
+              <FaEdit />
+              <span>{t.editSummary || 'Edit Summary'}</span>
             </button>
 
             <button className="menu-item-purple" onClick={() => navigate('/publish')}>
               <FaGlobe size={16} />
-              <span>{t.publish || 'เผยแพร่'}</span>
+              <span>{t.publish || 'Publish'}</span>
             </button>
 
             <button className="menu-item-purple" onClick={() => navigate('/users')}>
-              <FaUsers size={16} />
-              <span>{t.userManagement || 'จัดการผู้ใช้'}</span>
+              <FaUsers />
+              <span>{t.userManagement || 'User Management'}</span>
             </button>
           </nav>
         </div>
 
         <div className="sidebar-footer-purple">
+          {/* ปุ่มสลับภาษา */}
+          <button
+            type="button"
+            className="menu-item-purple"
+            onClick={toggleLanguage}
+            style={{ marginBottom: '10px', background: 'rgba(139, 92, 246, 0.2)', color: '#c084fc' }}
+          >
+            <FaLanguage size={18} />
+            <span>{lang ? lang.toUpperCase() : 'EN'}</span>
+          </button>
+
           <button className="logout-btn-purple" onClick={handleLogout}>
-            <FaSignOutAlt size={16} />
-            <span>{t.logout || 'ออกจากระบบ'}</span>
+            <FaSignOutAlt />
+            <span>{t.logout || 'Logout'}</span>
           </button>
         </div>
       </aside>
 
       {/* ===== Main Content ===== */}
       <main className="main-content-purple">
-        {/* Top Header */}
-        <header className="top-header-purple" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div className="header-title-box" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div className="header-icon-badge" style={{ background: 'rgba(139, 92, 246, 0.2)', color: '#c084fc', padding: '10px', borderRadius: '10px', display: 'flex' }}>
-              <FaEdit size={18} />
-            </div>
-            <h2 style={{ margin: 0, fontSize: '20px', fontWeight: 'bold' }}>
-              {lang === 'en' ? 'Edit Summary Data' : 'แก้ไขข้อมูลของสรุป'}
-            </h2>
-          </div>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div className="search-box-purple">
-              <FaSearch className="search-icon-purple" style={{ color: '#9ca3af', fontSize: '14px' }} />
-              <input 
-                type="text" 
-                className="search-input-purple" 
-                placeholder={t.searchPlaceholder || 'ค้นหาสรุป, ตำแหน่งงาน'} 
-              />
-            </div>
-
-            {/* 🌐 ปุ่มสลับภาษา UI */}
-            <button 
-              type="button" 
-              onClick={toggleLanguage}
+        {/* Top Header — ยึดโครงสร้างเดียวกับ AdminDashboard */}
+        <header className="top-header-purple">
+          <div className="header-title">
+            <div
+              className="header-icon-box"
               style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                padding: '6px 12px',
-                borderRadius: '20px',
-                border: '1px solid rgba(192, 132, 252, 0.4)',
-                background: 'rgba(139, 92, 246, 0.15)',
+                background: 'rgba(139, 92, 246, 0.2)',
                 color: '#c084fc',
-                fontSize: '12px',
-                fontWeight: '600',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                whiteSpace: 'nowrap'
+                padding: '8px',
+                borderRadius: '8px',
+                display: 'flex'
               }}
             >
-              <FaGlobeAmericas size={12} />
-              <span>{lang ? lang.toUpperCase() : 'EN'}</span>
-            </button>
+              <FaEdit size={18} />
+            </div>
+            <div>
+              <h2 style={{ margin: 0 }}>
+                {t.editSummary || 'Edit Summary'}
+              </h2>
+              <p className="subtitle-purple" style={{ margin: 0 }}>
+                {lang === 'en' ? 'Edit and update video summary data' : 'แก้ไขและอัปเดตข้อมูลสรุปวิดีโอ'}
+              </p>
+            </div>
+          </div>
+
+          <div className="search-box-purple">
+            <FaSearch style={{ color: '#9ca3af', fontSize: '14px' }} />
+            <input
+              type="text"
+              placeholder={t.searchPlaceholder || 'Search summary, position...'}
+            />
           </div>
         </header>
 
-        {/* Content Body Area */}
+        {/* Form Card */}
         <div className="detail-body-area" style={{ marginTop: '20px' }}>
-          <div className="purple-card" style={{ padding: '32px' }}>
-            
-            {/* Title */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '28px' }}>
-              <span style={{ width: '10px', height: '10px', backgroundColor: '#f59e0b', borderRadius: '50%', display: 'inline-block' }}></span>
-              <h3 style={{ margin: 0, fontSize: '20px', fontWeight: 'bold', color: '#ffffff' }}>
-                {lang === 'en' ? 'Edit Summary Data' : 'แก้ไขข้อมูลของสรุป'}
-              </h3>
+          <div className="edit-card-purple">
+
+            {/* Card Header */}
+            <div className="edit-card-header">
+              <span className="orange-dot">●</span>
+              <h3>{lang === 'en' ? 'Edit Summary Data' : 'แก้ไขข้อมูลของสรุป'}</h3>
             </div>
 
-            <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-              
+            <form className="edit-form-purple" onSubmit={handleSave}>
+
               {/* ชื่อตำแหน่งงาน */}
               <div className="form-group-purple">
-                <label style={{ display: 'block', color: '#e2e8f0', fontWeight: '600', marginBottom: '8px', fontSize: '15px' }}>
-                  {lang === 'en' ? 'Job Title *' : 'ชื่อตำแหน่งงาน *'}
+                <label>
+                  {lang === 'en' ? 'Job Title' : 'ชื่อตำแหน่งงาน'} <span className="req-star">*</span>
                 </label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   name="jobTitle"
                   value={formData.jobTitle}
                   onChange={handleChange}
-                  style={{
-                    width: '100%',
-                    padding: '12px 16px',
-                    borderRadius: '12px',
-                    border: '1px solid rgba(192, 132, 252, 0.3)',
-                    background: 'rgba(17, 24, 39, 0.6)',
-                    color: '#ffffff',
-                    fontSize: '15px',
-                    outline: 'none'
-                  }}
+                  className="input-purple"
                 />
               </div>
 
               {/* บริษัท/องค์กร */}
               <div className="form-group-purple">
-                <label style={{ display: 'block', color: '#e2e8f0', fontWeight: '600', marginBottom: '8px', fontSize: '15px' }}>
-                  {lang === 'en' ? 'Company / Organization *' : 'บริษัท/องค์กร *'}
+                <label>
+                  {lang === 'en' ? 'Company / Organization' : 'บริษัท/องค์กร'} <span className="req-star">*</span>
                 </label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   name="company"
                   value={formData.company}
                   onChange={handleChange}
-                  style={{
-                    width: '100%',
-                    padding: '12px 16px',
-                    borderRadius: '12px',
-                    border: '1px solid rgba(192, 132, 252, 0.3)',
-                    background: 'rgba(17, 24, 39, 0.6)',
-                    color: '#ffffff',
-                    fontSize: '15px',
-                    outline: 'none'
-                  }}
+                  className="input-purple"
                 />
               </div>
 
-              {/* หมวดหมู่ & จังหวัด (2 Columns) */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+              {/* หมวดหมู่ & จังหวัด (2 คอลัมน์) */}
+              <div className="form-row-purple">
                 <div className="form-group-purple">
-                  <label style={{ display: 'block', color: '#e2e8f0', fontWeight: '600', marginBottom: '8px', fontSize: '15px' }}>
-                    {lang === 'en' ? 'Category *' : 'หมวดหมู่*'}
+                  <label>
+                    {lang === 'en' ? 'Category' : 'หมวดหมู่'} <span className="req-star">*</span>
                   </label>
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     name="category"
                     value={formData.category}
                     onChange={handleChange}
-                    style={{
-                      width: '100%',
-                      padding: '12px 16px',
-                      borderRadius: '12px',
-                      border: '1px solid rgba(192, 132, 252, 0.3)',
-                      background: 'rgba(17, 24, 39, 0.6)',
-                      color: '#ffffff',
-                      fontSize: '15px',
-                      outline: 'none'
-                    }}
+                    className="input-purple"
                   />
                 </div>
 
                 <div className="form-group-purple">
-                  <label style={{ display: 'block', color: '#e2e8f0', fontWeight: '600', marginBottom: '8px', fontSize: '15px' }}>
-                    {lang === 'en' ? 'Province *' : 'จังหวัด*'}
+                  <label>
+                    {lang === 'en' ? 'Province' : 'จังหวัด'} <span className="req-star">*</span>
                   </label>
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     name="province"
                     value={formData.province}
                     onChange={handleChange}
-                    style={{
-                      width: '100%',
-                      padding: '12px 16px',
-                      borderRadius: '12px',
-                      border: '1px solid rgba(192, 132, 252, 0.3)',
-                      background: 'rgba(17, 24, 39, 0.6)',
-                      color: '#ffffff',
-                      fontSize: '15px',
-                      outline: 'none'
-                    }}
+                    className="input-purple"
                   />
                 </div>
               </div>
 
               {/* เนื้อหาที่สรุป */}
               <div className="form-group-purple">
-                <label style={{ display: 'block', color: '#e2e8f0', fontWeight: '600', marginBottom: '8px', fontSize: '15px' }}>
-                  {lang === 'en' ? 'Summary Content *' : 'เนื้อหาที่สรุป *'}
+                <label>
+                  {lang === 'en' ? 'Summary Content' : 'เนื้อหาที่สรุป'} <span className="req-star">*</span>
                 </label>
-                <div style={{
-                  padding: '16px',
-                  borderRadius: '16px',
-                  border: '1px solid rgba(192, 132, 252, 0.3)',
-                  background: 'rgba(17, 24, 39, 0.6)',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '10px'
-                }}>
-                  <h4 style={{ margin: 0, color: '#c084fc', fontSize: '15px', fontWeight: 'bold' }}>
+                <div className="summary-content-box">
+                  <p className="summary-content-label">
                     {lang === 'en' ? 'Summary Results:' : 'ผลสรุปเนื้อหา:'}
-                  </h4>
-                  <textarea 
+                  </p>
+                  <textarea
                     name="summaryContent"
                     value={formData.summaryContent}
                     onChange={handleChange}
                     rows={6}
-                    style={{
-                      width: '100%',
-                      background: 'transparent',
-                      border: 'none',
-                      color: '#e2e8f0',
-                      fontSize: '14px',
-                      lineHeight: '1.6',
-                      outline: 'none',
-                      resize: 'vertical'
-                    }}
+                    className="textarea-purple"
+                    style={{ border: 'none', background: 'transparent', padding: 0 }}
                   />
                 </div>
               </div>
 
               {/* ปุ่มบันทึก */}
-              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
-                <button 
-                  type="submit"
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    padding: '12px 28px',
-                    borderRadius: '12px',
-                    border: 'none',
-                    background: '#8b5cf6',
-                    color: '#ffffff',
-                    fontSize: '15px',
-                    fontWeight: '600',
-                    cursor: 'pointer',
-                    boxShadow: '0 4px 12px rgba(139, 92, 246, 0.3)',
-                    transition: 'all 0.2s ease'
-                  }}
+              <div className="form-actions-purple">
+                <button
+                  type="button"
+                  className="btn-cancel-purple"
+                  onClick={() => navigate('/admin')}
                 >
-                  <FaSave size={16} />
+                  {lang === 'en' ? 'Cancel' : 'ยกเลิก'}
+                </button>
+                <button type="submit" className="btn-save-purple">
+                  <FaSave size={14} />
                   <span>{lang === 'en' ? 'Save Changes' : 'บันทึกการแก้ไข'}</span>
                 </button>
               </div>
 
             </form>
-
           </div>
         </div>
       </main>
