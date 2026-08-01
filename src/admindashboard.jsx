@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useLanguage } from './LanguageContext'; // 1. Import useLanguage เข้ามา
+import { useLanguage } from './LanguageContext';
 import './admindashboard.css';
 
-// 📌 นำเข้า React Icons
 import {
   FaHome,
   FaVideo,
@@ -16,15 +15,42 @@ import {
   FaLanguage
 } from 'react-icons/fa';
 
+// ✅ helper: แปลง Duration "15:30" → "15:30 mins"
+function formatDuration(duration) {
+  if (!duration) return '-';
+  return `${duration} mins`;
+}
+
+// ✅ helper: แปลงวันที่เป็น "30 January 2026" หรือ "30 มกราคม 2026"
+function formatDate(dateStr, lang) {
+  if (!dateStr) return '-';
+  const date = new Date(dateStr);
+  return date.toLocaleDateString(lang === 'th' ? 'th-TH' : 'en-GB', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
+}
+
+// ✅ helper: map Position → badge label
+function getCategoryBadge(position) {
+  if (!position) return 'Developer';
+  const p = position.toLowerCase();
+  if (p.includes('ux') || p.includes('ui')) return 'UX/UI';
+  if (p.includes('data') || p.includes('ai')) return 'Data/AI';
+  if (p.includes('network')) return 'Network';
+  if (p.includes('graphic')) return 'Graphic';
+  return 'Developer';
+}
+
 function AdminDashboard() {
   const navigate = useNavigate();
-  const { t, lang, toggleLanguage } = useLanguage(); // 2. ดึงตารางภาษา ฟังก์ชัน และภาษาปัจจุบันมาใช้
+  const { t, lang, toggleLanguage } = useLanguage();
   const [currentUser, setCurrentUser] = useState(null);
 
   const [hasSearched, setHasSearched] = useState(false);
   const resultRef = useRef(null);
 
-  // Default States สำหรับฟิลเตอร์
   const initialCategory = 'UX/UI';
   const initialWorkTypes = { onsite: true, hybrid: true, wfh: false };
 
@@ -33,6 +59,11 @@ function AdminDashboard() {
   const [businessType, setBusinessType] = useState('Software House');
   const [location, setLocation] = useState('');
   const [keyword, setKeyword] = useState('');
+
+  // ✅ State สำหรับข้อมูลจริงจาก API
+  const [popularVideo, setPopularVideo] = useState(null);
+  const [weeklySummaries, setWeeklySummaries] = useState([]);
+  const [dashboardLoading, setDashboardLoading] = useState(true);
 
   // 🔒 เช็กล็อกอิน
   useEffect(() => {
@@ -43,6 +74,28 @@ function AdminDashboard() {
       setCurrentUser(JSON.parse(savedUser));
     }
   }, [navigate]);
+
+  // ✅ ดึงข้อมูล Dashboard จาก API
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        setDashboardLoading(true);
+        const [popularRes, weeklyRes] = await Promise.all([
+          fetch('http://localhost:5000/api/dashboard/popular-video'),
+          fetch('http://localhost:5000/api/dashboard/weekly-summaries'),
+        ]);
+        const popularData = await popularRes.json();
+        const weeklyData = await weeklyRes.json();
+        setPopularVideo(popularData.data || null);
+        setWeeklySummaries(weeklyData.data || []);
+      } catch (err) {
+        console.error('Dashboard fetch error:', err);
+      } finally {
+        setDashboardLoading(false);
+      }
+    };
+    fetchDashboardData();
+  }, []);
 
   const [videoResults, setVideoResults] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -60,7 +113,7 @@ function AdminDashboard() {
         businessType,
         location,
         workType: workTypeList.join(','),
-        keyword
+        keyword,
       });
 
       const res = await fetch(`http://localhost:5000/api/videos/search?${params}`);
@@ -87,19 +140,18 @@ function AdminDashboard() {
     setWorkTypes({ ...workTypes, [e.target.name]: e.target.checked });
   };
 
-  // 🧹 ฟังก์ชันล้างตัวกรอง
   const handleResetFilter = () => {
     setSelectedCategory(initialCategory);
     setWorkTypes(initialWorkTypes);
     setBusinessType('');
-    setLocation(''); // เปลี่ยนจาก 'กรุงเทพมหานคร'
+    setLocation('');
     setKeyword('');
     setHasSearched(false);
   };
 
   return (
     <div className="admin-purple-container">
-      {/* ===== Sidebar ม่วงเข้ม ===== */}
+      {/* ===== Sidebar ===== */}
       <aside className="sidebar-purple">
         <div>
           <div className="brand-logo-purple" onClick={() => navigate('/admin')} style={{ cursor: 'pointer' }}>
@@ -122,22 +174,18 @@ function AdminDashboard() {
               <FaHome />
               <span>{t.dashboard || 'Dashboard'}</span>
             </button>
-
             <button className="menu-item-purple" onClick={() => navigate('/upload-video')}>
               <FaVideo />
               <span>{t.uploadVideo || 'Upload Video'}</span>
             </button>
-
             <button className="menu-item-purple" onClick={() => navigate('/edit-summary')}>
               <FaEdit />
               <span>{t.editSummary || 'Edit Summary'}</span>
             </button>
-
             <button className="menu-item-purple" onClick={() => navigate('/publish')}>
               <FaGlobe size={16} />
               <span>{t.publish || 'Publish'}</span>
             </button>
-
             <button className="menu-item-purple" onClick={() => navigate('/users')}>
               <FaUsers />
               <span>{t.userManagement || 'User Management'}</span>
@@ -146,7 +194,6 @@ function AdminDashboard() {
         </div>
 
         <div className="sidebar-footer-purple">
-          {/* 🌐 ปุ่มสลับภาษาตรง Sidebar */}
           <button
             type="button"
             className="menu-item-purple"
@@ -156,7 +203,6 @@ function AdminDashboard() {
             <FaLanguage size={18} />
             <span>{lang ? lang.toUpperCase() : 'EN'}</span>
           </button>
-
           <button className="logout-btn-purple" onClick={handleLogout}>
             <FaSignOutAlt />
             <span>{t.logout || 'Logout'}</span>
@@ -164,7 +210,7 @@ function AdminDashboard() {
         </div>
       </aside>
 
-      {/* ===== Main Content ด้านขวา ===== */}
+      {/* ===== Main Content ===== */}
       <main className="main-content-purple">
         <header className="top-header-purple">
           <div className="header-title">
@@ -178,92 +224,65 @@ function AdminDashboard() {
               </p>
             </div>
           </div>
-
           <div className="search-box-purple">
             <FaSearch style={{ color: '#9ca3af', fontSize: '14px' }} />
             <input type="text" placeholder={t.searchPlaceholder || 'Search summary, position...'} />
           </div>
         </header>
 
-        {/* แถวที่ 1: ยอดฮิต + สรุปประจำสัปดาห์ */}
+        {/* ✅ แถวที่ 1: Popular Video + Weekly Summaries (ข้อมูลจริง) */}
         <div className="grid-row-2">
+
+          {/* Popular Video Rank */}
           <div className="purple-card">
             <h3 className="card-title-purple text-green">
               🟢 {t.popularVideoTitle || 'Popular Video Rank'}
             </h3>
-            <div className="hero-banner-purple">
-              <span className="top-badge">👑 {t.rankBadge || 'Rank 1 This Week'}</span>
-              <div className="hero-details">
-                <h4>
-                  {lang === 'en'
-                    ? 'Position UX/UI Design | INVERSE SOLUTIONS CO., LTD.'
-                    : 'ตำแหน่ง UX/UI Design | บริษัท อินเวิร์ส โซลูชันส์ จำกัด'}
-                </h4>
-                <p>IO-HOPE ENTERPRISE · Developer</p>
-                <div className="stats-purple">
-                  <span>👁️ 312 {t.viewsCount || 'views'}</span>
-                  <span>⏱️ 5:03 {t.durationMinutes || 'mins'}</span>
+            {dashboardLoading ? (
+              <div style={{ color: '#94a3b8', fontSize: '14px' }}>กำลังโหลด...</div>
+            ) : popularVideo ? (
+              <div className="hero-banner-purple">
+                <span className="top-badge">👑 {t.rankBadge || 'Rank 1 This Week'}</span>
+                <div className="hero-details">
+                  <h4>{popularVideo.VideoTitle}</h4>
+                  <p>{popularVideo.CompanyName} · {popularVideo.Position}</p>
+                  <div className="stats-purple">
+                    <span>👁️ {popularVideo.ViewCount} {t.viewsCount || 'views'}</span>
+                    <span>⏱️ {formatDuration(popularVideo.Duration)}</span>
+                  </div>
                 </div>
+                <div className="chart-icon">📈</div>
               </div>
-              <div className="chart-icon">📈</div>
-            </div>
+            ) : null}
           </div>
 
+          {/* Weekly Video Summaries */}
           <div className="purple-card">
             <h3 className="card-title-purple text-purple">
               🔹 {t.weeklySummaryListTitle || 'Weekly Video Summaries'}
             </h3>
-            <ul className="weekly-list-purple">
-              <li>
-                <div>
-                  <strong>
-                    {lang === 'en'
-                      ? 'Position UX/UI Design | INVERSE SOLUTIONS CO., LTD.'
-                      : 'ตำแหน่ง UX/UI Design | บริษัท อินเวิร์ส โซลูชันส์ จำกัด'}
-                  </strong>
-                  <p>
-                    {lang === 'en'
-                      ? '30 January 2026 · 5:30 mins · 18 views'
-                      : 'วันที่ 30 เดือนมกราคม 2569 · 5:30 นาที · ผู้ชม 18 คน'}
-                  </p>
-                </div>
-                <span className="purple-badge">UX/UI</span>
-              </li>
-              <li>
-                <div>
-                  <strong>
-                    {lang === 'en'
-                      ? 'Position Graphic | PRINT UP CO., LTD.'
-                      : 'ตำแหน่ง Graphic บริษัท PRINT UP'}
-                  </strong>
-                  <p>
-                    {lang === 'en'
-                      ? '30 January 2026 · 5:08 mins · 6 views'
-                      : 'วันที่ 30 เดือนมกราคม 2569 · 5:08 นาที · ผู้ชม 6 คน'}
-                  </p>
-                </div>
-                <span className="purple-badge">Graphic</span>
-              </li>
-              <li>
-                <div>
-                  <strong>
-                    {lang === 'en'
-                      ? 'Position Web Developer | IO-HOPE ENTERPRISE'
-                      : 'ตำแหน่ง web Developer บริษัท IO-HOPE ENTERPRISE'}
-                  </strong>
-                  <p>
-                    {lang === 'en'
-                      ? '30 January 2026 · 5:03 mins · 10 views'
-                      : 'วันที่ 30 เดือนมกราคม 2569 · 5:03 นาที · ผู้ชม 10 คน'}
-                  </p>
-                </div>
-                <span className="purple-badge">Developer</span>
-              </li>
-            </ul>
+            {dashboardLoading ? (
+              <div style={{ color: '#94a3b8', fontSize: '14px' }}>กำลังโหลด...</div>
+            ) : (
+              <ul className="weekly-list-purple">
+                {weeklySummaries.map((video) => (
+                  <li key={video.VideoID}>
+                    <div>
+                      <strong>{video.VideoTitle}</strong>
+                      <p>
+                        {formatDate(video.UploadDate, lang)} · {formatDuration(video.Duration)} · {video.ViewCount} views
+                      </p>
+                    </div>
+                    <span className="purple-badge">{getCategoryBadge(video.Position)}</span>
+                  </li>
+                ))}
+
+              </ul>
+            )}
           </div>
         </div>
 
-        {/* แถวที่ 2: ตัวกรองข้อมูล */}
+        {/* ===== ตัวกรองข้อมูล (ไม่เปลี่ยนแปลง) ===== */}
         <div className="purple-card filter-section-purple">
           <div className="result-header-purple" style={{ marginBottom: '15px' }}>
             <h3 className="card-title-purple" style={{ margin: 0 }}>
@@ -284,7 +303,7 @@ function AdminDashboard() {
                   { id: 'UX/UI', label: 'UX/UI' },
                   { id: 'Data/AI', label: 'Data/AI' },
                   { id: 'Network', label: 'Network' },
-                  { id: 'Graphic', label: 'Graphic' }
+                  { id: 'Graphic', label: 'Graphic' },
                 ].map((cat) => (
                   <button
                     key={cat.id}
@@ -299,11 +318,7 @@ function AdminDashboard() {
 
               <div className="form-group-purple">
                 <label>{t.businessType || 'Business Type'}</label>
-                <select
-                  className="dark-purple-input"
-                  value={businessType}
-                  onChange={(e) => setBusinessType(e.target.value)}
-                >
+                <select className="dark-purple-input" value={businessType} onChange={(e) => setBusinessType(e.target.value)}>
                   <option value="">{lang === 'en' ? 'All' : 'ทั้งหมด'}</option>
                   <option value="Software House">Software House</option>
                   <option value="E-Commerce">E-Commerce</option>
@@ -357,7 +372,6 @@ function AdminDashboard() {
                   : `ตัวกรองพบ ${videoResults.length} ตำแหน่งงาน`}
               </h3>
             </div>
-
             <div className="cards-grid-purple">
               {isLoading && <p>{lang === 'en' ? 'Loading...' : 'กำลังโหลด...'}</p>}
               {!isLoading && videoResults.length === 0 && (
