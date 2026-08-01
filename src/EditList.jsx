@@ -6,8 +6,10 @@ import './admindashboard.css';
 import { 
   FaHome, FaVideo, FaEdit, FaGlobe, FaUsers,
   FaSignOutAlt, FaSearch, FaPlay, FaAsterisk,
-  FaArrowRight, FaLanguage
+  FaArrowRight, FaLanguage, FaTrash
 } from 'react-icons/fa';
+
+const API_BASE = 'http://localhost:5000/api';
 
 export default function EditList() {
   const navigate = useNavigate();
@@ -16,6 +18,8 @@ export default function EditList() {
   const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [deletingId, setDeletingId] = useState(null); // เก็บ VideoID ที่กำลังลบอยู่ (กันกดซ้ำ)
+  const [videoToDelete, setVideoToDelete] = useState(null); // วิดีโอที่รอยืนยันลบ (เปิด modal เมื่อไม่ใช่ null)
 
   useEffect(() => {
     const savedUser = localStorage.getItem('user');
@@ -29,7 +33,7 @@ export default function EditList() {
     const fetchVideos = async () => {
       try {
         setLoading(true);
-        const res = await fetch('http://localhost:5000/api/videos');
+        const res = await fetch(`${API_BASE}/videos`);
         const data = await res.json();
         setVideos(data);
       } catch (err) {
@@ -44,6 +48,43 @@ export default function EditList() {
   const handleLogout = () => {
     localStorage.removeItem('user');
     navigate('/login');
+  };
+
+  // 🗑️ คลิกถังขยะ -> เปิด modal ยืนยันก่อน (ยังไม่ลบจริง)
+  const handleDeleteClick = (e, video) => {
+    e.stopPropagation(); // กันไม่ให้ trigger การคลิกที่การ์ด (ซึ่งจะ navigate ไปหน้า edit)
+    setVideoToDelete(video);
+  };
+
+  // ✅ กดยืนยันใน modal -> ลบจริง
+  const confirmDelete = async () => {
+    if (!videoToDelete) return;
+    const video = videoToDelete;
+
+    setDeletingId(video.VideoID);
+    try {
+      const res = await fetch(`${API_BASE}/videos/${video.VideoID}`, {
+        method: 'DELETE',
+      });
+
+      if (!res.ok) {
+        throw new Error('ลบไม่สำเร็จ');
+      }
+
+      // ลบออกจาก state ทันที ไม่ต้อง reload ทั้งหน้า
+      setVideos((prev) => prev.filter((v) => v.VideoID !== video.VideoID));
+    } catch (err) {
+      console.error('Delete video error:', err);
+      alert(lang === 'en' ? 'Failed to delete video' : 'ลบวิดีโอไม่สำเร็จ');
+    } finally {
+      setDeletingId(null);
+      setVideoToDelete(null); // ปิด modal
+    }
+  };
+
+  // ❌ กดยกเลิกใน modal
+  const cancelDelete = () => {
+    setVideoToDelete(null);
   };
 
   // กรองตาม search
@@ -138,7 +179,7 @@ export default function EditList() {
             <div
               key={video.VideoID}
               className="purple-card"
-              style={{ padding: '0', cursor: 'pointer' }}
+              style={{ padding: '0', cursor: 'pointer', position: 'relative' }}
               onClick={() => navigate(`/edit-summary-detail/${video.VideoID}`)}
               onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(139, 92, 246, 0.08)'}
               onMouseLeave={(e) => e.currentTarget.style.background = '#150c26'}
@@ -152,9 +193,43 @@ export default function EditList() {
                       {lang === 'en' ? 'Summary Completed' : 'สรุปเสร็จสิ้น'}
                     </span>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#c4b5fd', fontSize: '0.82rem', fontWeight: '500', background: 'rgba(139, 92, 246, 0.2)', padding: '4px 12px', borderRadius: '20px', border: '1px solid rgba(139, 92, 246, 0.4)' }}>
-                    <span>{lang === 'en' ? 'Click to edit summary' : 'คลิกเพื่อแก้ไขสรุป'}</span>
-                    <FaArrowRight size={10} style={{ color: '#c084fc' }} />
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#c4b5fd', fontSize: '0.82rem', fontWeight: '500', background: 'rgba(139, 92, 246, 0.2)', padding: '4px 12px', borderRadius: '20px', border: '1px solid rgba(139, 92, 246, 0.4)' }}>
+                      <span>{lang === 'en' ? 'Click to edit summary' : 'คลิกเพื่อแก้ไขสรุป'}</span>
+                      <FaArrowRight size={10} style={{ color: '#c084fc' }} />
+                    </div>
+
+                    {/* ปุ่มถังขยะ - ลบวิดีโอ */}
+                    <button
+                      onClick={(e) => handleDeleteClick(e, video)}
+                      disabled={deletingId === video.VideoID}
+                      title={lang === 'en' ? 'Delete video' : 'ลบวิดีโอ'}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        width: '32px',
+                        height: '32px',
+                        background: 'rgba(239, 68, 68, 0.15)',
+                        border: '1px solid rgba(239, 68, 68, 0.4)',
+                        borderRadius: '8px',
+                        color: '#f87171',
+                        cursor: deletingId === video.VideoID ? 'not-allowed' : 'pointer',
+                        opacity: deletingId === video.VideoID ? 0.5 : 1,
+                        transition: 'all 0.15s',
+                      }}
+                      onMouseEnter={(e) => {
+                        if (deletingId !== video.VideoID) {
+                          e.currentTarget.style.background = 'rgba(239, 68, 68, 0.3)';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = 'rgba(239, 68, 68, 0.15)';
+                      }}
+                    >
+                      <FaTrash size={13} />
+                    </button>
                   </div>
                 </div>
 
@@ -188,6 +263,104 @@ export default function EditList() {
           ))}
         </div>
       </main>
+
+      {/* ===== Modal ยืนยันการลบ ===== */}
+      {videoToDelete && (
+        <div
+          onClick={cancelDelete}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0, 0, 0, 0.6)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()} // กันไม่ให้คลิกในกล่องแล้วปิด modal
+            style={{
+              background: '#150c26',
+              border: '1px solid rgba(139, 92, 246, 0.25)',
+              borderRadius: '14px',
+              padding: '28px',
+              width: '90%',
+              maxWidth: '380px',
+              boxShadow: '0 10px 40px rgba(0, 0, 0, 0.5)',
+              textAlign: 'center',
+            }}
+          >
+            <div
+              style={{
+                width: '56px',
+                height: '56px',
+                borderRadius: '50%',
+                background: 'rgba(239, 68, 68, 0.15)',
+                border: '1px solid rgba(239, 68, 68, 0.4)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 16px auto',
+                color: '#f87171',
+              }}
+            >
+              <FaTrash size={20} />
+            </div>
+
+            <h3 style={{ color: '#f1f5f9', margin: '0 0 8px 0', fontSize: '16px', fontWeight: 600 }}>
+              {lang === 'en' ? 'Delete this video?' : 'ยืนยันการลบวิดีโอนี้?'}
+            </h3>
+            <p style={{ color: '#94a3b8', margin: '0 0 22px 0', fontSize: '13px', lineHeight: 1.6 }}>
+              {lang === 'en'
+                ? <>Are you sure you want to delete <strong style={{ color: '#e2e8f0' }}>"{videoToDelete.VideoTitle}"</strong>? This action cannot be undone and all related data will be removed.</>
+                : <>ต้องการลบ <strong style={{ color: '#e2e8f0' }}>"{videoToDelete.VideoTitle}"</strong> ใช่หรือไม่? การกระทำนี้ไม่สามารถย้อนกลับได้ และข้อมูลที่เกี่ยวข้องทั้งหมดจะถูกลบไปด้วย</>
+              }
+            </p>
+
+            <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
+              <button
+                onClick={cancelDelete}
+                disabled={deletingId === videoToDelete.VideoID}
+                style={{
+                  flex: 1,
+                  background: 'transparent',
+                  color: '#cbd5e1',
+                  border: '1px solid rgba(139, 92, 246, 0.35)',
+                  padding: '10px 16px',
+                  borderRadius: '8px',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                }}
+              >
+                {lang === 'en' ? 'Cancel' : 'ยกเลิก'}
+              </button>
+              <button
+                onClick={confirmDelete}
+                disabled={deletingId === videoToDelete.VideoID}
+                style={{
+                  flex: 1,
+                  background: deletingId === videoToDelete.VideoID
+                    ? 'rgba(239, 68, 68, 0.5)'
+                    : 'linear-gradient(135deg, #ef4444, #b91c1c)',
+                  color: '#ffffff',
+                  border: 'none',
+                  padding: '10px 16px',
+                  borderRadius: '8px',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  cursor: deletingId === videoToDelete.VideoID ? 'not-allowed' : 'pointer',
+                }}
+              >
+                {deletingId === videoToDelete.VideoID
+                  ? (lang === 'en' ? 'Deleting...' : 'กำลังลบ...')
+                  : (lang === 'en' ? 'Delete' : 'ลบเลย')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -20,7 +20,7 @@ import CoopContent from './student/CoopContent.jsx';
 import DownloadPdf from './student/DownloadPdf.jsx';
 import Favorites from './student/Favorites.jsx';
 import Register from './Register.jsx'
-
+import ForgotPassword from './ForgotPassword.jsx';
 import './index.css';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
@@ -44,6 +44,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           <Route path="/download-pdf" element={<DownloadPdf />} />
           <Route path="/favorites" element={<Favorites />} />
           <Route path='/Register' element={<Register />} />
+          <Route path="/reset-password" element={<ForgotPassword />} />
         </Routes>
       </BrowserRouter>
     </LanguageProvider> 

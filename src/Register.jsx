@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useLanguage } from './LanguageContext';
 import './Register.css';
 
 export default function Register() {
   const navigate = useNavigate();
+  const { lang, toggleLanguage } = useLanguage();
 
   const [formData, setFormData] = useState({
     email: '',
@@ -31,12 +33,16 @@ export default function Register() {
 
     // ตรวจสอบอีเมลก่อนส่งไป backend: ต้องมี "@" ถึงจะลงทะเบียนผ่าน
     if (!formData.email.includes('@') || !isValidEmail(formData.email)) {
-      setError('กรุณากรอกอีเมลให้ถูกต้อง (ต้องมี @ เช่น example@email.com)');
+      setError(lang === 'en'
+        ? 'Please enter a valid email (must contain @, e.g. example@email.com)'
+        : 'กรุณากรอกอีเมลให้ถูกต้อง (ต้องมี @ เช่น example@email.com)');
       return;
     }
 
     if (formData.password.length < 6) {
-      setError('รหัสผ่านต้องมีความยาวอย่างน้อย 6 ตัวอักษร');
+      setError(lang === 'en'
+        ? 'Password must be at least 6 characters long'
+        : 'รหัสผ่านต้องมีความยาวอย่างน้อย 6 ตัวอักษร');
       return;
     }
 
@@ -51,17 +57,23 @@ export default function Register() {
       const data = await res.json().catch(() => ({}));
 
       if (!res.ok) {
-        throw new Error(data.message || 'สมัครสมาชิกไม่สำเร็จ กรุณาลองใหม่อีกครั้ง');
+        throw new Error(data.message || (lang === 'en'
+          ? 'Registration failed, please try again'
+          : 'สมัครสมาชิกไม่สำเร็จ กรุณาลองใหม่อีกครั้ง'));
       }
 
-      setSuccess('สมัครสมาชิกสำเร็จ กำลังพาไปหน้าเข้าสู่ระบบ...');
+      setSuccess(lang === 'en'
+        ? 'Registration successful! Redirecting to login...'
+        : 'สมัครสมาชิกสำเร็จ กำลังพาไปหน้าเข้าสู่ระบบ...');
 
       // เคลียร์ฟอร์มแล้วพาไปหน้า login หลังสมัครสำเร็จ
       setFormData({ email: '', username: '', password: '', firstname: '', lastname: '' });
       setTimeout(() => navigate('/login'), 1200);
     } catch (err) {
       console.error('Register error:', err);
-      setError(err.message || 'เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง');
+      setError(err.message || (lang === 'en'
+        ? 'An error occurred, please try again'
+        : 'เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง'));
     } finally {
       setLoading(false);
     }
@@ -79,21 +91,21 @@ export default function Register() {
             watch, read summaries, and download notes efficiently.
           </p>
         </div>
-        <div className="footer-text">
-          © 2026 Video Summary System. All rights reserved.
-        </div>
       </div>
 
       {/* ฝั่งขวา */}
       <div className="register-right">
-        <button className="lang-btn">🌐 EN</button>
+        <button type="button" className="lang-btn" onClick={toggleLanguage}>
+          🌐 {lang ? lang.toUpperCase() : 'EN'}
+        </button>
 
         <div className="form-container-box">
           <div className="form-header">
             <h2>Video Summary</h2>
-            <h3>Create Account</h3>
+            <h3>{lang === 'en' ? 'Create Account' : 'สร้างบัญชีผู้ใช้'}</h3>
             <p className="subtitle">
-              Already have an account? <a href="/login">Sign in</a>
+              {lang === 'en' ? 'Already have an account?' : 'มีบัญชีอยู่แล้ว?'}{' '}
+              <a href="/login">{lang === 'en' ? 'Sign in' : 'เข้าสู่ระบบ'}</a>
             </p>
           </div>
 
@@ -101,7 +113,7 @@ export default function Register() {
             <input
               type="email"
               name="email"
-              placeholder="Email"
+              placeholder={lang === 'en' ? 'Email' : 'อีเมล'}
               value={formData.email}
               onChange={handleChange}
               required
@@ -110,7 +122,7 @@ export default function Register() {
             <input
               type="text"
               name="username"
-              placeholder="Username"
+              placeholder={lang === 'en' ? 'Username' : 'ชื่อผู้ใช้'}
               value={formData.username}
               onChange={handleChange}
               required
@@ -119,7 +131,7 @@ export default function Register() {
             <input
               type="password"
               name="password"
-              placeholder="Password"
+              placeholder={lang === 'en' ? 'Password' : 'รหัสผ่าน'}
               value={formData.password}
               onChange={handleChange}
               required
@@ -128,7 +140,7 @@ export default function Register() {
             <input
               type="text"
               name="firstname"
-              placeholder="First Name"
+              placeholder={lang === 'en' ? 'First Name' : 'ชื่อจริง'}
               value={formData.firstname}
               onChange={handleChange}
               required
@@ -137,7 +149,7 @@ export default function Register() {
             <input
               type="text"
               name="lastname"
-              placeholder="Last Name"
+              placeholder={lang === 'en' ? 'Last Name' : 'นามสกุล'}
               value={formData.lastname}
               onChange={handleChange}
               required
@@ -156,7 +168,9 @@ export default function Register() {
             )}
 
             <button type="submit" className="btn-signup" disabled={loading}>
-              {loading ? 'กำลังสมัครสมาชิก...' : 'Sign Up'}
+              {loading
+                ? (lang === 'en' ? 'Signing up...' : 'กำลังสมัครสมาชิก...')
+                : (lang === 'en' ? 'Sign Up' : 'สมัครสมาชิก')}
             </button>
           </form>
         </div>
@@ -164,6 +178,3 @@ export default function Register() {
     </div>
   );
 }
-
-
-

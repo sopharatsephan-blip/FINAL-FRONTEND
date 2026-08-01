@@ -90,7 +90,7 @@ function Login() {
               ? "Platform for teachers to upload lesson videos and students to watch, read summaries, and download notes efficiently."
               : "แพลตฟอร์มสำหรับอาจารย์ในการอัปโหลดวิดีโอบทเรียน และนิสิตสามารถรับชม อ่านบทสรุป และดาวน์โหลดโน้ตได้อย่างมีประสิทธิภาพ"}
           </p>
-          <footer>© 2026 Video Summary System. All rights reserved.</footer>
+          
         </div>
       </div>
 
