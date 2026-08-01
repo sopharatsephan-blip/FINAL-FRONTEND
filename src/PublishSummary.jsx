@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useLanguage } from './LanguageContext';
 import './PublishSummary.css';
 
@@ -20,14 +20,24 @@ import {
   FaLanguage
 } from 'react-icons/fa';
 
+const API_BASE = 'http://localhost:5000/api';
+
 export default function PublishSummary() {
   const navigate = useNavigate();
+  const { videoId } = useParams(); // route: /publish-summary/:videoId
   const { t, lang, toggleLanguage } = useLanguage();
   const [currentUser, setCurrentUser] = useState(null);
-  const [publishTarget, setPublishTarget] = useState('everyone'); 
-  
+  const [publishTarget, setPublishTarget] = useState('everyone');
+
   // State สำหรับควบคุม Success Modal
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+
+  // State สำหรับข้อมูลวิดีโอ/สรุปจริงจากฐานข้อมูล
+  const [video, setVideo] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [publishing, setPublishing] = useState(false);
+  const [publishError, setPublishError] = useState('');
 
   useEffect(() => {
     const savedUser = localStorage.getItem('user');
@@ -40,13 +50,69 @@ export default function PublishSummary() {
     }
   }, []);
 
+  // ✅ ดึงรายละเอียดวิดีโอ + สรุปจริงจากฐานข้อมูลตาม videoId
+  useEffect(() => {
+    if (!videoId) {
+      setError(lang === 'en' ? 'No video selected.' : 'ไม่พบรหัสวิดีโอใน URL');
+      setLoading(false);
+      return;
+    }
+
+    const fetchVideo = async () => {
+      try {
+        setLoading(true);
+        const res = await fetch(`${API_BASE}/videos/${videoId}`);
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.message || 'ดึงข้อมูลไม่สำเร็จ');
+        }
+
+        setVideo(data);
+        // ตั้งค่าเริ่มต้นของ target ตามสถานะปัจจุบันในฐานข้อมูล
+        setPublishTarget(data.VisibilityType === 'Private' ? 'private' : 'everyone');
+        setError('');
+      } catch (err) {
+        console.error('Fetch video detail error:', err);
+        setError(lang === 'en' ? 'Failed to load video details' : 'ไม่สามารถโหลดข้อมูลวิดีโอได้');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchVideo();
+  }, [videoId, lang]);
+
   const handleLogout = () => {
     localStorage.removeItem('user');
     navigate('/login');
   };
 
-  const handlePublish = () => {
-    setShowSuccessModal(true);
+  // ✅ เผยแพร่จริง - อัปเดต VisibilityType ในฐานข้อมูล
+  const handlePublish = async () => {
+    setPublishError('');
+    setPublishing(true);
+    try {
+      const visibilityType = publishTarget === 'private' ? 'Private' : 'Public';
+      const res = await fetch(`${API_BASE}/videos/${videoId}/publish`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ visibilityType }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        throw new Error(data.message || (lang === 'en' ? 'Failed to publish' : 'เผยแพร่ไม่สำเร็จ'));
+      }
+
+      setShowSuccessModal(true);
+    } catch (err) {
+      console.error('Publish error:', err);
+      setPublishError(err.message || (lang === 'en' ? 'Failed to publish' : 'เผยแพร่ไม่สำเร็จ'));
+    } finally {
+      setPublishing(false);
+    }
   };
 
   const handleCloseModal = () => {
@@ -152,109 +218,141 @@ export default function PublishSummary() {
           </div>
         </header>
 
-        {/* Area เนื้อหา Publish - ใช้สไตล์และการจัดวางเดียวกับ Admin Dashboard */}
-        <div className="publish-body-area">
-          <div className="publish-top-grid">
-            {/* การ์ดสรุปวิดีโอ */}
-            <div className="purple-card">
+        {loading && (
+          <div className="purple-card" style={{ color: '#94a3b8', padding: '24px', marginTop: '20px' }}>
+            {lang === 'en' ? 'Loading...' : 'กำลังโหลด...'}
+          </div>
+        )}
+
+        {!loading && error && (
+          <div className="purple-card" style={{ color: '#f87171', padding: '24px', marginTop: '20px' }}>
+            {error}
+          </div>
+        )}
+
+        {!loading && !error && video && (
+          <div className="publish-body-area">
+            <div className="publish-top-grid">
+              {/* การ์ดสรุปวิดีโอ - ข้อมูลจริงจาก DB */}
+              <div className="purple-card">
+                <div className="card-header-purple">
+                  <span className="green-status-dot"></span>
+                  <h3 style={{ margin: 0, color: '#ffffff', fontSize: '1.05rem', fontWeight: '600' }}>
+                    {lang === 'en' ? 'Summary Completed' : 'สรุปเสร็จสิ้น'}
+                  </h3>
+                </div>
+                
+                <div className="summary-video-info">
+                  <div className="video-thumbnail-box-purple">
+                    <FaPlay size={18} />
+                  </div>
+                  <div className="video-details">
+                    <h4 style={{ color: '#ffffff', margin: '0 0 6px 0', fontSize: '1rem', fontWeight: '600' }}>
+                      {video.Position 
+                        ? `Internship ตำแหน่ง ${video.Position}${video.CompanyName ? ` | ${video.CompanyName}` : ''}`
+                        : video.VideoTitle}
+                    </h4>
+                    <p style={{ color: '#cbd5e1', fontSize: '0.85rem', margin: '0 0 10px 0' }}>
+                      {video.UploadDate
+                        ? new Date(video.UploadDate).toLocaleDateString(lang === 'th' ? 'th-TH' : 'en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+                        : ''}
+                      {` · 👁 ${video.ViewCount ?? 0} views`}
+                    </p>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      {video.CategoryName && (
+                        <span className="purple-badge">{video.CategoryName}</span>
+                      )}
+                      <span style={{ background: 'rgba(34, 197, 94, 0.2)', color: '#86efac', border: '1px solid rgba(34, 197, 94, 0.4)', padding: '4px 10px', borderRadius: '999px', fontSize: '11px', fontWeight: '600' }}>
+                        {lang === 'en' ? 'Completed' : 'สรุปเสร็จแล้ว'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* การ์ดเลือกกลุ่มเป้าหมาย */}
+              <div className="purple-card">
+                <div className="card-header-purple">
+                  <span className="green-status-dot"></span>
+                  <h3 style={{ margin: 0, color: '#ffffff', fontSize: '1.05rem', fontWeight: '600' }}>
+                    {lang === 'en' ? 'Target Audience' : 'เผยแพร่ถึงใคร'}
+                  </h3>
+                </div>
+                
+                <div className="target-selection">
+                  <div 
+                    className={`target-box-dark ${publishTarget === 'everyone' ? 'active' : ''}`}
+                    onClick={() => setPublishTarget('everyone')}
+                  >
+                    <div className="icon-wrapper">
+                      <FaUserAlt size={18} />
+                    </div>
+                    <span className="target-title">{lang === 'en' ? 'Everyone' : 'ทุกคน'}</span>
+                    <small className="target-count">{lang === 'en' ? 'Public' : 'สาธารณะ'}</small>
+                  </div>
+
+                  <div 
+                    className={`target-box-dark ${publishTarget === 'private' ? 'active' : ''}`}
+                    onClick={() => setPublishTarget('private')}
+                  >
+                    <div className="icon-wrapper">
+                      <FaLock size={18} />
+                    </div>
+                    <span className="target-title">{lang === 'en' ? 'Private' : 'ส่วนตัว'}</span>
+                    <small className="target-count">{lang === 'en' ? 'Hidden' : 'ไม่เผยแพร่'}</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* การ์ดบทสรุปที่จะเผยแพร่ (กล่องใหญ่ด้านล่าง) - เนื้อหาสรุปจริงจาก LexRank */}
+            <div className="purple-card main-summary-card-dark">
               <div className="card-header-purple">
                 <span className="green-status-dot"></span>
                 <h3 style={{ margin: 0, color: '#ffffff', fontSize: '1.05rem', fontWeight: '600' }}>
-                  {lang === 'en' ? 'Summary Completed' : 'สรุปเสร็จสิ้น'}
+                  {lang === 'en' ? 'Summary to Publish' : 'บทสรุปที่จะเผยแพร่'}
                 </h3>
               </div>
-              
-              <div className="summary-video-info">
-                <div className="video-thumbnail-box-purple">
-                  <FaPlay size={18} />
-                </div>
-                <div className="video-details">
-                  <h4 style={{ color: '#ffffff', margin: '0 0 6px 0', fontSize: '1rem', fontWeight: '600' }}>
-                    Internship ตำแหน่ง UX/UI Design | บริษัท อินเวิร์ส โซลูชันส์ จำกัด
+
+              <div className="summary-text-box-dark">
+                <div className="summary-item-header">
+                  <div className="item-number">1</div>
+                  <h4 style={{ margin: 0, color: '#ffffff', fontSize: '1rem', fontWeight: '600' }}>
+                    {video.Position 
+                      ? `ตำแหน่ง ${video.Position}${video.CompanyName ? ` | ${video.CompanyName}` : ''}`
+                      : video.VideoTitle}
                   </h4>
-                  <p style={{ color: '#cbd5e1', fontSize: '0.85rem', margin: '0 0 10px 0' }}>
-                    {lang === 'en' ? '30 Jan 2026 · 112 original sentences ➔ 5 summary sentences' : '30 ม.ค. 2569 · 112 ประโยคต้นฉบับ ➔ 5 ประโยคสรุป'}
+                </div>
+
+                <div className="summary-section-dark">
+                  <h5 style={{ margin: '0 0 8px 0', color: '#c084fc', fontSize: '0.95rem', fontWeight: '600' }}>
+                    {lang === 'en' ? 'Summary Results:' : 'ผลสรุป:'}
+                  </h5>
+                  <p style={{ margin: 0, color: '#cbd5e1', fontSize: '0.9rem', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>
+                    {video.SummaryText || (lang === 'en' ? 'No summary available.' : 'ยังไม่มีข้อความสรุป')}
                   </p>
-                  <div style={{ display: 'flex', gap: '8px' }}>
-                    <span className="purple-badge">UX/UI</span>
-                    <span style={{ background: 'rgba(34, 197, 94, 0.2)', color: '#86efac', border: '1px solid rgba(34, 197, 94, 0.4)', padding: '4px 10px', borderRadius: '999px', fontSize: '11px', fontWeight: '600' }}>
-                      {lang === 'en' ? 'Completed' : 'สรุปเสร็จแล้ว'}
-                    </span>
-                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* การ์ดเลือกกลุ่มเป้าหมาย */}
-            <div className="purple-card">
-              <div className="card-header-purple">
-                <span className="green-status-dot"></span>
-                <h3 style={{ margin: 0, color: '#ffffff', fontSize: '1.05rem', fontWeight: '600' }}>
-                  {lang === 'en' ? 'Target Audience' : 'เผยแพร่ถึงใคร'}
-                </h3>
-              </div>
-              
-              <div className="target-selection">
-                <div 
-                  className={`target-box-dark ${publishTarget === 'everyone' ? 'active' : ''}`}
-                  onClick={() => setPublishTarget('everyone')}
-                >
-                  <div className="icon-wrapper">
-                    <FaUserAlt size={18} />
-                  </div>
-                  <span className="target-title">{lang === 'en' ? 'Everyone' : 'ทุกคน'}</span>
-                  <small className="target-count">{lang === 'en' ? '100 users' : '100 คน'}</small>
-                </div>
-
-                <div 
-                  className={`target-box-dark ${publishTarget === 'private' ? 'active' : ''}`}
-                  onClick={() => setPublishTarget('private')}
-                >
-                  <div className="icon-wrapper">
-                    <FaLock size={18} />
-                  </div>
-                  <span className="target-title">{lang === 'en' ? 'Private' : 'ส่วนตัว'}</span>
-                  <small className="target-count">{lang === 'en' ? 'Custom' : 'กำหนดได้'}</small>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* การ์ดบทสรุปที่จะเผยแพร่ (กล่องใหญ่ด้านล่าง) */}
-          <div className="purple-card main-summary-card-dark">
-            <div className="card-header-purple">
-              <span className="green-status-dot"></span>
-              <h3 style={{ margin: 0, color: '#ffffff', fontSize: '1.05rem', fontWeight: '600' }}>
-                {lang === 'en' ? 'Summary to Publish' : 'บทสรุปที่จะเผยแพร่'}
-              </h3>
-            </div>
-
-            <div className="summary-text-box-dark">
-              <div className="summary-item-header">
-                <div className="item-number">1</div>
-                <h4 style={{ margin: 0, color: '#ffffff', fontSize: '1rem', fontWeight: '600' }}>
-                  ตำแหน่ง UX/UI Design | บริษัท อินเวิร์ส โซลูชันส์ จำกัด
-                </h4>
-              </div>
-
-              <div className="summary-section-dark">
-                <h5 style={{ margin: '0 0 8px 0', color: '#c084fc', fontSize: '0.95rem', fontWeight: '600' }}>
-                  {lang === 'en' ? 'Summary Results:' : 'ผลสรุป:'}
-                </h5>
-                <p style={{ margin: 0, color: '#cbd5e1', fontSize: '0.9rem', lineHeight: '1.6' }}>
-                  สวัสดีค่ะ ดิฉันได้ฝึกงานในบริษัทเอกชนที่จังหวัดภูเก็ต ซึ่งให้บริการด้านการออกแบบและพัฒนาซอฟต์แวร์เว็บไซต์และ Mobile Application โดยหน้าที่หลักคือการออกแบบ UI/UX วิเคราะห์ความต้องการผู้ใช้งาน และออกแบบหน้าตาเว็บไซต์ด้วยโปรแกรม Figma รวมถึงมีส่วนร่วมในการออกแบบระบบหลังบ้าน เช่น ระบบจัดการข้อมูลและระบบจองต่าง ๆ จากการฝึกงานครั้งนี้ทำให้ได้เรียนรู้การทำงานจริงและพัฒนาทักษะหลายด้าน... <span className="read-more-purple">{lang === 'en' ? 'Read more' : 'ดูเพิ่มเติม'}</span>
+              {publishError && (
+                <p style={{ color: '#f87171', fontSize: '0.85rem', margin: '12px 0 0 0' }}>
+                  {publishError}
                 </p>
+              )}
+
+              <div className="publish-action-bar">
+                <button className="btn-publish-submit-dark" onClick={handlePublish} disabled={publishing}>
+                  <span className="btn-text">
+                    {publishing
+                      ? (lang === 'en' ? 'Publishing...' : 'กำลังเผยแพร่...')
+                      : (lang === 'en' ? 'Ready to Publish' : 'พร้อมเผยแพร่แล้ว')}
+                  </span>
+                  <span className="go-pill-purple">GO <FaChevronRight size={10} /></span>
+                </button>
               </div>
             </div>
-
-            <div className="publish-action-bar">
-              <button className="btn-publish-submit-dark" onClick={handlePublish}>
-                <span className="btn-text">{lang === 'en' ? 'Ready to Publish' : 'พร้อมเผยแพร่แล้ว'}</span>
-                <span className="go-pill-purple">GO <FaChevronRight size={10} /></span>
-              </button>
-            </div>
           </div>
-        </div>
+        )}
       </main>
 
       {/* ================= SUCCESS MODAL (ป๊อปอัป) ================= */}
