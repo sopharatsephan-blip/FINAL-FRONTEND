@@ -114,7 +114,7 @@ export default function SummaryResult() {
   };
 
  const handleEditSummary = () => {
-    navigate(`/edit-summary-detail/${videoId}`, {   // ✅ ไปหน้ารายละเอียดของวิดีโอนี้โดยตรง
+    navigate(`/edit-summary-detail/${videoId}`, {   // ✅ มี videoId ต่อท้าย URL
       state: {
         videoId,
         videoTitle,
@@ -128,7 +128,7 @@ export default function SummaryResult() {
 
   // 📌 ส่ง state ไปยังหน้า Publish (เผยแพร่)
   const handleShare = () => {
-    navigate('/publish-summary', {   // ✅ path ถูกต้อง ไปหน้ารายละเอียดโดยตรง
+    navigate(`/publish-summary/${videoId}`, {   // ✅ เพิ่ม videoId เป็นส่วนหนึ่งของ URL
       state: {
         videoId,
         videoTitle,
