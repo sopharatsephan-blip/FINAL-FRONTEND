@@ -42,12 +42,49 @@ export default function SummaryResult() {
     summary = ''
   } = videoData;
 
+  // 🧪 State สำหรับทดสอบดึงข้อมูล Summary จริงจากฐานข้อมูล
+  const [dbSummary, setDbSummary] = useState(null);
+  const [dbLoading, setDbLoading] = useState(true);
+  const [dbError, setDbError] = useState('');
+
+  // 🔒 โหลดข้อมูลผู้ใช้จาก localStorage
   useEffect(() => {
     const savedUser = localStorage.getItem('user');
     if (savedUser) {
       setCurrentUser(JSON.parse(savedUser));
     }
   }, []);
+
+  // 🧪 ทดสอบดึงข้อมูล Summary จริงจากฐานข้อมูล ตาม videoId
+  useEffect(() => {
+    if (!videoId) {
+      setDbLoading(false);
+      setDbError('ไม่มี videoId ส่งมา ไม่สามารถดึงข้อมูลจาก DB ได้');
+      return;
+    }
+
+    const fetchDbSummary = async () => {
+      try {
+        setDbLoading(true);
+        const res = await fetch(`http://localhost:5000/api/videos/${videoId}/summary`);
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.message || 'ดึงข้อมูลไม่สำเร็จ');
+        }
+
+        setDbSummary(data);
+        setDbError('');
+      } catch (err) {
+        console.error('Fetch DB summary error:', err);
+        setDbError(err.message);
+      } finally {
+        setDbLoading(false);
+      }
+    };
+
+    fetchDbSummary();
+  }, [videoId]);
 
   const handleLogout = () => {
     localStorage.removeItem('user');
@@ -79,6 +116,20 @@ export default function SummaryResult() {
   // 📌 ส่ง state ไปยังหน้าแก้ไข
   const handleEditSummary = () => {
     navigate('/edit-summary', {
+      state: {
+        videoId,
+        videoTitle,
+        position,
+        company,
+        transcript,
+        summary
+      }
+    });
+  };
+
+  // 📌 ส่ง state ไปยังหน้า Publish (เผยแพร่)
+  const handleShare = () => {
+    navigate('/publish-summary', {   // ✅ path ถูกต้อง ไปหน้ารายละเอียดโดยตรง
       state: {
         videoId,
         videoTitle,
@@ -244,7 +295,7 @@ export default function SummaryResult() {
                   <FaEdit /> {lang === 'en' ? 'Edit' : 'แก้ไข'}
                 </button>
 
-                <button className="btn-action btn-share">
+                <button className="btn-action btn-share" onClick={handleShare}>
                   <FaShareAlt /> {lang === 'en' ? 'Share' : 'แชร์'}
                 </button>
                 
@@ -256,6 +307,46 @@ export default function SummaryResult() {
                   <FaDownload /> {lang === 'en' ? 'Download' : 'ดาวน์โหลด'}
                 </button>
               </div>
+            </div>
+
+            {/* 🧪 ส่วนทดสอบ: แสดงข้อมูลดิบจาก DB แบบยาวๆ */}
+            <div style={{ marginTop: '24px', padding: '20px', background: 'rgba(139, 92, 246, 0.08)', borderRadius: '12px' }}>
+              <h4 style={{ color: '#c084fc', marginBottom: '12px' }}>
+                🧪 ทดสอบข้อมูลจาก Database (VideoID: {videoId || '-'})
+              </h4>
+
+              {dbLoading && (
+                <p style={{ color: '#94a3b8' }}>กำลังดึงข้อมูลจากฐานข้อมูล...</p>
+              )}
+
+              {!dbLoading && dbError && (
+                <p style={{ color: '#f87171' }}>❌ {dbError}</p>
+              )}
+
+              {!dbLoading && dbSummary && (
+                <div>
+                  <p style={{ color: '#e9d5ff', fontSize: '13px', marginBottom: '8px' }}>
+                    ✅ ดึงข้อมูลสำเร็จ (SummaryID: {dbSummary.SummaryID})
+                  </p>
+
+                  <h5 style={{ color: '#c084fc', marginTop: '16px' }}>SummaryText (จาก LexRank):</h5>
+                  <p style={{ whiteSpace: 'pre-wrap', color: '#e5e7eb', lineHeight: '1.6' }}>
+                    {dbSummary.SummaryText || '(ไม่มีข้อมูล)'}
+                  </p>
+
+                  <h5 style={{ color: '#c084fc', marginTop: '16px' }}>Transcript (ข้อความถอดเสียงเต็ม):</h5>
+                  <p style={{ 
+                    whiteSpace: 'pre-wrap', 
+                    color: '#9ca3af', 
+                    fontSize: '13px', 
+                    lineHeight: '1.6', 
+                    maxHeight: '300px', 
+                    overflowY: 'auto' 
+                  }}>
+                    {dbSummary.Transcript || '(ไม่มีข้อมูล)'}
+                  </p>
+                </div>
+              )}
             </div>
 
           </div>

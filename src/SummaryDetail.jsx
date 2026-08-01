@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useLanguage } from './LanguageContext';
 import './SummaryDetail.css';
 
@@ -19,8 +19,20 @@ import {
 
 export default function SummaryDetail() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { t, lang, toggleLanguage } = useLanguage();
   const [currentUser, setCurrentUser] = useState(null);
+
+  // 📌 อ่าน videoId ที่ส่งมาจากหน้าก่อนหน้า (SummaryResult)
+  const videoData = location.state || {};
+  const { videoId = null } = videoData;
+
+  // 📌 State สำหรับข้อมูลสรุปจริงจากฐานข้อมูล
+  const [summaryText, setSummaryText] = useState('');
+  const [transcriptText, setTranscriptText] = useState('');
+  const [summaryId, setSummaryId] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     const savedUser = localStorage.getItem('user');
@@ -28,6 +40,39 @@ export default function SummaryDetail() {
       setCurrentUser(JSON.parse(savedUser));
     }
   }, []);
+
+  // 📌 ดึงข้อมูลสรุป (LexRank) จริงจากฐานข้อมูล ตาม videoId
+  useEffect(() => {
+    if (!videoId) {
+      setLoading(false);
+      setError(lang === 'en' ? 'No video selected.' : 'ไม่พบข้อมูลวิดีโอที่เลือก');
+      return;
+    }
+
+    const fetchSummary = async () => {
+      try {
+        setLoading(true);
+        const res = await fetch(`http://localhost:5000/api/videos/${videoId}/summary`);
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.message || 'Fetch failed');
+        }
+
+        setSummaryText(data.SummaryText || '');
+        setTranscriptText(data.Transcript || '');
+        setSummaryId(data.SummaryID || '');
+        setError('');
+      } catch (err) {
+        console.error('Fetch summary error:', err);
+        setError(lang === 'en' ? 'Failed to load summary.' : 'ไม่สามารถโหลดข้อมูลสรุปได้');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSummary();
+  }, [videoId, lang]);
 
   const handleLogout = () => {
     localStorage.removeItem('user');
@@ -92,7 +137,7 @@ export default function SummaryDetail() {
 
       {/* ===== Main Content ===== */}
       <main className="main-content-purple">
-        {/* Top Header: แก้ชื่อตรงนี้ไม่ให้ซ้ำกับ Upload Video */}
+        {/* Top Header */}
         <header className="top-header-purple" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div className="header-title-box" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div className="header-icon-badge" style={{ background: 'rgba(139, 92, 246, 0.2)', color: '#c084fc', padding: '10px', borderRadius: '10px', display: 'flex' }}>
@@ -143,7 +188,7 @@ export default function SummaryDetail() {
         <div className="detail-body-area" style={{ marginTop: '20px' }}>
           <div className="purple-card">
             
-            {/* Header: เหลือเฉพาะปุ่มย้อนกลับ (ลบปุ่มเลือก TextRank/LexRank ออก) */}
+            {/* Header: ปุ่มย้อนกลับ */}
             <div className="result-header-purple" style={{ marginBottom: '20px' }}>
               <button 
                 className="reset-btn-purple" 
@@ -154,115 +199,46 @@ export default function SummaryDetail() {
               </button>
             </div>
 
-            {/* เนื้อหาสรุป (ใช้ข้อมูลเฉพาะ LexRank ตัด TextRank ออกสมบูรณ์) */}
+            {/* เนื้อหาสรุป: ดึงจาก LexRank จริงจากฐานข้อมูล */}
             <div className="summary-text-box">
-              <h3 className="card-title-purple" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px', fontSize: '18px' }}>
+              <h3 className="card-title-purple" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '20px', fontSize: '18px' }}>
                 <FaFileAlt style={{ color: '#c084fc' }} />
-                {lang === 'en' ? 'Topic Summary' : 'สรุปตามหัวข้อ'}
+                {lang === 'en' ? 'Topic Summary' : 'สรุปเนื้อหา'}
               </h3>
 
-              <div className="summary-content-list" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                <section className="summary-item">
-                  <h4 style={{ color: '#c084fc', marginBottom: '6px', fontSize: '15px' }}>
-                    {lang === 'en' ? '1) Company / Organization Name' : '1) ชื่อหน่วยงานและสถานประกอบการ'}
-                  </h4>
-                  <p style={{ color: '#e2e8f0', margin: 0, lineHeight: '1.6' }}>
-                    {lang === 'en'
-                      ? 'A private company specializing in software design, website, and mobile application development located in Phuket.'
-                      : 'บริษัทเอกชนด้านการออกแบบและพัฒนาซอฟต์แวร์เว็บไซต์และ Mobile Application ตั้งอยู่ที่จังหวัดภูเก็ต'
-                    }
-                  </p>
-                </section>
+              {loading && (
+                <p style={{ color: '#94a3b8' }}>
+                  {lang === 'en' ? 'Loading summary...' : 'กำลังโหลดข้อมูลสรุป...'}
+                </p>
+              )}
 
-                <section className="summary-item">
-                  <h4 style={{ color: '#c084fc', marginBottom: '6px', fontSize: '15px' }}>
-                    {lang === 'en' ? '2) Position and Job Responsibilities' : '2) ตำแหน่งและลักษณะงานที่ทำ'}
-                  </h4>
-                  <p style={{ color: '#e2e8f0', margin: 0, lineHeight: '1.6' }}>
-                    {lang === 'en'
-                      ? 'Internship position in UI/UX design, responsible for analyzing user requirements, creating wireframes and web interfaces, as well as testing and making design improvements based on feedback.'
-                      : 'ตำแหน่งที่ฝึกงานเกี่ยวกับการออกแบบ UI/UX โดยมีหน้าที่วิเคราะห์ความต้องการของผู้ใช้งาน ออกแบบ Wireframe และหน้าตาเว็บไซต์ รวมถึงทดสอบและปรับปรุงดีไซน์ตามข้อเสนอแนะ'
-                    }
-                  </p>
-                </section>
+              {!loading && error && (
+                <p style={{ color: '#f87171' }}>{error}</p>
+              )}
 
-                <section className="summary-item">
-                  <h4 style={{ color: '#c084fc', marginBottom: '6px', fontSize: '15px' }}>
-                    {lang === 'en' ? '3) Projects or Tasks During Internship' : '3) Project หรือ งานที่ทำระหว่างฝึกงาน'}
-                  </h4>
-                  <p style={{ color: '#e2e8f0', margin: '0 0 8px 0', lineHeight: '1.6' }}>
-                    {lang === 'en'
-                      ? 'Designed 3 back-end web systems using Figma, including:'
-                      : 'ออกแบบเว็บไซต์ระบบหลังบ้านจำนวน 3 ระบบ โดยใช้ Figma เช่น'
-                    }
-                  </p>
-                  <ul style={{ color: '#e2e8f0', paddingLeft: '20px', margin: 0, lineHeight: '1.6' }}>
-                    <li>{lang === 'en' ? 'Company Data Management System' : 'ระบบจัดการข้อมูลบริษัท'}</li>
-                    <li>{lang === 'en' ? 'Driver & Vehicle Management System' : 'ระบบจัดการข้อมูลคนขับและรถ'}</li>
-                    <li>{lang === 'en' ? 'Car Booking System & Spa System for masseuse management, queue booking, and products' : 'ระบบ Booking การจองรถ รวมถึงระบบ Spa สำหรับจัดการหมอนวด การจองคิว และสินค้า'}</li>
-                  </ul>
-                </section>
+              {!loading && !error && (
+                <>
+                  {summaryId && (
+                    <p style={{ color: '#94a3b8', fontSize: '13px', marginBottom: '20px' }}>
+                      SummaryID: {summaryId}
+                    </p>
+                  )}
 
-                <section className="summary-item">
-                  <h4 style={{ color: '#c084fc', marginBottom: '6px', fontSize: '15px' }}>
-                    {lang === 'en' ? '4) Problems Encountered and Solutions' : '4) ปัญหาที่พบและวิธีการแก้ไข (ถ้ามี)'}
+                  <h4 style={{ color: '#c084fc', marginBottom: '10px', fontSize: '15px' }}>
+                    {lang === 'en' ? 'SummaryText (from LexRank):' : 'ข้อความสรุป (จาก LexRank):'}
                   </h4>
-                  <p style={{ color: '#e2e8f0', margin: 0, lineHeight: '1.6' }}>
-                    {lang === 'en'
-                      ? 'Encountered issues in aligning designs with user expectations; solved by continuously receiving team feedback and iteratively improving designs.'
-                      : 'พบปัญหาในการออกแบบให้ตรงกับความต้องการผู้ใช้ จึงแก้ไขโดยการรับ Feedback จากทีมและปรับปรุงดีไซน์อย่างต่อเนื่อง'
-                    }
+                  <p style={{ color: '#e2e8f0', margin: '0 0 28px 0', lineHeight: '1.8', whiteSpace: 'pre-wrap' }}>
+                    {summaryText || (lang === 'en' ? 'No summary available.' : 'ยังไม่มีข้อความสรุป')}
                   </p>
-                </section>
 
-                <section className="summary-item">
-                  <h4 style={{ color: '#c084fc', marginBottom: '6px', fontSize: '15px' }}>
-                    {lang === 'en' ? '5) Key Takeaways & Experience Gained' : '5) สิ่งที่ได้รับจากการไปฝึกงานในครั้งนี้'}
+                  <h4 style={{ color: '#c084fc', marginBottom: '10px', fontSize: '15px' }}>
+                    {lang === 'en' ? 'Transcript (Full Text):' : 'ข้อความถอดเสียงเต็ม:'}
                   </h4>
-                  <p style={{ color: '#e2e8f0', margin: 0, lineHeight: '1.6' }}>
-                    {lang === 'en'
-                      ? 'Learned practical teamwork, effective communication, and enhanced skills in design and analytical thinking.'
-                      : 'ได้เรียนรู้การทำงานจริง การทำงานเป็นทีม และการสื่อสารกับผู้อื่น รวมถึงพัฒนาทักษะด้านการออกแบบและการคิดวิเคราะห์'
-                    }
+                  <p style={{ color: '#e2e8f0', margin: 0, lineHeight: '1.8', whiteSpace: 'pre-wrap' }}>
+                    {transcriptText || (lang === 'en' ? 'No transcript available.' : 'ยังไม่มีข้อความถอดเสียง')}
                   </p>
-                </section>
-
-                <section className="summary-item">
-                  <h4 style={{ color: '#c084fc', marginBottom: '6px', fontSize: '15px' }}>
-                    {lang === 'en' ? '6) Future Career Outlook' : '6) แนวคิดต่ออาชีพในอนาคต'}
-                  </h4>
-                  <p style={{ color: '#e2e8f0', margin: 0, lineHeight: '1.6' }}>
-                    {lang === 'en'
-                      ? 'Inclined toward pursuing a career path in UI/UX and system design based on internship experiences.'
-                      : 'มีแนวโน้มที่จะสนใจสายงานด้าน UI/UX และการออกแบบระบบมากขึ้น จากประสบการณ์ฝึกงานที่ได้รับ'
-                    }
-                  </p>
-                </section>
-
-                <section className="summary-item">
-                  <h4 style={{ color: '#c084fc', marginBottom: '6px', fontSize: '15px' }}>
-                    {lang === 'en' ? '7) Recommendation for This Internship Site' : '7) ควรแนะนำที่ฝึกงานนี้หรือไม่ เพราะอะไร'}
-                  </h4>
-                  <p style={{ color: '#e2e8f0', margin: 0, lineHeight: '1.6' }}>
-                    {lang === 'en'
-                      ? 'Highly recommended due to hands-on projects, helpful team mentorship, and a welcoming atmosphere.'
-                      : 'แนะนำให้ไปฝึกงาน เพราะได้ทำงานจริง ได้รับคำแนะนำจากพี่ในทีม และบรรยากาศการทำงานเป็นกันเอง ไม่กดดัน'
-                    }
-                  </p>
-                </section>
-
-                <section className="summary-item">
-                  <h4 style={{ color: '#c084fc', marginBottom: '6px', fontSize: '15px' }}>
-                    {lang === 'en' ? '8) Suggestions for Juniors' : '8) ข้อเสนอแนะสำหรับรุ่นน้อง'}
-                  </h4>
-                  <p style={{ color: '#e2e8f0', margin: 0, lineHeight: '1.6' }}>
-                    {lang === 'en'
-                      ? 'Stay open to continuous learning, build diverse skill sets, and actively express ideas to grow professionally.'
-                      : 'ควรเปิดใจเรียนรู้ ฝึกทักษะให้หลากหลาย กล้าถาม กล้าคิด กล้าแสดงออก เพื่อพัฒนาตัวเองให้มากขึ้น'
-                    }
-                  </p>
-                </section>
-              </div>
+                </>
+              )}
             </div>
 
           </div>
