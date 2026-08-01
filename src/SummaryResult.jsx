@@ -113,9 +113,8 @@ export default function SummaryResult() {
     });
   };
 
-  // 📌 ส่ง state ไปยังหน้าแก้ไข
-  const handleEditSummary = () => {
-    navigate('/edit-summary', {
+ const handleEditSummary = () => {
+    navigate(`/edit-summary-detail/${videoId}`, {   // ✅ ไปหน้ารายละเอียดของวิดีโอนี้โดยตรง
       state: {
         videoId,
         videoTitle,
