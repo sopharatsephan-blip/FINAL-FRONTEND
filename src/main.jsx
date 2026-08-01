@@ -35,7 +35,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           <Route path="/summary-result" element={<SummaryResult />} />
           <Route path="/summary-detail" element={<SummaryDetail />} />
           <Route path="/edit-summary" element={<EditList />} />
-          <Route path="/edit-summary-detail" element={<EditSummary />} />
+          <Route path="/edit-summary-detail/:videoId" element={<EditSummary />} />
           <Route path="/publish" element={<PublishList />} />
           <Route path="/publish-summary" element={<PublishSummary />} />
           <Route path="/users" element={<UserManagement />} />

@@ -1,33 +1,34 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useLanguage } from './LanguageContext';
 import './EditSummary.css';
 
 import { 
-  FaHome, 
-  FaVideo, 
-  FaEdit, 
-  FaGlobe, 
-  FaUsers, 
-  FaSignOutAlt, 
-  FaSearch, 
-  FaAsterisk,
-  FaSave,
-  FaLanguage
+  FaHome, FaVideo, FaEdit, FaGlobe, FaUsers, FaSignOutAlt, 
+  FaSearch, FaAsterisk, FaSave, FaLanguage
 } from 'react-icons/fa';
+
+const API_BASE = 'http://localhost:5000/api'; // เปลี่ยนเป็น base URL จริงของ backend คุณ
 
 export default function EditSummary() {
   const navigate = useNavigate();
+  const { videoId } = useParams(); // route: /edit-summary-detail/:videoId
   const { t, lang, toggleLanguage } = useLanguage();
   const [currentUser, setCurrentUser] = useState(null);
 
+  const [summaryId, setSummaryId] = useState(null); // เก็บ SummaryID ไว้ใช้ตอนกด Save
+
   const [formData, setFormData] = useState({
-    jobTitle: 'UX/UI Design',
-    company: 'บริษัท อินเวิร์ส โซลูชันส์ จำกัด',
-    category: 'UX/UI',
-    province: 'ภูเก็ต',
-    summaryContent: 'สวัสดีค่ะ ดิฉันได้เข้าฝึกงานในบริษัทพัฒนาเว็บไซต์และ Mobile Application ที่จังหวัดภูเก็ต โดยได้รับหน้าที่ออกแบบ UI/UX ตั้งแต่การวิเคราะห์ความต้องการผู้ใช้ ออกแบบ Wireframe ไปจนถึงการทดสอบและปรับปรุงดีไซน์ นอกจากนี้ยังได้ทำโปรเจกต์ออกแบบระบบหลังบ้านหลายระบบ เช่น ระบบ Booking และระบบจัดการคิว ซึ่งช่วยให้ได้รับประสบการณ์ทำงานจริงและพัฒนาทักษะการสื่อสารและการทำงานเป็นทีม... ดูเพิ่มเติม'
+    jobTitle: '',
+    company: '',
+    category: '',
+    province: '',
+    summaryContent: ''
   });
+
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const savedUser = localStorage.getItem('user');
@@ -35,6 +36,42 @@ export default function EditSummary() {
       setCurrentUser(JSON.parse(savedUser));
     }
   }, []);
+
+  // ดึงข้อมูลสรุปจริงจากฐานข้อมูลตาม videoId
+  useEffect(() => {
+    if (!videoId) {
+      setError('ไม่พบรหัสวิดีโอใน URL');
+      setLoading(false);
+      return;
+    }
+
+    const fetchSummary = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await fetch(`${API_BASE}/summaries/video/${videoId}`);
+        if (!res.ok) {
+          throw new Error('ไม่สามารถดึงข้อมูลสรุปได้');
+        }
+        const data = await res.json();
+        setSummaryId(data.summaryId); // เก็บไว้ใช้ตอน PUT
+        setFormData({
+          jobTitle: data.jobTitle,
+          company: data.company,
+          category: data.category,
+          province: data.province,
+          summaryContent: data.summaryContent,
+        });
+      } catch (err) {
+        console.error(err);
+        setError(lang === 'en' ? 'Failed to load summary data' : 'ไม่สามารถโหลดข้อมูลสรุปได้');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSummary();
+  }, [videoId, lang]);
 
   const handleLogout = () => {
     localStorage.removeItem('user');
@@ -46,10 +83,48 @@ export default function EditSummary() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSave = (e) => {
+  const handleSave = async (e) => {
     e.preventDefault();
-    alert(lang === 'en' ? 'Data saved successfully!' : 'บันทึกข้อมูลเรียบร้อยแล้ว!');
+    if (!summaryId) {
+      alert(lang === 'en' ? 'Missing summary ID, cannot save' : 'ไม่พบรหัสสรุป ไม่สามารถบันทึกได้');
+      return;
+    }
+    setSaving(true);
+    try {
+      const res = await fetch(`${API_BASE}/summaries/${summaryId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          jobTitle: formData.jobTitle,
+          summaryContent: formData.summaryContent,
+          // ถ้า backend รองรับการแก้ company/category/province เพิ่ม field ตรงนี้ได้
+        }),
+      });
+      if (!res.ok) throw new Error('บันทึกไม่สำเร็จ');
+      alert(lang === 'en' ? 'Data saved successfully!' : 'บันทึกข้อมูลเรียบร้อยแล้ว!');
+    } catch (err) {
+      console.error(err);
+      alert(lang === 'en' ? 'Failed to save data' : 'บันทึกข้อมูลไม่สำเร็จ');
+    } finally {
+      setSaving(false);
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="admin-purple-container">
+        <p style={{ padding: 40 }}>{lang === 'en' ? 'Loading...' : 'กำลังโหลดข้อมูล...'}</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="admin-purple-container">
+        <p style={{ padding: 40, color: 'red' }}>{error}</p>
+      </div>
+    );
+  }
 
   return (
     <div className="admin-purple-container">
@@ -80,22 +155,18 @@ export default function EditSummary() {
               <FaHome />
               <span>{t.dashboard || 'Dashboard'}</span>
             </button>
-
             <button className="menu-item-purple" onClick={() => navigate('/upload-video')}>
               <FaVideo />
               <span>{t.uploadVideo || 'Upload Video'}</span>
             </button>
-
             <button className="menu-item-purple active" onClick={() => navigate('/edit-summary')}>
               <FaEdit />
               <span>{t.editSummary || 'Edit Summary'}</span>
             </button>
-
             <button className="menu-item-purple" onClick={() => navigate('/publish')}>
               <FaGlobe size={16} />
               <span>{t.publish || 'Publish'}</span>
             </button>
-
             <button className="menu-item-purple" onClick={() => navigate('/users')}>
               <FaUsers />
               <span>{t.userManagement || 'User Management'}</span>
@@ -104,7 +175,6 @@ export default function EditSummary() {
         </div>
 
         <div className="sidebar-footer-purple">
-          {/* ปุ่มสลับภาษา */}
           <button
             type="button"
             className="menu-item-purple"
@@ -114,7 +184,6 @@ export default function EditSummary() {
             <FaLanguage size={18} />
             <span>{lang ? lang.toUpperCase() : 'EN'}</span>
           </button>
-
           <button className="logout-btn-purple" onClick={handleLogout}>
             <FaSignOutAlt />
             <span>{t.logout || 'Logout'}</span>
@@ -124,25 +193,16 @@ export default function EditSummary() {
 
       {/* ===== Main Content ===== */}
       <main className="main-content-purple">
-        {/* Top Header — ยึดโครงสร้างเดียวกับ AdminDashboard */}
         <header className="top-header-purple">
           <div className="header-title">
             <div
               className="header-icon-box"
-              style={{
-                background: 'rgba(139, 92, 246, 0.2)',
-                color: '#c084fc',
-                padding: '8px',
-                borderRadius: '8px',
-                display: 'flex'
-              }}
+              style={{ background: 'rgba(139, 92, 246, 0.2)', color: '#c084fc', padding: '8px', borderRadius: '8px', display: 'flex' }}
             >
               <FaEdit size={18} />
             </div>
             <div>
-              <h2 style={{ margin: 0 }}>
-                {t.editSummary || 'Edit Summary'}
-              </h2>
+              <h2 style={{ margin: 0 }}>{t.editSummary || 'Edit Summary'}</h2>
               <p className="subtitle-purple" style={{ margin: 0 }}>
                 {lang === 'en' ? 'Edit and update video summary data' : 'แก้ไขและอัปเดตข้อมูลสรุปวิดีโอ'}
               </p>
@@ -151,91 +211,43 @@ export default function EditSummary() {
 
           <div className="search-box-purple">
             <FaSearch style={{ color: '#9ca3af', fontSize: '14px' }} />
-            <input
-              type="text"
-              placeholder={t.searchPlaceholder || 'Search summary, position...'}
-            />
+            <input type="text" placeholder={t.searchPlaceholder || 'Search summary, position...'} />
           </div>
         </header>
 
-        {/* Form Card */}
         <div className="detail-body-area" style={{ marginTop: '20px' }}>
           <div className="edit-card-purple">
-
-            {/* Card Header */}
             <div className="edit-card-header">
               <span className="orange-dot">●</span>
               <h3>{lang === 'en' ? 'Edit Summary Data' : 'แก้ไขข้อมูลของสรุป'}</h3>
             </div>
 
             <form className="edit-form-purple" onSubmit={handleSave}>
-
-              {/* ชื่อตำแหน่งงาน */}
               <div className="form-group-purple">
-                <label>
-                  {lang === 'en' ? 'Job Title' : 'ชื่อตำแหน่งงาน'} <span className="req-star">*</span>
-                </label>
-                <input
-                  type="text"
-                  name="jobTitle"
-                  value={formData.jobTitle}
-                  onChange={handleChange}
-                  className="input-purple"
-                />
+                <label>{lang === 'en' ? 'Job Title' : 'ชื่อตำแหน่งงาน'} <span className="req-star">*</span></label>
+                <input type="text" name="jobTitle" value={formData.jobTitle} onChange={handleChange} className="input-purple" />
               </div>
 
-              {/* บริษัท/องค์กร */}
               <div className="form-group-purple">
-                <label>
-                  {lang === 'en' ? 'Company / Organization' : 'บริษัท/องค์กร'} <span className="req-star">*</span>
-                </label>
-                <input
-                  type="text"
-                  name="company"
-                  value={formData.company}
-                  onChange={handleChange}
-                  className="input-purple"
-                />
+                <label>{lang === 'en' ? 'Company / Organization' : 'บริษัท/องค์กร'} <span className="req-star">*</span></label>
+                <input type="text" name="company" value={formData.company} onChange={handleChange} className="input-purple" disabled />
               </div>
 
-              {/* หมวดหมู่ & จังหวัด (2 คอลัมน์) */}
               <div className="form-row-purple">
                 <div className="form-group-purple">
-                  <label>
-                    {lang === 'en' ? 'Category' : 'หมวดหมู่'} <span className="req-star">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    name="category"
-                    value={formData.category}
-                    onChange={handleChange}
-                    className="input-purple"
-                  />
+                  <label>{lang === 'en' ? 'Category' : 'หมวดหมู่'} <span className="req-star">*</span></label>
+                  <input type="text" name="category" value={formData.category} onChange={handleChange} className="input-purple" disabled />
                 </div>
-
                 <div className="form-group-purple">
-                  <label>
-                    {lang === 'en' ? 'Province' : 'จังหวัด'} <span className="req-star">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    name="province"
-                    value={formData.province}
-                    onChange={handleChange}
-                    className="input-purple"
-                  />
+                  <label>{lang === 'en' ? 'Province' : 'จังหวัด'} <span className="req-star">*</span></label>
+                  <input type="text" name="province" value={formData.province} onChange={handleChange} className="input-purple" disabled />
                 </div>
               </div>
 
-              {/* เนื้อหาที่สรุป */}
               <div className="form-group-purple">
-                <label>
-                  {lang === 'en' ? 'Summary Content' : 'เนื้อหาที่สรุป'} <span className="req-star">*</span>
-                </label>
+                <label>{lang === 'en' ? 'Summary Content' : 'เนื้อหาที่สรุป'} <span className="req-star">*</span></label>
                 <div className="summary-content-box">
-                  <p className="summary-content-label">
-                    {lang === 'en' ? 'Summary Results:' : 'ผลสรุปเนื้อหา:'}
-                  </p>
+                  <p className="summary-content-label">{lang === 'en' ? 'Summary Results:' : 'ผลสรุปเนื้อหา:'}</p>
                   <textarea
                     name="summaryContent"
                     value={formData.summaryContent}
@@ -247,21 +259,15 @@ export default function EditSummary() {
                 </div>
               </div>
 
-              {/* ปุ่มบันทึก */}
               <div className="form-actions-purple">
-                <button
-                  type="button"
-                  className="btn-cancel-purple"
-                  onClick={() => navigate('/admin')}
-                >
+                <button type="button" className="btn-cancel-purple" onClick={() => navigate('/admin')}>
                   {lang === 'en' ? 'Cancel' : 'ยกเลิก'}
                 </button>
-                <button type="submit" className="btn-save-purple">
+                <button type="submit" className="btn-save-purple" disabled={saving}>
                   <FaSave size={14} />
-                  <span>{lang === 'en' ? 'Save Changes' : 'บันทึกการแก้ไข'}</span>
+                  <span>{saving ? (lang === 'en' ? 'Saving...' : 'กำลังบันทึก...') : (lang === 'en' ? 'Save Changes' : 'บันทึกการแก้ไข')}</span>
                 </button>
               </div>
-
             </form>
           </div>
         </div>
