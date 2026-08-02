@@ -68,8 +68,10 @@ export default function PublishSummary() {
         }
 
         setVideo(data);
-        // ตั้งค่าเริ่มต้นของ target ตามสถานะปัจจุบันในฐานข้อมูล
-        setPublishTarget(data.VisibilityType === 'Private' ? 'private' : 'everyone');
+        // ✅ default เป็น 'everyone' (Public) เสมอ ไม่ sync ตามสถานะเดิมในฐานข้อมูล
+        // เพราะปุ่มคือ "Ready to Publish" ควรพร้อมเผยแพร่เป็นสาธารณะโดยค่าเริ่มต้น
+        // (ถ้า sync ตามค่าเดิมที่มักเป็น 'Private' จะทำให้กดปุ่มแล้วค่าไม่เปลี่ยนเป็น Public)
+        setPublishTarget('everyone');
         setError('');
       } catch (err) {
         console.error('Fetch video detail error:', err);
@@ -104,6 +106,9 @@ export default function PublishSummary() {
       if (!res.ok) {
         throw new Error(data.message || (lang === 'en' ? 'Failed to publish' : 'เผยแพร่ไม่สำเร็จ'));
       }
+
+      // ✅ อัปเดต state ในหน้านี้ทันที ให้ตรงกับฐานข้อมูลล่าสุด
+      setVideo((prev) => (prev ? { ...prev, VisibilityType: visibilityType } : prev));
 
       setShowSuccessModal(true);
     } catch (err) {
@@ -296,6 +301,23 @@ export default function PublishSummary() {
                     <small className="target-count">{lang === 'en' ? 'Hidden' : 'ไม่เผยแพร่'}</small>
                   </div>
                 </div>
+
+                {/* ✅ แสดงสถานะปัจจุบันจริงในฐานข้อมูล + สิ่งที่กำลังจะเปลี่ยนเป็น ให้ผู้ใช้เห็นชัดเจน */}
+                <p style={{ color: '#94a3b8', fontSize: '12px', marginTop: '14px', lineHeight: 1.6 }}>
+                  {lang === 'en' ? 'Current status: ' : 'สถานะปัจจุบัน: '}
+                  <strong style={{ color: video.VisibilityType === 'Public' ? '#86efac' : '#fca5a5' }}>
+                    {video.VisibilityType === 'Public'
+                      ? (lang === 'en' ? 'Public' : 'สาธารณะ')
+                      : (lang === 'en' ? 'Private' : 'ส่วนตัว')}
+                  </strong>
+                  {' · '}
+                  {lang === 'en' ? 'Will change to: ' : 'จะเปลี่ยนเป็น: '}
+                  <strong style={{ color: publishTarget === 'private' ? '#fca5a5' : '#86efac' }}>
+                    {publishTarget === 'private'
+                      ? (lang === 'en' ? 'Private' : 'ส่วนตัว')
+                      : (lang === 'en' ? 'Public' : 'สาธารณะ')}
+                  </strong>
+                </p>
               </div>
             </div>
 
