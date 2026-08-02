@@ -1,6 +1,57 @@
 /* นำเข้าฟอนต์และสไตล์ตั้งต้นของ Admin Dashboard */
 @import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap');
 
+/* ===== Back Button ===== */
+.back-btn-row {
+  margin-bottom: 18px;
+}
+
+.back-btn-purple {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  background: rgba(139, 92, 246, 0.15);
+  border: 1px solid rgba(139, 92, 246, 0.35);
+  color: #c084fc;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.back-btn-purple:hover {
+  background: rgba(139, 92, 246, 0.3);
+  border-color: rgba(139, 92, 246, 0.55);
+}
+
+/* ===== Language Toggle (Header - Top Right) ===== */
+.lang-toggle-purple {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(139, 92, 246, 0.18);
+  border: 1px solid rgba(139, 92, 246, 0.4);
+  color: #ffffff;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+  white-space: nowrap;
+}
+
+.lang-toggle-purple svg {
+  color: #c084fc;
+}
+
+.lang-toggle-purple:hover {
+  background: rgba(139, 92, 246, 0.3);
+  border-color: rgba(139, 92, 246, 0.6);
+}
+
 /* Layout กล่องเนื้อหา Publish */
 .publish-body-area {
   display: flex;

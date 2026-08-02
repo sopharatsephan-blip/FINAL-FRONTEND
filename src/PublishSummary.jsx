@@ -10,14 +10,13 @@ import {
   FaGlobe, 
   FaUsers, 
   FaSignOutAlt, 
-  FaSearch, 
   FaPlay,
   FaUserAlt,
   FaLock,
   FaChevronRight,
   FaAsterisk,
   FaCheck,
-  FaLanguage
+  FaArrowLeft
 } from 'react-icons/fa';
 
 const API_BASE = 'http://localhost:5000/api';
@@ -174,16 +173,6 @@ export default function PublishSummary() {
 
         {/* Sidebar Footer */}
         <div className="sidebar-footer-purple">
-          <button
-            type="button"
-            className="menu-item-purple"
-            onClick={toggleLanguage}
-            style={{ marginBottom: '10px', background: 'rgba(139, 92, 246, 0.2)', color: '#c084fc' }}
-          >
-            <FaLanguage size={18} />
-            <span>{lang ? lang.toUpperCase() : 'EN'}</span>
-          </button>
-
           <button className="logout-btn-purple" onClick={handleLogout}>
             <FaSignOutAlt size={16} />
             <span>{t.logout || 'ออกจากระบบ'}</span>
@@ -209,14 +198,19 @@ export default function PublishSummary() {
             </div>
           </div>
 
-          <div className="search-box-purple">
-            <FaSearch style={{ color: '#9ca3af', fontSize: '14px' }} />
-            <input 
-              type="text" 
-              placeholder={t.searchPlaceholder || 'ค้นหาสรุป, ตำแหน่งงาน...'} 
-            />
-          </div>
+          {/* ✅ ปุ่มสลับภาษา ย้ายมาไว้ฝั่งขวาบน (ไอคอนโลก) */}
+          <button type="button" className="lang-toggle-purple" onClick={toggleLanguage}>
+            <FaGlobe size={14} />
+            <span>{lang ? lang.toUpperCase() : 'EN'}</span>
+          </button>
         </header>
+
+        {/* ✅ ปุ่มย้อนกลับ - อยู่ใต้ header ฝั่งซ้าย */}
+        <div className="back-btn-row">
+          <button type="button" className="back-btn-purple" onClick={() => navigate(-1)} title={lang === 'en' ? 'Back' : 'ย้อนกลับ'}>
+            <FaArrowLeft size={14} />
+          </button>
+        </div>
 
         {loading && (
           <div className="purple-card" style={{ color: '#94a3b8', padding: '24px', marginTop: '20px' }}>

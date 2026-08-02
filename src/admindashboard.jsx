@@ -10,9 +10,8 @@ import {
   FaGlobe,
   FaUsers,
   FaSignOutAlt,
-  FaSearch,
   FaAsterisk,
-  FaLanguage
+  FaArrowLeft
 } from 'react-icons/fa';
 
 // ✅ helper: แปลง Duration "15:30" → "15:30 mins"
@@ -194,15 +193,6 @@ function AdminDashboard() {
         </div>
 
         <div className="sidebar-footer-purple">
-          <button
-            type="button"
-            className="menu-item-purple"
-            onClick={toggleLanguage}
-            style={{ marginBottom: '10px', background: 'rgba(139, 92, 246, 0.2)', color: '#c084fc' }}
-          >
-            <FaLanguage size={18} />
-            <span>{lang ? lang.toUpperCase() : 'EN'}</span>
-          </button>
           <button className="logout-btn-purple" onClick={handleLogout}>
             <FaSignOutAlt />
             <span>{t.logout || 'Logout'}</span>
@@ -224,11 +214,20 @@ function AdminDashboard() {
               </p>
             </div>
           </div>
-          <div className="search-box-purple">
-            <FaSearch style={{ color: '#9ca3af', fontSize: '14px' }} />
-            <input type="text" placeholder={t.searchPlaceholder || 'Search summary, position...'} />
-          </div>
+
+          {/* ✅ ปุ่มสลับภาษา ย้ายมาไว้ฝั่งขวาบน (ไอคอนโลก) */}
+          <button type="button" className="lang-toggle-purple" onClick={toggleLanguage}>
+            <FaGlobe size={14} />
+            <span>{lang ? lang.toUpperCase() : 'EN'}</span>
+          </button>
         </header>
+
+        {/* ✅ ปุ่มย้อนกลับ - อยู่ใต้ header ฝั่งซ้าย */}
+        <div className="back-btn-row">
+          <button type="button" className="back-btn-purple" onClick={() => navigate(-1)} title={t.back || 'Back'}>
+            <FaArrowLeft size={14} />
+          </button>
+        </div>
 
         {/* ✅ แถวที่ 1: Popular Video + Weekly Summaries (ข้อมูลจริง) */}
         <div className="grid-row-2">

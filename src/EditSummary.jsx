@@ -5,7 +5,7 @@ import './EditSummary.css';
 
 import { 
   FaHome, FaVideo, FaEdit, FaGlobe, FaUsers, FaSignOutAlt, 
-  FaSearch, FaAsterisk, FaSave, FaLanguage
+  FaAsterisk, FaSave, FaArrowLeft
 } from 'react-icons/fa';
 
 const API_BASE = 'http://localhost:5000/api'; // เปลี่ยนเป็น base URL จริงของ backend คุณ
@@ -175,15 +175,6 @@ export default function EditSummary() {
         </div>
 
         <div className="sidebar-footer-purple">
-          <button
-            type="button"
-            className="menu-item-purple"
-            onClick={toggleLanguage}
-            style={{ marginBottom: '10px', background: 'rgba(139, 92, 246, 0.2)', color: '#c084fc' }}
-          >
-            <FaLanguage size={18} />
-            <span>{lang ? lang.toUpperCase() : 'EN'}</span>
-          </button>
           <button className="logout-btn-purple" onClick={handleLogout}>
             <FaSignOutAlt />
             <span>{t.logout || 'Logout'}</span>
@@ -209,13 +200,21 @@ export default function EditSummary() {
             </div>
           </div>
 
-          <div className="search-box-purple">
-            <FaSearch style={{ color: '#9ca3af', fontSize: '14px' }} />
-            <input type="text" placeholder={t.searchPlaceholder || 'Search summary, position...'} />
-          </div>
+          {/* ✅ ปุ่มสลับภาษา ย้ายมาไว้ฝั่งขวาบน (ไอคอนโลก) */}
+          <button type="button" className="lang-toggle-purple" onClick={toggleLanguage}>
+            <FaGlobe size={14} />
+            <span>{lang ? lang.toUpperCase() : 'EN'}</span>
+          </button>
         </header>
 
-        <div className="detail-body-area" style={{ marginTop: '20px' }}>
+        {/* ✅ ปุ่มย้อนกลับ - อยู่ใต้ header ฝั่งซ้าย */}
+        <div className="back-btn-row">
+          <button type="button" className="back-btn-purple" onClick={() => navigate(-1)} title={lang === 'en' ? 'Back' : 'ย้อนกลับ'}>
+            <FaArrowLeft size={14} />
+          </button>
+        </div>
+
+        <div className="detail-body-area" style={{ marginTop: '8px' }}>
           <div className="edit-card-purple">
             <div className="edit-card-header">
               <span className="orange-dot">●</span>

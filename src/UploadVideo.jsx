@@ -10,10 +10,9 @@ import {
   FaGlobe, 
   FaUsers, 
   FaSignOutAlt, 
-  FaSearch, 
   FaCloudUploadAlt, 
   FaAsterisk,
-  FaGlobeAmericas
+  FaArrowLeft
 } from 'react-icons/fa';
 
 export default function UploadVideo() {
@@ -198,41 +197,19 @@ export default function UploadVideo() {
             <h2>{t.uploadVideo || 'Upload Video'}</h2>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div className="search-box-purple">
-              <FaSearch className="search-icon-purple" />
-              <input 
-                type="text" 
-                className="search-input-purple" 
-                placeholder={t.searchPlaceholder || 'Search summary, position...'} 
-              />
-            </div>
-
-            {/* 🌐 ปุ่มสลับภาษาขนาดเล็กขวาบน */}
-            <button 
-              type="button" 
-              onClick={toggleLanguage}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                padding: '6px 12px',
-                borderRadius: '20px',
-                border: '1px solid rgba(192, 132, 252, 0.4)',
-                background: 'rgba(139, 92, 246, 0.15)',
-                color: '#c084fc',
-                fontSize: '12px',
-                fontWeight: '600',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                whiteSpace: 'nowrap'
-              }}
-            >
-              <FaGlobeAmericas size={12} />
-              <span>{lang ? lang.toUpperCase() : 'EN'}</span>
-            </button>
-          </div>
+          {/* ✅ ปุ่มสลับภาษา ย้ายมาไว้ฝั่งขวาบน (ไอคอนโลก) - เหมือนหน้าอื่นๆ */}
+          <button type="button" className="lang-toggle-purple" onClick={toggleLanguage}>
+            <FaGlobe size={14} />
+            <span>{lang ? lang.toUpperCase() : 'EN'}</span>
+          </button>
         </header>
+
+        {/* ✅ ปุ่มย้อนกลับ - อยู่ใต้ header ฝั่งซ้าย */}
+        <div className="back-btn-row" style={{ padding: '0 32px' }}>
+          <button type="button" className="back-btn-purple" onClick={() => navigate(-1)} title={lang === 'en' ? 'Back' : 'ย้อนกลับ'}>
+            <FaArrowLeft size={14} />
+          </button>
+        </div>
 
         {/* Upload Body Area */}
         <div className="upload-body-area">
@@ -306,5 +283,3 @@ export default function UploadVideo() {
     </div>
   );
 }
-
-///

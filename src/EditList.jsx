@@ -5,8 +5,8 @@ import './admindashboard.css';
 
 import { 
   FaHome, FaVideo, FaEdit, FaGlobe, FaUsers,
-  FaSignOutAlt, FaSearch, FaPlay, FaAsterisk,
-  FaArrowRight, FaLanguage, FaTrash
+  FaSignOutAlt, FaPlay, FaAsterisk,
+  FaArrowRight, FaArrowLeft, FaTrash
 } from 'react-icons/fa';
 
 const API_BASE = 'http://localhost:5000/api';
@@ -123,11 +123,6 @@ export default function EditList() {
         </div>
 
         <div className="sidebar-footer-purple">
-          <button type="button" className="menu-item-purple" onClick={toggleLanguage}
-            style={{ marginBottom: '10px', background: 'rgba(139, 92, 246, 0.2)', color: '#c084fc' }}>
-            <FaLanguage size={18} />
-            <span>{lang ? lang.toUpperCase() : 'EN'}</span>
-          </button>
           <button className="logout-btn-purple" onClick={handleLogout}>
             <FaSignOutAlt size={16} /><span>{t.logout || 'Logout'}</span>
           </button>
@@ -150,16 +145,19 @@ export default function EditList() {
             </div>
           </div>
 
-          <div className="search-box-purple">
-            <FaSearch style={{ color: '#9ca3af', fontSize: '14px' }} />
-            <input
-              type="text"
-              placeholder={lang === 'en' ? 'Search summary, position...' : 'ค้นหาสรุป, ตำแหน่งงาน...'}
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-          </div>
+          {/* ✅ ปุ่มสลับภาษา ย้ายมาไว้ฝั่งขวาบน (ไอคอนโลก) */}
+          <button type="button" className="lang-toggle-purple" onClick={toggleLanguage}>
+            <FaGlobe size={14} />
+            <span>{lang ? lang.toUpperCase() : 'EN'}</span>
+          </button>
         </header>
+
+        {/* ✅ ปุ่มย้อนกลับ - อยู่ใต้ header ฝั่งซ้าย */}
+        <div className="back-btn-row">
+          <button type="button" className="back-btn-purple" onClick={() => navigate(-1)} title={lang === 'en' ? 'Back' : 'ย้อนกลับ'}>
+            <FaArrowLeft size={14} />
+          </button>
+        </div>
 
         {/* รายการวิดีโอจาก DB */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '10px' }}>

@@ -13,11 +13,11 @@ import {
   FaSignOutAlt, 
   FaSearch, 
   FaAsterisk,
-  FaLanguage,
   FaUserShield,
   FaUserMinus,
   FaLock,
-  FaTimes
+  FaTimes,
+  FaArrowLeft
 } from 'react-icons/fa';
 
 export default function UserManagement() {
@@ -243,17 +243,6 @@ export default function UserManagement() {
         </div>
 
         <div className="sidebar-footer-purple">
-          {/* 🌐 ปุ่มสลับภาษาตรง Sidebar */}
-          <button
-            type="button"
-            className="menu-item-purple"
-            onClick={toggleLanguage}
-            style={{ marginBottom: '10px', background: 'rgba(139, 92, 246, 0.2)', color: '#c084fc' }}
-          >
-            <FaLanguage size={18} />
-            <span>{lang ? lang.toUpperCase() : 'EN'}</span>
-          </button>
-
           <button className="logout-btn-purple" onClick={handleLogout}>
             <FaSignOutAlt />
             <span>{t.logout || 'Logout'}</span>
@@ -276,14 +265,19 @@ export default function UserManagement() {
             </div>
           </div>
 
-          <div className="search-box-purple">
-            <FaSearch style={{ color: '#ffffff', fontSize: '14px' }} />
-            <input 
-              type="text" 
-              placeholder={lang === 'en' ? 'Search summary, position...' : 'ค้นหาสรุป, ตำแหน่ง...'} 
-            />
-          </div>
+          {/* ✅ ปุ่มสลับภาษา ย้ายมาไว้ฝั่งขวาบน (ไอคอนโลก) */}
+          <button type="button" className="lang-toggle-purple" onClick={toggleLanguage}>
+            <FaGlobe size={14} />
+            <span>{lang ? lang.toUpperCase() : 'EN'}</span>
+          </button>
         </header>
+
+        {/* ✅ ปุ่มย้อนกลับ - อยู่ใต้ header ฝั่งซ้าย */}
+        <div className="back-btn-row">
+          <button type="button" className="back-btn-purple" onClick={() => navigate(-1)} title={lang === 'en' ? 'Back' : 'ย้อนกลับ'}>
+            <FaArrowLeft size={14} />
+          </button>
+        </div>
 
         {/* แถบสถานะผู้ใช้ที่เลือก & ปุ่มจัดการสิทธิ์ */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>

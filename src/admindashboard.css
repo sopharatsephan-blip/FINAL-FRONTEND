@@ -147,28 +147,55 @@
   font-size: 13px;
 }
 
-.search-box-purple {
+/* ===== Back Button ===== */
+.back-btn-row {
+  margin-bottom: 18px;
+}
+
+.back-btn-purple {
   display: flex;
   align-items: center;
-  gap: 8px;
-  background: #150c26;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  background: rgba(139, 92, 246, 0.15);
   border: 1px solid rgba(139, 92, 246, 0.35);
+  color: #c084fc;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.back-btn-purple:hover {
+  background: rgba(139, 92, 246, 0.3);
+  border-color: rgba(139, 92, 246, 0.55);
+}
+
+/* ===== Language Toggle (Header - Top Right) ===== */
+.lang-toggle-purple {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(139, 92, 246, 0.18);
+  border: 1px solid rgba(139, 92, 246, 0.4);
+  color: #ffffff;
+  padding: 8px 14px;
   border-radius: 999px;
-  padding: 10px 18px;
-  min-width: 320px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+  white-space: nowrap;
 }
 
-.search-box-purple input {
-  background: transparent;
-  border: none;
-  outline: none;
-  color: #ffffff; /* ตัวอักษรสีขาว */
-  width: 100%;
-  font-size: 14px;
+.lang-toggle-purple svg {
+  color: #c084fc;
 }
 
-.search-box-purple input::placeholder {
-  color: #94a3b8;
+.lang-toggle-purple:hover {
+  background: rgba(139, 92, 246, 0.3);
+  border-color: rgba(139, 92, 246, 0.6);
 }
 
 /* ===== Cards & Inputs ===== */

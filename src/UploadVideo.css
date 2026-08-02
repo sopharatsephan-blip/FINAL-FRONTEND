@@ -190,38 +190,55 @@ body {
   color: var(--text-white); /* สีขาวอ่านชัดมาก */
 }
 
-.search-box-purple {
-  position: relative;
+/* ===== Back Button ===== */
+.back-btn-row {
+  margin: 16px 0 0 0;
+}
+
+.back-btn-purple {
   display: flex;
   align-items: center;
-  width: 280px;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  background: rgba(139, 92, 246, 0.15);
+  border: 1px solid rgba(139, 92, 246, 0.35);
+  color: #c084fc;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
 }
 
-.search-icon-purple {
-  position: absolute;
-  left: 14px;
-  color: var(--text-gray);
-  font-size: 14px;
+.back-btn-purple:hover {
+  background: rgba(139, 92, 246, 0.3);
+  border-color: rgba(139, 92, 246, 0.55);
 }
 
-.search-input-purple {
-  width: 100%;
-  background-color: var(--bg-card);
-  border: 1px solid var(--border-subtle);
-  border-radius: 20px;
-  padding: 8px 16px 8px 38px;
-  color: var(--text-white);
+/* ===== Language Toggle (Header - Top Right) ===== */
+.lang-toggle-purple {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(139, 92, 246, 0.18);
+  border: 1px solid rgba(139, 92, 246, 0.4);
+  color: #ffffff;
+  padding: 8px 14px;
+  border-radius: 999px;
   font-size: 13px;
-  outline: none;
-  transition: border-color 0.2s;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+  white-space: nowrap;
 }
 
-.search-input-purple:focus {
-  border-color: var(--purple-accent);
+.lang-toggle-purple svg {
+  color: #c084fc;
 }
 
-.search-input-purple::placeholder {
-  color: #71717a;
+.lang-toggle-purple:hover {
+  background: rgba(139, 92, 246, 0.3);
+  border-color: rgba(139, 92, 246, 0.6);
 }
 
 /* ===== Content Body & Upload Card ===== */
