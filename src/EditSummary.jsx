@@ -5,7 +5,7 @@ import './EditSummary.css';
 
 import { 
   FaHome, FaVideo, FaEdit, FaGlobe, FaUsers, FaSignOutAlt, 
-  FaAsterisk, FaSave, FaArrowLeft, FaShareAlt
+  FaAsterisk, FaSave, FaArrowLeft, FaShareAlt, FaCheck
 } from 'react-icons/fa';
 
 const API_BASE = 'http://localhost:5000/api'; // เปลี่ยนเป็น base URL จริงของ backend คุณ
@@ -29,6 +29,7 @@ export default function EditSummary() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
+  const [showSuccessModal, setShowSuccessModal] = useState(false); // ✅ ป๊อปอัปแจ้งบันทึกสำเร็จ
 
   useEffect(() => {
     const savedUser = localStorage.getItem('user');
@@ -101,13 +102,17 @@ export default function EditSummary() {
         }),
       });
       if (!res.ok) throw new Error('บันทึกไม่สำเร็จ');
-      alert(lang === 'en' ? 'Data saved successfully!' : 'บันทึกข้อมูลเรียบร้อยแล้ว!');
+      setShowSuccessModal(true); // ✅ แสดงป๊อปอัปแจ้งบันทึกสำเร็จ แทน alert()
     } catch (err) {
       console.error(err);
       alert(lang === 'en' ? 'Failed to save data' : 'บันทึกข้อมูลไม่สำเร็จ');
     } finally {
       setSaving(false);
     }
+  };
+
+  const handleCloseSuccessModal = () => {
+    setShowSuccessModal(false);
   };
 
   // ✅ ปุ่ม Share -> ไปยังหน้า Public Summary พร้อม videoId
@@ -309,6 +314,26 @@ export default function EditSummary() {
           </div>
         </div>
       </main>
+
+      {/* ===== ป๊อปอัปแจ้งบันทึกสำเร็จ ===== */}
+      {showSuccessModal && (
+        <div className="save-success-overlay" onClick={handleCloseSuccessModal}>
+          <div className="save-success-card" onClick={(e) => e.stopPropagation()}>
+            <div className="save-success-icon-circle">
+              <FaCheck size={22} />
+            </div>
+            <h3 className="save-success-title">
+              {lang === 'en' ? 'Saved Successfully!' : 'บันทึกข้อมูลสำเร็จ!'}
+            </h3>
+            <p className="save-success-desc">
+              {lang === 'en' ? 'Your summary data has been updated.' : 'ข้อมูลสรุปของคุณถูกอัปเดตเรียบร้อยแล้ว'}
+            </p>
+            <button className="save-success-btn" onClick={handleCloseSuccessModal}>
+              {lang === 'en' ? 'OK' : 'ตกลง'}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
