@@ -8,7 +8,6 @@ import "./CoopContent.css";
 import {
   FaHome,
   FaFileAlt,
-  FaFilePdf,
   FaHeart,
   FaRegHeart,
   FaSignOutAlt,
@@ -220,11 +219,6 @@ function CoopContent() {
               <span>{lang === "en" ? "Co-op Content" : "เนื้อหาสหกิจศึกษา"}</span>
             </button>
 
-            <button className="menu-item-purple" onClick={() => navigate("/download-pdf")}>
-              <FaFilePdf style={{ color: "#ef4444" }} />
-              <span>{lang === "en" ? "Download PDF" : "ดาวน์โหลด PDF"}</span>
-            </button>
-
             <button className="menu-item-purple" onClick={() => navigate("/favorites")}>
               <FaHeart style={{ color: "#ef4444" }} />
               <span>{lang === "en" ? "Favorites" : "รายการโปรด"}</span>
@@ -303,6 +297,28 @@ function CoopContent() {
             </button>
           </div>
         </header>
+
+        <div style={{ margin: "16px 0" }}>
+          <button
+            type="button"
+            onClick={() => navigate("/dashboard")}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "8px",
+              background: "rgba(139, 92, 246, 0.12)",
+              border: "1px solid rgba(139, 92, 246, 0.4)",
+              borderRadius: "999px",
+              padding: "8px 16px",
+              color: "#c4b5fd",
+              fontWeight: 600,
+              fontSize: "13px",
+              cursor: "pointer"
+            }}
+          >
+            <FaArrowLeft /> {lang === "en" ? "Back to Dashboard" : "กลับไปหน้าแดชบอร์ด"}
+          </button>
+        </div>
 
         {viewingItem ? (
           <div

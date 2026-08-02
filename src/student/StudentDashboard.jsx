@@ -6,7 +6,6 @@ import './StudentDashboard.css';
 import {
   FaHome,
   FaFileAlt,
-  FaFilePdf,
   FaHeart,
   FaSignOutAlt,
   FaSearch,
@@ -132,11 +131,6 @@ function StudentDashboard() {
             <button className="menu-item-purple" onClick={() => navigate('/coop-content')}>
               <FaFileAlt />
               <span>{lang === 'en' ? 'Co-op Content' : 'เนื้อหาสหกิจศึกษา'}</span>
-            </button>
-
-            <button className="menu-item-purple" onClick={() => navigate('/download-pdf')}>
-              <FaFilePdf style={{ color: '#ef4444' }} />
-              <span>{lang === 'en' ? 'Download PDF' : 'ดาวน์โหลด PDF'}</span>
             </button>
 
             <button className="menu-item-purple" onClick={() => navigate('/favorites')}>

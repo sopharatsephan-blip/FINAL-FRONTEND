@@ -17,7 +17,6 @@ import UserManagement from './UserManagement.jsx';
 import StudentDashboard from './student/StudentDashboard.jsx';
 import { LanguageProvider } from './LanguageContext.jsx'; 
 import CoopContent from './student/CoopContent.jsx';
-import DownloadPdf from './student/DownloadPdf.jsx';
 import Favorites from './student/Favorites.jsx';
 import Register from './Register.jsx'
 import ForgotPassword from './ForgotPassword.jsx';
@@ -41,7 +40,6 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           <Route path="/users" element={<UserManagement />} />
           <Route path="/dashboard" element={<StudentDashboard />} />
           <Route path="/coop-content" element={<CoopContent />} />
-          <Route path="/download-pdf" element={<DownloadPdf />} />
           <Route path="/favorites" element={<Favorites />} />
           <Route path='/Register' element={<Register />} />
           <Route path="/reset-password" element={<ForgotPassword />} />
