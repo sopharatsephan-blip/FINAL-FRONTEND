@@ -5,7 +5,7 @@ import './EditSummary.css';
 
 import { 
   FaHome, FaVideo, FaEdit, FaGlobe, FaUsers, FaSignOutAlt, 
-  FaAsterisk, FaSave, FaArrowLeft
+  FaAsterisk, FaSave, FaArrowLeft, FaShareAlt
 } from 'react-icons/fa';
 
 const API_BASE = 'http://localhost:5000/api'; // เปลี่ยนเป็น base URL จริงของ backend คุณ
@@ -108,6 +108,16 @@ export default function EditSummary() {
     } finally {
       setSaving(false);
     }
+  };
+
+  // ✅ ปุ่ม Share -> ไปยังหน้า Public Summary พร้อม videoId
+  const handleShare = () => {
+    navigate(`/publish-summary/${videoId}`, {
+      state: {
+        videoId,
+        ...formData
+      }
+    });
   };
 
   if (loading) {
@@ -216,9 +226,37 @@ export default function EditSummary() {
 
         <div className="detail-body-area" style={{ marginTop: '8px' }}>
           <div className="edit-card-purple">
-            <div className="edit-card-header">
-              <span className="orange-dot">●</span>
-              <h3>{lang === 'en' ? 'Edit Summary Data' : 'แก้ไขข้อมูลของสรุป'}</h3>
+            <div
+              className="edit-card-header"
+              style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span className="orange-dot">●</span>
+                <h3>{lang === 'en' ? 'Edit Summary Data' : 'แก้ไขข้อมูลของสรุป'}</h3>
+              </div>
+
+              {/* ✅ ปุ่ม Share ใหม่ */}
+              <button
+                type="button"
+                className="btn-action btn-share"
+                onClick={handleShare}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '8px 16px',
+                  borderRadius: '8px',
+                  border: 'none',
+                  background: '#3b82f6',
+                  color: '#fff',
+                  fontSize: '13px',
+                  fontWeight: '600',
+                  cursor: 'pointer'
+                }}
+              >
+                <FaShareAlt size={14} />
+                <span>{lang === 'en' ? 'Share' : 'แชร์'}</span>
+              </button>
             </div>
 
             <form className="edit-form-purple" onSubmit={handleSave}>
