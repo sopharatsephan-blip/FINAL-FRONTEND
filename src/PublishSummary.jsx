@@ -20,6 +20,19 @@ import {
 } from 'react-icons/fa';
 
 const API_BASE = 'http://localhost:5000/api';
+const SERVER_ORIGIN = API_BASE.replace(/\/api\/?$/, ''); // ตัด /api ออกให้เหลือ origin ของ backend เช่น http://localhost:5000
+
+// ✅ สร้าง URL ของไฟล์วิดีโอจริงจากข้อมูลที่ backend ส่งมา รองรับหลายชื่อฟิลด์เผื่อ backend ใช้ชื่อไม่ตรงกัน
+function resolveVideoSrc(video) {
+  if (!video) return '';
+  const path =
+    video.VideoPath || video.videoPath ||
+    video.FilePath || video.filePath ||
+    video.VideoURL || video.videoUrl || video.VideoUrl || '';
+  if (!path) return '';
+  if (/^https?:\/\//i.test(path)) return path; // เป็น URL เต็มอยู่แล้ว
+  return `${SERVER_ORIGIN}${path.startsWith('/') ? '' : '/'}${path}`;
+}
 
 export default function PublishSummary() {
   const navigate = useNavigate();
@@ -68,10 +81,8 @@ export default function PublishSummary() {
         }
 
         setVideo(data);
-        // ✅ default เป็น 'everyone' (Public) เสมอ ไม่ sync ตามสถานะเดิมในฐานข้อมูล
-        // เพราะปุ่มคือ "Ready to Publish" ควรพร้อมเผยแพร่เป็นสาธารณะโดยค่าเริ่มต้น
-        // (ถ้า sync ตามค่าเดิมที่มักเป็น 'Private' จะทำให้กดปุ่มแล้วค่าไม่เปลี่ยนเป็น Public)
-        setPublishTarget('everyone');
+        // ตั้งค่าเริ่มต้นของ target ตามสถานะปัจจุบันในฐานข้อมูล
+        setPublishTarget(data.VisibilityType === 'Private' ? 'private' : 'everyone');
         setError('');
       } catch (err) {
         console.error('Fetch video detail error:', err);
@@ -106,9 +117,6 @@ export default function PublishSummary() {
       if (!res.ok) {
         throw new Error(data.message || (lang === 'en' ? 'Failed to publish' : 'เผยแพร่ไม่สำเร็จ'));
       }
-
-      // ✅ อัปเดต state ในหน้านี้ทันที ให้ตรงกับฐานข้อมูลล่าสุด
-      setVideo((prev) => (prev ? { ...prev, VisibilityType: visibilityType } : prev));
 
       setShowSuccessModal(true);
     } catch (err) {
@@ -242,9 +250,18 @@ export default function PublishSummary() {
                 </div>
                 
                 <div className="summary-video-info">
-                  <div className="video-thumbnail-box-purple">
-                    <FaPlay size={18} />
-                  </div>
+                  {resolveVideoSrc(video) ? (
+                    <video
+                      className="video-thumbnail-player-purple"
+                      src={resolveVideoSrc(video)}
+                      controls
+                      preload="metadata"
+                    />
+                  ) : (
+                    <div className="video-thumbnail-box-purple">
+                      <FaPlay size={18} />
+                    </div>
+                  )}
                   <div className="video-details">
                     <h4 style={{ color: '#ffffff', margin: '0 0 6px 0', fontSize: '1rem', fontWeight: '600' }}>
                       {video.Position 
@@ -301,23 +318,6 @@ export default function PublishSummary() {
                     <small className="target-count">{lang === 'en' ? 'Hidden' : 'ไม่เผยแพร่'}</small>
                   </div>
                 </div>
-
-                {/* ✅ แสดงสถานะปัจจุบันจริงในฐานข้อมูล + สิ่งที่กำลังจะเปลี่ยนเป็น ให้ผู้ใช้เห็นชัดเจน */}
-                <p style={{ color: '#94a3b8', fontSize: '12px', marginTop: '14px', lineHeight: 1.6 }}>
-                  {lang === 'en' ? 'Current status: ' : 'สถานะปัจจุบัน: '}
-                  <strong style={{ color: video.VisibilityType === 'Public' ? '#86efac' : '#fca5a5' }}>
-                    {video.VisibilityType === 'Public'
-                      ? (lang === 'en' ? 'Public' : 'สาธารณะ')
-                      : (lang === 'en' ? 'Private' : 'ส่วนตัว')}
-                  </strong>
-                  {' · '}
-                  {lang === 'en' ? 'Will change to: ' : 'จะเปลี่ยนเป็น: '}
-                  <strong style={{ color: publishTarget === 'private' ? '#fca5a5' : '#86efac' }}>
-                    {publishTarget === 'private'
-                      ? (lang === 'en' ? 'Private' : 'ส่วนตัว')
-                      : (lang === 'en' ? 'Public' : 'สาธารณะ')}
-                  </strong>
-                </p>
               </div>
             </div>
 
@@ -347,6 +347,19 @@ export default function PublishSummary() {
                   <p style={{ margin: 0, color: '#cbd5e1', fontSize: '0.9rem', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>
                     {video.SummaryText || (lang === 'en' ? 'No summary available.' : 'ยังไม่มีข้อความสรุป')}
                   </p>
+                </div>
+
+                {/* ✅ ซับไตเติ้ล / บทถอดเสียงเต็ม แสดงคู่กับผลสรุป */}
+                <div className="summary-section-dark subtitle-section-dark">
+                  <h5 style={{ margin: '0 0 8px 0', color: '#c084fc', fontSize: '0.95rem', fontWeight: '600' }}>
+                    {lang === 'en' ? 'Subtitle / Transcript:' : 'ซับไตเติ้ล / บทถอดเสียง:'}
+                  </h5>
+                  <div className="subtitle-scroll-box">
+                    <p style={{ margin: 0, color: '#94a3b8', fontSize: '0.85rem', lineHeight: '1.7', whiteSpace: 'pre-wrap' }}>
+                      {video.Transcript || video.TranscriptText || video.SubtitleText || video.Subtitle ||
+                        (lang === 'en' ? 'No subtitle/transcript available.' : 'ยังไม่มีข้อมูลซับไตเติ้ล')}
+                    </p>
+                  </div>
                 </div>
               </div>
 

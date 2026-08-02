@@ -108,6 +108,24 @@
   box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
 }
 
+/* ✅ กล่องแสดงวิดีโอจริงที่อัปโหลดไว้ แทนไอคอน Play แบบ static */
+.video-thumbnail-player-purple {
+  width: 180px;
+  aspect-ratio: 16 / 9;
+  border-radius: 14px;
+  background: #000000;
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.25);
+  flex-shrink: 0;
+  object-fit: cover;
+}
+
+@media (max-width: 640px) {
+  .video-thumbnail-player-purple {
+    width: 130px;
+  }
+}
+
 .video-details {
   display: flex;
   flex-direction: column;
@@ -169,6 +187,33 @@
   border-radius: 12px;
   padding: 18px;
   border: 1px solid rgba(139, 92, 246, 0.15);
+}
+
+/* ✅ ระยะห่างระหว่างส่วนสรุปกับส่วนซับไตเติ้ล */
+.subtitle-section-dark {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px dashed rgba(139, 92, 246, 0.2);
+}
+
+/* ✅ กล่องซับไตเติ้ล/บทถอดเสียง เลื่อนดูได้ถ้ายาว */
+.subtitle-scroll-box {
+  max-height: 220px;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+.subtitle-scroll-box::-webkit-scrollbar {
+  width: 6px;
+}
+
+.subtitle-scroll-box::-webkit-scrollbar-thumb {
+  background: rgba(139, 92, 246, 0.35);
+  border-radius: 999px;
+}
+
+.subtitle-scroll-box::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 .summary-item-header {
