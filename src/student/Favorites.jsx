@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "../LanguageContext";
+import html2pdf from "html2pdf.js";
 import "./StudentDashboard.css";
 import "./CoopContent.css";
 import "./Favorites.css";
@@ -19,6 +20,8 @@ import {
   FaArrowLeft
 } from "react-icons/fa";
 
+const API_BASE = "http://localhost:5000";
+
 function Favorites() {
   const navigate = useNavigate();
   const langContext = typeof useLanguage === "function" ? useLanguage() : null;
@@ -26,25 +29,66 @@ function Favorites() {
   const toggleLanguage = langContext?.toggleLanguage || (() => {});
   const currentUser = JSON.parse(localStorage.getItem("user") || "null");
 
-  // สมมติข้อมูลรายการโปรด (รายการที่เคยถูกกด favorite ไว้)
-  const [favoriteItems, setFavoriteItems] = useState([
-    {
-      id: 1,
-      titleTh: "ตำแหน่ง UX/UI Design | บริษัท อินเวิร์ซ โซลูชันส์ จำกัด",
-      titleEn: "Position UX/UI Design | INVERSE SOLUTIONS CO., LTD.",
-      dateTh: "30 ม.ค.2569",
-      dateEn: "30 January 2026",
-      pages: "5",
-      keyword: "UX/UI Design",
-      isFavorite: true
-    }
-  ]);
-
+  // ===== ข้อมูลจริงจากฐานข้อมูล =====
+  const [favoriteItems, setFavoriteItems] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const toggleFavorite = (id) => {
-    // เอาออกจากรายการโปรดเมื่อกดเลิกถูกใจ
-    setFavoriteItems((prev) => prev.filter((item) => item.id !== id));
+  // ===== หน้ารายละเอียดสรุป (View Summary) =====
+  const [viewingItem, setViewingItem] = useState(null);
+  const [summaryData, setSummaryData] = useState(null);
+  const [isSummaryLoading, setIsSummaryLoading] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
+  const summaryRef = useRef(null);
+
+  useEffect(() => {
+    const fetchFavorites = async () => {
+      if (!currentUser?.uid) {
+        setIsLoading(false);
+        return;
+      }
+      setIsLoading(true);
+      try {
+        const res = await fetch(`${API_BASE}/api/favorites/${currentUser.uid}/videos`);
+        const data = await res.json();
+        setFavoriteItems(Array.isArray(data) ? data : []);
+      } catch (err) {
+        console.error("Fetch favorites error:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchFavorites();
+  }, [currentUser?.uid]);
+
+  const formatUploadDate = (dateStr) => {
+    if (!dateStr) return "-";
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return "-";
+
+    if (lang === "en") {
+      return d.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+    }
+    const thaiMonthsShort = [
+      "ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.",
+      "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."
+    ];
+    return `${d.getDate()} ${thaiMonthsShort[d.getMonth()]}${d.getFullYear() + 543}`;
+  };
+
+  const toggleFavorite = async (videoId) => {
+    if (!currentUser?.uid) return;
+    // เอาออกจากรายการโปรดทันที (optimistic update)
+    setFavoriteItems((prev) => prev.filter((item) => item.VideoID !== videoId));
+
+    try {
+      await fetch(`${API_BASE}/api/favorites/${currentUser.uid}/${videoId}`, {
+        method: "DELETE"
+      });
+    } catch (err) {
+      console.error("Remove favorite error:", err);
+    }
   };
 
   const handleLogout = () => {
@@ -52,10 +96,73 @@ function Favorites() {
     navigate("/login");
   };
 
+  const handleWatchVideo = (item) => {
+    navigate(`/video/${item.VideoID}`);
+  };
+
+  const handleOpenSummary = async (item) => {
+    setViewingItem(item);
+    setSummaryData(null);
+    setIsSummaryLoading(true);
+    try {
+      const res = await fetch(`${API_BASE}/api/videos/${item.VideoID}/summary`);
+      if (!res.ok) {
+        setSummaryData({ notFound: true });
+        return;
+      }
+      const data = await res.json();
+      setSummaryData(data);
+    } catch (err) {
+      console.error("Fetch summary error:", err);
+      setSummaryData({ notFound: true });
+    } finally {
+      setIsSummaryLoading(false);
+    }
+  };
+
+  const handleBackFromSummary = () => {
+    setViewingItem(null);
+    setSummaryData(null);
+  };
+
+  const handleDownload = () => {
+    const node = summaryRef.current;
+    if (!node || !viewingItem) return;
+
+    setIsDownloading(true);
+    const safeName = (viewingItem.Position || viewingItem.VideoTitle || "summary").replace(/\s+/g, "_");
+    const filename = `${safeName}_summary.pdf`;
+
+    html2pdf()
+      .set({
+        filename,
+        margin: 10,
+        image: { type: "jpeg", quality: 0.98 },
+        html2canvas: { scale: 2, backgroundColor: "#150a1f", useCORS: true },
+        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+        pagebreak: { mode: ["css", "legacy"] }
+      })
+      .from(node)
+      .save()
+      .then(() => setIsDownloading(false))
+      .catch(() => setIsDownloading(false));
+  };
+
+  // กรองรายการโปรดตามคำค้นหาจากช่องด้านบน
   const filteredItems = favoriteItems.filter((item) => {
-    const title = lang === "en" ? item.titleEn : item.titleTh;
-    return title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-           item.keyword.toLowerCase().includes(searchQuery.toLowerCase());
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.trim().toLowerCase();
+    const haystack = [
+      item.Position,
+      item.VideoTitle,
+      item.CompanyName,
+      item.CategoryName,
+      item.Keywords
+    ]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase();
+    return haystack.includes(q);
   });
 
   return (
@@ -131,10 +238,14 @@ function Favorites() {
             </div>
             <div>
               <h2 style={{ margin: 0, fontSize: "18px", color: "#fff", display: "flex", alignItems: "center", gap: "8px" }}>
-                {lang === "en" ? "Favorites" : "รายการโปรด"}
-                <span style={{ fontSize: "13px", color: "#8b8ba0", fontWeight: "normal" }}>
-                  {lang === "en" ? "Saved by you" : "ที่คุณบันทึกไว้"}
-                </span>
+                {viewingItem
+                  ? (lang === "en" ? "Summary Details" : "รายละเอียดสรุป")
+                  : (lang === "en" ? "Favorites" : "รายการโปรด")}
+                {!viewingItem && (
+                  <span style={{ fontSize: "13px", color: "#8b8ba0", fontWeight: "normal" }}>
+                    {lang === "en" ? "Saved by you" : "ที่คุณบันทึกไว้"}
+                  </span>
+                )}
               </h2>
             </div>
           </div>
@@ -196,81 +307,176 @@ function Favorites() {
           </button>
         </div>
 
-        {/* ===== Section รายการโปรด ===== */}
-        <div className="coop-card-wrapper" style={{ marginTop: "24px" }}>
-          <div className="coop-section-head">
-            <span className="coop-status-dot"></span>
-            <span>{lang === "en" ? "All Summary Content" : "สรุปเนื้อหาทั้งหมด"}</span>
-          </div>
-
-          {filteredItems.length === 0 ? (
-            <div
+        {viewingItem ? (
+          <div
+            ref={summaryRef}
+            className="purple-card"
+            style={{
+              maxWidth: "820px",
+              margin: "24px auto 0",
+              padding: "28px clamp(20px, 4vw, 40px)"
+            }}
+          >
+            <button
+              data-html2canvas-ignore="true"
+              onClick={handleBackFromSummary}
               style={{
-                textAlign: "center",
-                padding: "60px 20px",
-                color: "#8b8ba0",
-                background: "rgba(30, 27, 75, 0.4)",
-                borderRadius: "16px",
-                border: "1px dashed rgba(139, 92, 246, 0.3)",
-                marginTop: "16px"
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "8px",
+                background: "rgba(139, 92, 246, 0.12)",
+                border: "1px solid rgba(139, 92, 246, 0.4)",
+                borderRadius: "999px",
+                padding: "8px 16px",
+                color: "#c4b5fd",
+                fontWeight: 600,
+                fontSize: "13px",
+                cursor: "pointer"
               }}
             >
-              <FaHeart size={48} style={{ color: "rgba(239, 68, 68, 0.3)", marginBottom: "12px" }} />
-              <p style={{ margin: 0, fontSize: "16px" }}>
-                {lang === "en" ? "No favorite items found" : "ยังไม่มีรายการโปรดที่บันทึกไว้"}
-              </p>
+              <FaArrowLeft /> {lang === "en" ? "Back" : "ย้อนกลับ"}
+            </button>
+
+            <div style={{ display: "flex", alignItems: "center", gap: "10px", margin: "24px 0 6px" }}>
+              <FaFileAlt style={{ color: "#a855f7" }} size={20} />
+              <h2 style={{ margin: 0, fontSize: "20px", fontWeight: 700, color: "#fff" }}>
+                {`${lang === "en" ? "Position" : "ตำแหน่ง"} ${viewingItem.Position || viewingItem.VideoTitle} | ${viewingItem.CompanyName || "-"}`}
+              </h2>
             </div>
-          ) : (
-            <div className="coop-card-list">
-              {filteredItems.map((item) => (
-                <div key={item.id} className="coop-card">
-                  <div className="coop-card-top">
-                    <div>
-                      <h3 className="coop-card-title">
-                        {lang === "en" ? item.titleEn : item.titleTh}
-                      </h3>
-                      <div className="coop-card-meta">
-                        <span className="coop-meta-item">
-                          <FaCalendarAlt style={{ color: "#a855f7" }} />{" "}
-                          {lang === "en" ? item.dateEn : item.dateTh}
-                        </span>
-                        <span className="coop-meta-item">
-                          <FaPages style={{ color: "#a855f7" }} />{" "}
-                          {lang === "en" ? `${item.pages} pages` : `${item.pages} หน้า`}
-                        </span>
+            <p style={{ margin: "0 0 20px", color: "#8b8ba0", fontSize: "13px" }}>
+              {formatUploadDate(viewingItem.UploadDate)}
+            </p>
+
+            {isSummaryLoading && (
+              <p style={{ color: "#c4b5fd" }}>{lang === "en" ? "Loading summary..." : "กำลังโหลดสรุป..."}</p>
+            )}
+
+            {!isSummaryLoading && summaryData?.notFound && (
+              <p style={{ color: "#8b8ba0" }}>
+                {lang === "en" ? "No summary available for this video yet." : "วิดีโอนี้ยังไม่มีข้อมูลสรุป"}
+              </p>
+            )}
+
+            {!isSummaryLoading && summaryData && !summaryData.notFound && (
+              <div>
+                {summaryData.MainTopic && (
+                  <h3 style={{ color: "#a855f7", fontSize: "15px", fontWeight: 700, margin: "0 0 10px" }}>
+                    {summaryData.MainTopic}
+                  </h3>
+                )}
+                <p style={{ margin: 0, color: "#d4d4d8", lineHeight: 1.8, whiteSpace: "pre-wrap" }}>
+                  {summaryData.SummaryText || (lang === "en" ? "No summary text." : "ไม่มีเนื้อหาสรุป")}
+                </p>
+              </div>
+            )}
+
+            <button
+              data-html2canvas-ignore="true"
+              onClick={handleDownload}
+              disabled={isDownloading || isSummaryLoading || summaryData?.notFound}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "8px",
+                background: "#a855f7",
+                border: "none",
+                borderRadius: "10px",
+                padding: "12px 22px",
+                color: "#fff",
+                fontWeight: 700,
+                fontSize: "14px",
+                cursor: isDownloading ? "not-allowed" : "pointer",
+                opacity: isDownloading || summaryData?.notFound ? 0.6 : 1,
+                marginTop: "24px",
+                boxShadow: "0 8px 20px rgba(168, 85, 247, 0.35)"
+              }}
+            >
+              <FaDownload />{" "}
+              {isDownloading
+                ? (lang === "en" ? "Preparing..." : "กำลังเตรียมไฟล์...")
+                : (lang === "en" ? "Download PDF" : "ดาวน์โหลด PDF")}
+            </button>
+          </div>
+        ) : (
+          <div className="coop-card-wrapper" style={{ marginTop: "24px" }}>
+            <div className="coop-section-head">
+              <span className="coop-status-dot"></span>
+              <span>{lang === "en" ? "All Summary Content" : "สรุปเนื้อหาทั้งหมด"}</span>
+            </div>
+
+            {isLoading && (
+              <p style={{ color: "#c4b5fd" }}>{lang === "en" ? "Loading..." : "กำลังโหลด..."}</p>
+            )}
+
+            {!isLoading && filteredItems.length === 0 && (
+              <div className="favorites-empty-card">
+                <div className="favorites-empty-icon">
+                  <FaHeart />
+                </div>
+                <p className="favorites-empty-title">
+                  {lang === "en" ? "No favorite items found" : "ยังไม่มีรายการโปรดที่บันทึกไว้"}
+                </p>
+                {favoriteItems.length > 0 && searchQuery.trim() && (
+                  <p className="favorites-empty-desc">
+                    {lang === "en" ? "Try a different search keyword." : "ลองค้นหาด้วยคำอื่น"}
+                  </p>
+                )}
+              </div>
+            )}
+
+            {!isLoading && filteredItems.length > 0 && (
+              <div className="coop-card-list">
+                {filteredItems.map((item) => (
+                  <div key={item.VideoID} className="coop-card coop-card-favorite-active">
+                    <div className="coop-card-top">
+                      <div>
+                        <h3 className="coop-card-title">
+                          {`${lang === "en" ? "Position" : "ตำแหน่ง"} ${item.Position || item.VideoTitle} | ${item.CompanyName || "-"}`}
+                        </h3>
+                        <div className="coop-card-meta">
+                          <span className="coop-meta-item">
+                            <FaCalendarAlt style={{ color: "#a855f7" }} />{" "}
+                            {formatUploadDate(item.UploadDate)}
+                          </span>
+                          <span className="coop-meta-item">
+                            <FaPages style={{ color: "#a855f7" }} />{" "}
+                            {item.PageCount != null
+                              ? (lang === "en" ? `${item.PageCount} pages` : `${item.PageCount} หน้า`)
+                              : "-"}
+                          </span>
+                        </div>
                       </div>
+
+                      <button
+                        className="coop-fav-btn active"
+                        onClick={() => toggleFavorite(item.VideoID)}
+                        title={lang === "en" ? "Remove from favorites" : "ลบออกจากรายการโปรด"}
+                      >
+                        <FaHeart />
+                      </button>
                     </div>
 
-                    <button
-                      className="coop-fav-btn active"
-                      onClick={() => toggleFavorite(item.id)}
-                      title={lang === "en" ? "Remove from favorites" : "ลบออกจากรายการโปรด"}
-                    >
-                      <FaHeart />
-                    </button>
-                  </div>
+                    <div className="coop-keyword-box">
+                      {lang === "en" ? "Keyword" : "คีย์เวิร์ด"} :{" "}
+                      <span style={{ color: "#c084fc", fontWeight: 500 }}>
+                        {item.Keywords || item.CategoryName || "-"}
+                      </span>
+                    </div>
 
-                  <div className="coop-keyword-box">
-                    {lang === "en" ? "Keyword" : "คีย์เวิร์ด"} :{" "}
-                    <span style={{ color: "#c084fc", fontWeight: 500 }}>{item.keyword}</span>
+                    <div className="coop-actions">
+                      <button className="btn-view-video" onClick={() => handleWatchVideo(item)}>
+                        <FaEye /> {lang === "en" ? "Watch Video" : "ดูวิดีโอ"}
+                      </button>
+                      <button className="btn-view-summary" onClick={() => handleOpenSummary(item)}>
+                        <FaFileAlt /> {lang === "en" ? "View Summary" : "ดูสรุป"}
+                      </button>
+                    </div>
                   </div>
-
-                  <div className="coop-actions">
-                    <button className="btn-view-video">
-                      <FaEye /> {lang === "en" ? "Watch Video" : "ดูวิดีโอ"}
-                    </button>
-                    <button
-                      className="btn-download-pdf"
-                      onClick={() => navigate("/coop-content")}
-                    >
-                      <FaDownload /> PDF
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </main>
     </div>
   );
