@@ -35,6 +35,14 @@ function StudentDashboard() {
   const [videoResults, setVideoResults] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
+  // ===== ช่องค้นหาด้านบน (Header Search) — ค้นหาแบบรวดเร็วโดยไม่ผูกกับ Data Filters =====
+  const [headerSearchQuery, setHeaderSearchQuery] = useState('');
+
+  // ===== ข้อมูลจริงสำหรับ "Popular Video Rank" และ "Weekly Video Summaries" =====
+  const [popularVideo, setPopularVideo] = useState(null);
+  const [weeklyVideos, setWeeklyVideos] = useState([]);
+  const [isDashboardLoading, setIsDashboardLoading] = useState(true);
+
   useEffect(() => {
     const savedUser = localStorage.getItem('user');
     if (!savedUser) {
@@ -48,6 +56,52 @@ function StudentDashboard() {
     }
     setCurrentUser(user);
   }, [navigate]);
+
+  // ดึงข้อมูลจริงจากฐานข้อมูลมาแสดงในการ์ด "ยอดฮิต" และ "สรุปประจำสัปดาห์"
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      setIsDashboardLoading(true);
+      try {
+        const [topRes, weeklyRes] = await Promise.all([
+          fetch('http://localhost:5000/api/videos/top'),
+          fetch('http://localhost:5000/api/videos/weekly?limit=3')
+        ]);
+        const topData = await topRes.json();
+        const weeklyData = await weeklyRes.json();
+
+        setPopularVideo(topData || null);
+        setWeeklyVideos(Array.isArray(weeklyData) ? weeklyData : []);
+      } catch (err) {
+        console.error('Dashboard data fetch error:', err);
+      } finally {
+        setIsDashboardLoading(false);
+      }
+    };
+
+    fetchDashboardData();
+  }, []);
+
+  // แปลง Duration รูปแบบ "mm:ss" จาก DB ให้อยู่ในรูปแบบข้อความอ่านง่าย
+  const formatDuration = (duration) => {
+    if (!duration) return '-';
+    return duration;
+  };
+
+  // แปลงวันที่ให้ตรงกับภาษาที่เลือก (EN / TH)
+  const formatUploadDate = (dateStr) => {
+    if (!dateStr) return '-';
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return '-';
+
+    if (lang === 'en') {
+      return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+    }
+    const thaiMonths = [
+      'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
+      'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'
+    ];
+    return `วันที่ ${d.getDate()} เดือน${thaiMonths[d.getMonth()]} ${d.getFullYear() + 543}`;
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('user');
@@ -95,6 +149,34 @@ function StudentDashboard() {
       console.error('Search error:', err);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  // ค้นหาแบบรวดเร็วจากช่องค้นหาด้านบน (ไม่ผูกกับตัวกรองด้านล่าง ใช้ keyword อย่างเดียว)
+  const handleHeaderSearch = async () => {
+    if (!headerSearchQuery.trim()) return;
+    setIsLoading(true);
+    try {
+      const params = new URLSearchParams({ keyword: headerSearchQuery.trim() });
+      const res = await fetch(`http://localhost:5000/api/videos/search?${params}`);
+      const data = await res.json();
+      setVideoResults(data);
+      setHasSearched(true);
+
+      setTimeout(() => {
+        resultRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    } catch (err) {
+      console.error('Header search error:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleHeaderSearchKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleHeaderSearch();
     }
   };
 
@@ -167,8 +249,17 @@ function StudentDashboard() {
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
             <div className="search-box-purple">
-              <FaSearch style={{ color: '#8b8ba0' }} />
-              <input type="text" placeholder={lang === 'en' ? 'Search summary, position...' : 'ค้นหาสรุป, ตำแหน่งงาน...'} />
+              <FaSearch
+                style={{ color: '#8b8ba0', cursor: 'pointer' }}
+                onClick={handleHeaderSearch}
+              />
+              <input
+                type="text"
+                placeholder={lang === 'en' ? 'Search summary, position...' : 'ค้นหาสรุป, ตำแหน่งงาน...'}
+                value={headerSearchQuery}
+                onChange={(e) => setHeaderSearchQuery(e.target.value)}
+                onKeyDown={handleHeaderSearchKeyDown}
+              />
             </div>
 
             {/* ปุ่มสลับภาษาด้านขวาบน */}
@@ -203,26 +294,36 @@ function StudentDashboard() {
               <span style={{ width: '8px', height: '8px', background: '#22c55e', borderRadius: '50%', display: 'inline-block' }}></span> 
               {lang === 'en' ? 'Popular Video Rank' : 'อันดับวิดีโอยอดฮิต'}
             </h3>
-            <div className="hero-banner-purple">
-              <span className="top-badge">
-                {lang === 'en' ? '👑 Rank 1 This Week' : '👑 อันดับ 1 สัปดาห์นี้'}
-              </span>
-              <div className="hero-details">
-                <h4>
-                  {lang === 'en' 
-                    ? 'Position UX/UI Design | INVERSE SOLUTIONS CO., LTD.' 
-                    : 'ตำแหน่ง UX/UI Design | บริษัท อินเวิร์ซ โซลูชันส์ จำกัด'}
-                </h4>
-                <p>IO-HOPE ENTERPRISE · Developer</p>
-                <div className="stats-purple">
-                  <span>👁️ 312 {lang === 'en' ? 'views' : 'คน'}</span>
-                  <span>⏱️ 5:03 {lang === 'en' ? 'mins' : 'นาที'}</span>
+            {isDashboardLoading && (
+              <p style={{ color: '#c4b5fd' }}>{lang === 'en' ? 'Loading...' : 'กำลังโหลด...'}</p>
+            )}
+
+            {!isDashboardLoading && !popularVideo && (
+              <p style={{ color: '#8b8ba0' }}>
+                {lang === 'en' ? 'No video data yet.' : 'ยังไม่มีข้อมูลวิดีโอ'}
+              </p>
+            )}
+
+            {!isDashboardLoading && popularVideo && (
+              <div className="hero-banner-purple">
+                <span className="top-badge">
+                  {lang === 'en' ? '👑 Rank 1 This Week' : '👑 อันดับ 1 สัปดาห์นี้'}
+                </span>
+                <div className="hero-details">
+                  <h4>
+                    {`${lang === 'en' ? 'Position' : 'ตำแหน่ง'} ${popularVideo.Position || popularVideo.VideoTitle} | ${popularVideo.CompanyName || '-'}`}
+                  </h4>
+                  <p>{[popularVideo.CategoryName, popularVideo.WorkType].filter(Boolean).join(' · ')}</p>
+                  <div className="stats-purple">
+                    <span>👁️ {popularVideo.ViewCount ?? 0} {lang === 'en' ? 'views' : 'คน'}</span>
+                    <span>⏱️ {formatDuration(popularVideo.Duration)} {lang === 'en' ? 'mins' : 'นาที'}</span>
+                  </div>
+                </div>
+                <div className="chart-icon">
+                  <FaArrowUp />
                 </div>
               </div>
-              <div className="chart-icon">
-                <FaArrowUp />
-              </div>
-            </div>
+            )}
           </div>
 
           <div className="purple-card">
@@ -230,53 +331,35 @@ function StudentDashboard() {
               <span style={{ width: '8px', height: '8px', background: '#3b82f6', borderRadius: '50%', display: 'inline-block' }}></span> 
               {lang === 'en' ? 'Weekly Video Summaries' : 'สรุปวิดีโอประจำสัปดาห์'}
             </h3>
-            <ul className="weekly-list-purple">
-              <li>
-                <div>
-                  <strong>
-                    {lang === 'en' 
-                      ? 'Position UX/UI Design | INVERSE SOLUTIONS CO., LTD.' 
-                      : 'ตำแหน่ง UX/UI Design | บริษัท อินเวิร์ซ โซลูชันส์ จำกัด'}
-                  </strong>
-                  <p>
-                    {lang === 'en' 
-                      ? '30 January 2026 · 5:30 mins · 18 views' 
-                      : 'วันที่ 30 เดือนมกราคม 2569 · 5:30 นาที · ผู้ชม 18 คน'}
-                  </p>
-                </div>
-                <span className="purple-badge">UX/UI</span>
-              </li>
-              <li>
-                <div>
-                  <strong>
-                    {lang === 'en' 
-                      ? 'Position Graphic | PRINT UP CO., LTD.' 
-                      : 'ตำแหน่ง Graphic บริษัท PRINT UP'}
-                  </strong>
-                  <p>
-                    {lang === 'en' 
-                      ? '30 January 2026 · 5:08 mins · 6 views' 
-                      : 'วันที่ 30 เดือนมกราคม 2569 · 5:08 นาที · ผู้ชม 6 คน'}
-                  </p>
-                </div>
-                <span className="purple-badge">Graphic</span>
-              </li>
-              <li>
-                <div>
-                  <strong>
-                    {lang === 'en' 
-                      ? 'Position Web Developer | IO-HOPE ENTERPRISE' 
-                      : 'ตำแหน่ง web Developer บริษัท IO-HOPE ENTERPRISE'}
-                  </strong>
-                  <p>
-                    {lang === 'en' 
-                      ? '30 January 2026 · 5:03 mins · 10 views' 
-                      : 'วันที่ 30 เดือนมกราคม 2569 · 5:03 นาที · ผู้ชม 10 คน'}
-                  </p>
-                </div>
-                <span className="purple-badge">Developer</span>
-              </li>
-            </ul>
+            {isDashboardLoading && (
+              <p style={{ color: '#c4b5fd' }}>{lang === 'en' ? 'Loading...' : 'กำลังโหลด...'}</p>
+            )}
+
+            {!isDashboardLoading && weeklyVideos.length === 0 && (
+              <p style={{ color: '#8b8ba0' }}>
+                {lang === 'en' ? 'No videos this week.' : 'ยังไม่มีวิดีโอในสัปดาห์นี้'}
+              </p>
+            )}
+
+            {!isDashboardLoading && weeklyVideos.length > 0 && (
+              <ul className="weekly-list-purple">
+                {weeklyVideos.map((item) => (
+                  <li key={item.VideoID}>
+                    <div>
+                      <strong>
+                        {`${lang === 'en' ? 'Position' : 'ตำแหน่ง'} ${item.Position || item.VideoTitle} | ${item.CompanyName || '-'}`}
+                      </strong>
+                      <p>
+                        {lang === 'en'
+                          ? `${formatUploadDate(item.UploadDate)} · ${formatDuration(item.Duration)} mins · ${item.ViewCount ?? 0} views`
+                          : `${formatUploadDate(item.UploadDate)} · ${formatDuration(item.Duration)} นาที · ผู้ชม ${item.ViewCount ?? 0} คน`}
+                      </p>
+                    </div>
+                    <span className="purple-badge">{item.CategoryName || '-'}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         </div>
 
