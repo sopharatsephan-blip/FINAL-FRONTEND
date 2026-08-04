@@ -288,6 +288,31 @@
   box-shadow: 0 0 12px rgba(168, 85, 247, 0.4);
 }
 
+/* ปุ่ม "View Summary" (แทนที่ปุ่ม PDF เดิม) */
+.btn-view-summary {
+  flex: 1;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #ffffff;
+  border: none;
+  padding: 10px;
+  border-radius: 20px;
+  font-size: 0.88rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+}
+
+.btn-view-summary:hover {
+  opacity: 0.92;
+  box-shadow: 0 0 16px rgba(16, 185, 129, 0.45);
+}
+
+/* คงคลาสเดิมไว้เผื่อใช้ที่อื่น (ปุ่มดาวน์โหลด PDF ในหน้ารายละเอียดสรุป) */
 .btn-download-pdf {
   flex: 1;
   background: linear-gradient(135deg, #10b981, #059669);
