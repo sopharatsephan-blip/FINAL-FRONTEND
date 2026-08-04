@@ -18,7 +18,7 @@ import StudentDashboard from './student/StudentDashboard.jsx';
 import { LanguageProvider } from './LanguageContext.jsx'; 
 import CoopContent from './student/CoopContent.jsx';
 import Favorites from './student/Favorites.jsx';
-import VideoPlayer from './student/VideoPlayer.jsx';
+import VideoPlayer from './student/Videoplayer.jsx';
 import Register from './Register.jsx'
 import ForgotPassword from './ForgotPassword.jsx';
 import './index.css';
