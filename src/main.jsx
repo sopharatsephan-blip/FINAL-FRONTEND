@@ -18,6 +18,7 @@ import StudentDashboard from './student/StudentDashboard.jsx';
 import { LanguageProvider } from './LanguageContext.jsx'; 
 import CoopContent from './student/CoopContent.jsx';
 import Favorites from './student/Favorites.jsx';
+import VideoPlayer from './student/VideoPlayer.jsx';
 import Register from './Register.jsx'
 import ForgotPassword from './ForgotPassword.jsx';
 import './index.css';
@@ -41,6 +42,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           <Route path="/dashboard" element={<StudentDashboard />} />
           <Route path="/coop-content" element={<CoopContent />} />
           <Route path="/favorites" element={<Favorites />} />
+          <Route path="/video/:id" element={<VideoPlayer />} />
           <Route path='/Register' element={<Register />} />
           <Route path="/reset-password" element={<ForgotPassword />} />
         </Routes>
