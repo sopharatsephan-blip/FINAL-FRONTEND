@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "../LanguageContext";
 import html2pdf from "html2pdf.js";
@@ -22,6 +22,8 @@ import {
   FaCheck
 } from "react-icons/fa";
 
+const API_BASE = "http://localhost:5000";
+
 function CoopContent() {
   const navigate = useNavigate();
   const langContext = typeof useLanguage === "function" ? useLanguage() : null;
@@ -29,110 +31,94 @@ function CoopContent() {
   const toggleLanguage = langContext?.toggleLanguage || (() => {});
   const currentUser = JSON.parse(localStorage.getItem("user") || "null");
 
-  const [coopItems, setCoopItems] = useState([
-    {
-      id: 1,
-      titleTh: "ตำแหน่ง UX/UI Design | บริษัท อินเวิร์ซ โซลูชันส์ จำกัด",
-      titleEn: "Position UX/UI Design | INVERSE SOLUTIONS CO., LTD.",
-      dateTh: "30 ม.ค.2569",
-      dateEn: "30 January 2026",
-      pages: "5",
-      keyword: "UX/UI Design",
-      isFavorite: false,
-      summaryEn: [
-        { title: "Company / Organization Name", body: "A private company specializing in software design, website, and mobile application development located in Phuket." },
-        { title: "Position and Job Responsibilities", body: "Internship position in UI/UX design, responsible for analyzing user requirements, creating wireframes and web interfaces, as well as testing and making design improvements based on feedback." },
-        { title: "Projects or Tasks During Internship", intro: "Designed 3 back-end web systems using Figma, including:", body: ["Company Data Management System", "Driver & Vehicle Management System", "Car Booking System & Spa System for masseuse management, queue booking, and products"] },
-        { title: "Problems Encountered and Solutions", body: "Encountered issues in aligning designs with user expectations; solved by continuously receiving team feedback and iteratively improving designs." },
-        { title: "Key Takeaways & Experience Gained", body: "Learned practical teamwork, effective communication, and enhanced skills in design and analytical thinking." },
-        { title: "Future Career Outlook", body: "Inclined toward pursuing a career path in UI/UX and system design based on internship experiences." },
-        { title: "Recommendation for This Internship Site", body: "Highly recommended due to hands-on projects, helpful team mentorship, and a welcoming atmosphere." },
-        { title: "Suggestions for Juniors", body: "Stay open to continuous learning, build diverse skill sets, and actively express ideas to grow professionally." }
-      ],
-      summaryTh: [
-        { title: "ชื่อบริษัท / องค์กร", body: "บริษัทเอกชนที่เชี่ยวชาญด้านการออกแบบซอฟต์แวร์ เว็บไซต์ และแอปพลิเคชันมือถือ ตั้งอยู่ในจังหวัดภูเก็ต" },
-        { title: "ตำแหน่งและหน้าที่ความรับผิดชอบ", body: "ตำแหน่งฝึกงานด้านการออกแบบ UI/UX รับผิดชอบวิเคราะห์ความต้องการของผู้ใช้ ออกแบบไวร์เฟรมและหน้าเว็บ รวมถึงทดสอบและปรับปรุงงานออกแบบตามฟีดแบ็ก" },
-        { title: "โปรเจกต์หรืองานที่ได้รับมอบหมายระหว่างฝึกงาน", intro: "ออกแบบระบบเว็บฝั่งหลังบ้าน 3 ระบบด้วย Figma ได้แก่", body: ["ระบบจัดการข้อมูลบริษัท", "ระบบจัดการคนขับรถและยานพาหนะ", "ระบบจองรถและระบบสปาสำหรับจัดการพนักงานนวด การจองคิว และสินค้า"] },
-        { title: "ปัญหาที่พบและแนวทางแก้ไข", body: "พบปัญหาการออกแบบให้ตรงกับความคาดหวังของผู้ใช้ แก้ไขโดยรับฟีดแบ็กจากทีมอย่างต่อเนื่องและปรับปรุงงานออกแบบซ้ำ ๆ" },
-        { title: "สิ่งที่ได้เรียนรู้และประสบการณ์ที่ได้รับ", body: "ได้เรียนรู้การทำงานเป็นทีม การสื่อสารที่มีประสิทธิภาพ และพัฒนาทักษะการออกแบบและการคิดวิเคราะห์" },
-        { title: "แนวทางอาชีพในอนาคต", body: "มีแนวโน้มจะเลือกเส้นทางอาชีพด้าน UI/UX และการออกแบบระบบจากประสบการณ์ฝึกงานครั้งนี้" },
-        { title: "คำแนะนำสำหรับสถานประกอบการนี้", body: "แนะนำอย่างยิ่ง เนื่องจากได้ลงมือทำงานจริง มีพี่เลี้ยงทีมงานที่ช่วยเหลือดี และบรรยากาศเป็นกันเอง" },
-        { title: "ข้อเสนอแนะสำหรับรุ่นน้อง", body: "เปิดใจเรียนรู้อย่างต่อเนื่อง สร้างทักษะที่หลากหลาย และกล้าแสดงความคิดเห็นเพื่อพัฒนาตนเองในสายอาชีพ" }
-      ]
-    },
-    {
-      id: 2,
-      titleTh: "ตำแหน่ง Graphic บริษัท PRINT UP",
-      titleEn: "Position Graphic | PRINT UP CO., LTD.",
-      dateTh: "30 ม.ค.2569",
-      dateEn: "30 January 2026",
-      pages: "5",
-      keyword: "Graphic",
-      isFavorite: false,
-      summaryEn: [
-        { title: "Company / Organization Name", body: "A printing and graphic production company, PRINT UP CO., LTD., offering design and print services for business clients." },
-        { title: "Position and Job Responsibilities", body: "Internship position in Graphic Design, responsible for producing artwork, preparing print-ready files, and coordinating with the production team." },
-        { title: "Projects or Tasks During Internship", intro: "Produced design work for client campaigns, including:", body: ["Company branding and logo refresh", "Packaging and label artwork", "Promotional banners and social media graphics"] },
-        { title: "Problems Encountered and Solutions", body: "Faced tight deadlines and revision requests; managed by prioritizing tasks and communicating clearly with the design team." },
-        { title: "Key Takeaways & Experience Gained", body: "Gained hands-on experience with print production standards, color management, and client communication." },
-        { title: "Future Career Outlook", body: "Interested in pursuing a career in graphic design or brand design after graduation." },
-        { title: "Recommendation for This Internship Site", body: "Recommended for students who want real production experience and direct client-facing design work." },
-        { title: "Suggestions for Juniors", body: "Practice software skills beforehand and be open to feedback, since revisions are a normal part of the design process." }
-      ],
-      summaryTh: [
-        { title: "ชื่อบริษัท / องค์กร", body: "บริษัท พริ้นท์อัพ จำกัด ผู้ให้บริการงานพิมพ์และกราฟิก ให้บริการออกแบบและพิมพ์งานสำหรับลูกค้าธุรกิจ" },
-        { title: "ตำแหน่งและหน้าที่ความรับผิดชอบ", body: "ตำแหน่งฝึกงานด้านกราฟิกดีไซน์ รับผิดชอบผลิตงานอาร์ตเวิร์ก จัดเตรียมไฟล์สำหรับพิมพ์ และประสานงานกับทีมผลิต" },
-        { title: "โปรเจกต์หรืองานที่ได้รับมอบหมายระหว่างฝึกงาน", intro: "ผลิตงานออกแบบให้ลูกค้าหลายแคมเปญ ได้แก่", body: ["งานปรับปรุงโลโก้และภาพลักษณ์บริษัท", "งานออกแบบบรรจุภัณฑ์และฉลากสินค้า", "แบนเนอร์โปรโมชันและกราฟิกสำหรับโซเชียลมีเดีย"] },
-        { title: "ปัญหาที่พบและแนวทางแก้ไข", body: "พบปัญหาเรื่องกำหนดเวลาที่กระชั้นชิดและการแก้ไขงานบ่อยครั้ง แก้ไขโดยจัดลำดับความสำคัญของงานและสื่อสารกับทีมออกแบบอย่างชัดเจน" },
-        { title: "สิ่งที่ได้เรียนรู้และประสบการณ์ที่ได้รับ", body: "ได้เรียนรู้มาตรฐานงานพิมพ์ การจัดการสี และการสื่อสารกับลูกค้า" },
-        { title: "แนวทางอาชีพในอนาคต", body: "สนใจประกอบอาชีพด้านกราฟิกดีไซน์หรือแบรนด์ดีไซน์หลังสำเร็จการศึกษา" },
-        { title: "คำแนะนำสำหรับสถานประกอบการนี้", body: "แนะนำสำหรับนักศึกษาที่ต้องการประสบการณ์งานผลิตจริงและงานออกแบบที่ต้องพบลูกค้าโดยตรง" },
-        { title: "ข้อเสนอแนะสำหรับรุ่นน้อง", body: "ฝึกฝนการใช้โปรแกรมมาก่อนล่วงหน้า และเปิดใจรับฟีดแบ็ก เพราะการแก้ไขงานเป็นส่วนหนึ่งของกระบวนการออกแบบ" }
-      ]
-    },
-    {
-      id: 3,
-      titleTh: "ตำแหน่ง web Developer บริษัท IO-HOPE ENTERPRISE",
-      titleEn: "Position Web Developer | IO-HOPE ENTERPRISE",
-      dateTh: "30 ม.ค.2569",
-      dateEn: "30 January 2026",
-      pages: "5",
-      keyword: "web Developer",
-      isFavorite: false,
-      summaryEn: [
-        { title: "Company / Organization Name", body: "IO-HOPE ENTERPRISE, a software and web development company providing custom web applications for clients." },
-        { title: "Position and Job Responsibilities", body: "Internship position in Web Development, responsible for building front-end interfaces, connecting APIs, and fixing bugs reported by the QA team." },
-        { title: "Projects or Tasks During Internship", intro: "Developed features for an internal web system, including:", body: ["Student dashboard and search/filter functions", "Video content management pages", "API integration between front-end and back-end"] },
-        { title: "Problems Encountered and Solutions", body: "Encountered bugs related to state management and API response handling; resolved through debugging, code review, and mentor guidance." },
-        { title: "Key Takeaways & Experience Gained", body: "Strengthened skills in React, REST APIs, and working within a real development workflow using version control." },
-        { title: "Future Career Outlook", body: "Interested in continuing a career as a front-end or full-stack web developer." },
-        { title: "Recommendation for This Internship Site", body: "Recommended for students who want to work on real production code with an experienced development team." },
-        { title: "Suggestions for Juniors", body: "Build a solid foundation in JavaScript and version control (Git) before starting, and don't hesitate to ask questions." }
-      ],
-      summaryTh: [
-        { title: "ชื่อบริษัท / องค์กร", body: "บริษัท IO-HOPE ENTERPRISE ผู้พัฒนาซอฟต์แวร์และเว็บแอปพลิเคชันสำหรับลูกค้า" },
-        { title: "ตำแหน่งและหน้าที่ความรับผิดชอบ", body: "ตำแหน่งฝึกงานด้าน Web Developer รับผิดชอบพัฒนาหน้าเว็บฝั่งผู้ใช้ เชื่อมต่อ API และแก้ไขบั๊กที่ทีม QA แจ้ง" },
-        { title: "โปรเจกต์หรืองานที่ได้รับมอบหมายระหว่างฝึกงาน", intro: "พัฒนาฟีเจอร์ให้ระบบเว็บภายในองค์กร ได้แก่", body: ["หน้าแดชบอร์ดนักศึกษาและฟังก์ชันค้นหา/กรองข้อมูล", "หน้าจัดการเนื้อหาวิดีโอ", "การเชื่อมต่อ API ระหว่างฝั่งหน้าบ้านและหลังบ้าน"] },
-        { title: "ปัญหาที่พบและแนวทางแก้ไข", body: "พบปัญหาเรื่องการจัดการสเตตและการรับส่งข้อมูลจาก API แก้ไขโดยการดีบัก ตรวจสอบโค้ดร่วมกับทีม และคำแนะนำจากพี่เลี้ยง" },
-        { title: "สิ่งที่ได้เรียนรู้และประสบการณ์ที่ได้รับ", body: "พัฒนาทักษะ React, REST API และการทำงานร่วมกับทีมพัฒนาจริงโดยใช้ระบบควบคุมเวอร์ชัน" },
-        { title: "แนวทางอาชีพในอนาคต", body: "สนใจประกอบอาชีพเป็น Front-end หรือ Full-stack Web Developer ต่อไป" },
-        { title: "คำแนะนำสำหรับสถานประกอบการนี้", body: "แนะนำสำหรับนักศึกษาที่ต้องการทำงานกับโค้ดจริงร่วมกับทีมพัฒนาที่มีประสบการณ์" },
-        { title: "ข้อเสนอแนะสำหรับรุ่นน้อง", body: "ควรมีพื้นฐาน JavaScript และ Git ที่แน่นก่อนเริ่มฝึกงาน และอย่ากลัวที่จะถามเมื่อไม่เข้าใจ" }
-      ]
-    }
-  ]);
+  // ===== ข้อมูลจริงจากฐานข้อมูล =====
+  const [coopItems, setCoopItems] = useState([]);
+  const [favoriteIds, setFavoriteIds] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const [viewingItem, setViewingItem] = useState(null);
+  // ===== หน้ารายละเอียดสรุป (View Summary) =====
+  const [viewingItem, setViewingItem] = useState(null); // ข้อมูลการ์ดที่กำลังดู (เพื่อโชว์ชื่อ/บริษัท)
+  const [summaryData, setSummaryData] = useState(null); // ข้อมูลสรุปจริงจาก API
+  const [isSummaryLoading, setIsSummaryLoading] = useState(false);
+
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const summaryRef = useRef(null);
 
-  const toggleFavorite = (id) => {
-    setCoopItems((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, isFavorite: !item.isFavorite } : item
-      )
+  // ===== ช่องค้นหาด้านบน =====
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // ดึงวิดีโอที่เผยแพร่แล้วทั้งหมด + รายการโปรดของผู้ใช้
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        const requests = [fetch(`${API_BASE}/api/videos/search`)];
+        if (currentUser?.uid) {
+          requests.push(fetch(`${API_BASE}/api/favorites/${currentUser.uid}`));
+        }
+
+        const responses = await Promise.all(requests);
+        const videosData = await responses[0].json();
+        setCoopItems(Array.isArray(videosData) ? videosData : []);
+
+        if (responses[1]) {
+          const favData = await responses[1].json();
+          setFavoriteIds(Array.isArray(favData) ? favData : []);
+        }
+      } catch (err) {
+        console.error("Fetch coop content error:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [currentUser?.uid]);
+
+  const formatUploadDate = (dateStr) => {
+    if (!dateStr) return "-";
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return "-";
+
+    if (lang === "en") {
+      return d.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+    }
+    const thaiMonthsShort = [
+      "ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.",
+      "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."
+    ];
+    return `${d.getDate()} ${thaiMonthsShort[d.getMonth()]}${d.getFullYear() + 543}`;
+  };
+
+  const toggleFavorite = async (videoId) => {
+    if (!currentUser?.uid) return;
+    const isFav = favoriteIds.includes(videoId);
+
+    // อัปเดตหน้าจอทันที (optimistic update)
+    setFavoriteIds((prev) =>
+      isFav ? prev.filter((id) => id !== videoId) : [...prev, videoId]
     );
+
+    try {
+      if (isFav) {
+        await fetch(`${API_BASE}/api/favorites/${currentUser.uid}/${videoId}`, {
+          method: "DELETE"
+        });
+      } else {
+        await fetch(`${API_BASE}/api/favorites`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ uid: currentUser.uid, videoId })
+        });
+      }
+    } catch (err) {
+      console.error("Toggle favorite error:", err);
+      // ถ้าเรียก API ไม่สำเร็จ ให้ย้อนสถานะกลับ
+      setFavoriteIds((prev) =>
+        isFav ? [...prev, videoId] : prev.filter((id) => id !== videoId)
+      );
+    }
   };
 
   const handleLogout = () => {
@@ -140,21 +126,61 @@ function CoopContent() {
     navigate("/login");
   };
 
-  const handleOpenSummary = (item) => {
+  // เปิดหน้าสรุป: ดึง SummaryText จริงจาก DB ตาม VideoID
+  const handleOpenSummary = async (item) => {
     setViewingItem(item);
+    setSummaryData(null);
+    setIsSummaryLoading(true);
+    try {
+      const res = await fetch(`${API_BASE}/api/videos/${item.VideoID}/summary`);
+      if (!res.ok) {
+        setSummaryData({ notFound: true });
+        return;
+      }
+      const data = await res.json();
+      setSummaryData(data);
+    } catch (err) {
+      console.error("Fetch summary error:", err);
+      setSummaryData({ notFound: true });
+    } finally {
+      setIsSummaryLoading(false);
+    }
   };
 
   const handleBackFromSummary = () => {
     setViewingItem(null);
+    setSummaryData(null);
   };
 
-  const handleDownload = (item) => {
+  const handleWatchVideo = (item) => {
+    navigate(`/video/${item.VideoID}`);
+  };
+
+  // กรองรายการตามคำค้นหาจากช่องด้านบน (ค้นหาจากตำแหน่ง, ชื่อวิดีโอ, บริษัท, หมวดหมู่, คีย์เวิร์ด)
+  const filteredCoopItems = coopItems.filter((item) => {
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.trim().toLowerCase();
+    const haystack = [
+      item.Position,
+      item.VideoTitle,
+      item.CompanyName,
+      item.CategoryName,
+      item.Keywords
+    ]
+      .filter(Boolean)
+      .join(' ')
+      .toLowerCase();
+    return haystack.includes(q);
+  });
+
+  const handleDownload = () => {
     const node = summaryRef.current;
-    if (!node) return;
+    if (!node || !viewingItem) return;
 
     setIsDownloading(true);
 
-    const filename = `${item.keyword.replace(/\s+/g, "_")}_summary.pdf`;
+    const safeName = (viewingItem.Position || viewingItem.VideoTitle || "summary").replace(/\s+/g, "_");
+    const filename = `${safeName}_summary.pdf`;
 
     html2pdf()
       .set({
@@ -170,15 +196,12 @@ function CoopContent() {
       .then(() => {
         setIsDownloading(false);
         setShowSuccessModal(true);
-        // แสดง Modal 3 วินาทีแล้วซ่อนอัตโนมัติ
         setTimeout(() => setShowSuccessModal(false), 3000);
       })
       .catch(() => {
         setIsDownloading(false);
       });
   };
-
-  const summary = viewingItem ? (lang === "en" ? viewingItem.summaryEn : viewingItem.summaryTh) : null;
 
   return (
     <div className="admin-purple-container">
@@ -271,6 +294,8 @@ function CoopContent() {
               <input
                 type="text"
                 placeholder={lang === "en" ? "Search summary, position..." : "ค้นหาสรุป, ตำแหน่งงาน..."}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
 
@@ -350,37 +375,43 @@ function CoopContent() {
               <FaArrowLeft /> {lang === "en" ? "Back" : "ย้อนกลับ"}
             </button>
 
-            <div style={{ display: "flex", alignItems: "center", gap: "10px", margin: "24px 0 20px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px", margin: "24px 0 6px" }}>
               <FaFileAlt style={{ color: "#a855f7" }} size={20} />
               <h2 style={{ margin: 0, fontSize: "20px", fontWeight: 700, color: "#fff" }}>
-                {lang === "en" ? "Topic Summary" : "สรุปหัวข้อ"}
+                {`${lang === "en" ? "Position" : "ตำแหน่ง"} ${viewingItem.Position || viewingItem.VideoTitle} | ${viewingItem.CompanyName || "-"}`}
               </h2>
             </div>
+            <p style={{ margin: "0 0 20px", color: "#8b8ba0", fontSize: "13px" }}>
+              {formatUploadDate(viewingItem.UploadDate)}
+            </p>
 
-            {summary.map((sec, idx) => (
-              <div key={idx} style={{ marginBottom: "22px" }}>
-                <h3 style={{ color: "#a855f7", fontSize: "15px", fontWeight: 700, margin: "0 0 6px" }}>
-                  {idx + 1}) {sec.title}
-                </h3>
-                {sec.intro && (
-                  <p style={{ margin: "0 0 6px", color: "#d4d4d8", lineHeight: 1.6 }}>{sec.intro}</p>
+            {isSummaryLoading && (
+              <p style={{ color: "#c4b5fd" }}>{lang === "en" ? "Loading summary..." : "กำลังโหลดสรุป..."}</p>
+            )}
+
+            {!isSummaryLoading && summaryData?.notFound && (
+              <p style={{ color: "#8b8ba0" }}>
+                {lang === "en" ? "No summary available for this video yet." : "วิดีโอนี้ยังไม่มีข้อมูลสรุป"}
+              </p>
+            )}
+
+            {!isSummaryLoading && summaryData && !summaryData.notFound && (
+              <div>
+                {summaryData.MainTopic && (
+                  <h3 style={{ color: "#a855f7", fontSize: "15px", fontWeight: 700, margin: "0 0 10px" }}>
+                    {summaryData.MainTopic}
+                  </h3>
                 )}
-                {Array.isArray(sec.body) ? (
-                  <ul style={{ margin: 0, paddingLeft: "20px", color: "#d4d4d8", lineHeight: 1.6 }}>
-                    {sec.body.map((line, i) => (
-                      <li key={i}>{line}</li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p style={{ margin: 0, color: "#d4d4d8", lineHeight: 1.6 }}>{sec.body}</p>
-                )}
+                <p style={{ margin: 0, color: "#d4d4d8", lineHeight: 1.8, whiteSpace: "pre-wrap" }}>
+                  {summaryData.SummaryText || (lang === "en" ? "No summary text." : "ไม่มีเนื้อหาสรุป")}
+                </p>
               </div>
-            ))}
+            )}
 
             <button
               data-html2canvas-ignore="true"
-              onClick={() => handleDownload(viewingItem)}
-              disabled={isDownloading}
+              onClick={handleDownload}
+              disabled={isDownloading || isSummaryLoading || summaryData?.notFound}
               style={{
                 display: "inline-flex",
                 alignItems: "center",
@@ -393,8 +424,8 @@ function CoopContent() {
                 fontWeight: 700,
                 fontSize: "14px",
                 cursor: isDownloading ? "not-allowed" : "pointer",
-                opacity: isDownloading ? 0.7 : 1,
-                marginTop: "8px",
+                opacity: isDownloading || summaryData?.notFound ? 0.6 : 1,
+                marginTop: "24px",
                 boxShadow: "0 8px 20px rgba(168, 85, 247, 0.35)"
               }}
             >
@@ -411,51 +442,76 @@ function CoopContent() {
               <span>{lang === "en" ? "All Summary Content" : "สรุปเนื้อหาทั้งหมด"}</span>
             </div>
 
-            <div className="coop-card-list">
-              {coopItems.map((item) => (
-                <div key={item.id} className="coop-card">
-                  <div className="coop-card-top">
-                    <div>
-                      <h3 className="coop-card-title">
-                        {lang === "en" ? item.titleEn : item.titleTh}
-                      </h3>
-                      <div className="coop-card-meta">
-                        <span className="coop-meta-item">
-                          <FaCalendarAlt style={{ color: "#a855f7" }} />{" "}
-                          {lang === "en" ? item.dateEn : item.dateTh}
-                        </span>
-                        <span className="coop-meta-item">
-                          <FaPages style={{ color: "#a855f7" }} />{" "}
-                          {lang === "en" ? `${item.pages} pages` : `${item.pages} หน้า`}
+            {isLoading && (
+              <p style={{ color: "#c4b5fd" }}>{lang === "en" ? "Loading..." : "กำลังโหลด..."}</p>
+            )}
+
+            {!isLoading && coopItems.length === 0 && (
+              <p style={{ color: "#8b8ba0" }}>
+                {lang === "en" ? "No published content yet." : "ยังไม่มีเนื้อหาที่เผยแพร่"}
+              </p>
+            )}
+
+            {!isLoading && coopItems.length > 0 && filteredCoopItems.length === 0 && (
+              <p style={{ color: "#8b8ba0" }}>
+                {lang === "en" ? "No results match your search." : "ไม่พบข้อมูลที่ตรงกับคำค้นหา"}
+              </p>
+            )}
+
+            {!isLoading && filteredCoopItems.length > 0 && (
+              <div className="coop-card-list">
+                {filteredCoopItems.map((item) => {
+                  const isFav = favoriteIds.includes(item.VideoID);
+                  return (
+                    <div key={item.VideoID} className="coop-card">
+                      <div className="coop-card-top">
+                        <div>
+                          <h3 className="coop-card-title">
+                            {`${lang === "en" ? "Position" : "ตำแหน่ง"} ${item.Position || item.VideoTitle} | ${item.CompanyName || "-"}`}
+                          </h3>
+                          <div className="coop-card-meta">
+                            <span className="coop-meta-item">
+                              <FaCalendarAlt style={{ color: "#a855f7" }} />{" "}
+                              {formatUploadDate(item.UploadDate)}
+                            </span>
+                            <span className="coop-meta-item">
+                              <FaPages style={{ color: "#a855f7" }} />{" "}
+                              {item.PageCount != null
+                                ? (lang === "en" ? `${item.PageCount} pages` : `${item.PageCount} หน้า`)
+                                : "-"}
+                            </span>
+                          </div>
+                        </div>
+
+                        <button
+                          className={`coop-fav-btn ${isFav ? "active" : ""}`}
+                          onClick={() => toggleFavorite(item.VideoID)}
+                          title={lang === "en" ? "Save to favorites" : "บันทึกรายการโปรด"}
+                        >
+                          {isFav ? <FaHeart /> : <FaRegHeart />}
+                        </button>
+                      </div>
+
+                      <div className="coop-keyword-box">
+                        {lang === "en" ? "Keyword" : "คีย์เวิร์ด"} :{" "}
+                        <span style={{ color: "#c084fc", fontWeight: 500 }}>
+                          {item.Keywords || item.CategoryName || "-"}
                         </span>
                       </div>
+
+                      <div className="coop-actions">
+                        <button className="btn-view-video" onClick={() => handleWatchVideo(item)}>
+                          <FaEye /> {lang === "en" ? "Watch Video" : "ดูวิดีโอ"}
+                        </button>
+                        <button className="btn-view-summary" onClick={() => handleOpenSummary(item)}>
+                          <FaFileAlt /> {lang === "en" ? "View Summary" : "ดูสรุป"}
+                        </button>
+                      </div>
                     </div>
-
-                    <button
-                      className={`coop-fav-btn ${item.isFavorite ? "active" : ""}`}
-                      onClick={() => toggleFavorite(item.id)}
-                      title={lang === "en" ? "Save to favorites" : "บันทึกรายการโปรด"}
-                    >
-                      {item.isFavorite ? <FaHeart /> : <FaRegHeart />}
-                    </button>
-                  </div>
-
-                  <div className="coop-keyword-box">
-                    {lang === "en" ? "Keyword" : "คีย์เวิร์ด"} :{" "}
-                    <span style={{ color: "#c084fc", fontWeight: 500 }}>{item.keyword}</span>
-                  </div>
-
-                  <div className="coop-actions">
-                    <button className="btn-view-video">
-                      <FaEye /> {lang === "en" ? "Watch Video" : "ดูวิดีโอ"}
-                    </button>
-                    <button className="btn-download-pdf" onClick={() => handleOpenSummary(item)}>
-                      <FaDownload /> PDF
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         )}
 
@@ -490,7 +546,6 @@ function CoopContent() {
                 animation: "popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)"
               }}
             >
-              {/* วงกลมไอคอนติ๊กถูกสีเขียวอ่อน */}
               <div
                 style={{
                   width: "80px",
@@ -506,7 +561,6 @@ function CoopContent() {
                 <FaCheck size={36} style={{ color: "#10b981" }} />
               </div>
 
-              {/* ข้อความแจ้งเตือน */}
               <h3
                 style={{
                   color: "#1e293b",
@@ -517,7 +571,7 @@ function CoopContent() {
               >
                 {lang === "en" ? "Download Complete!" : "ดาวน์โหลดเสร็จสิ้น !"}
               </h3>
-              
+
               <p
                 style={{
                   color: "#64748b",
