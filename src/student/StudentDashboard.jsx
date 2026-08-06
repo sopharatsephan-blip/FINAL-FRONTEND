@@ -186,17 +186,17 @@ function StudentDashboard() {
       <aside className="sidebar-purple">
         <div>
           <div className="brand-logo-purple" onClick={() => navigate('/dashboard')} style={{ cursor: 'pointer' }}>
-            <div className="avatar-purple" style={{ marginRight: '10px' }}>ICT</div>
+            <div className="avatar-student" style={{ marginRight: '10px' }}>ICT</div>
             <span>ICT Cooperative</span>
           </div>
 
-          <div className="user-profile-purple">
-            <div className="avatar-purple">
+          <div className="user-profile-student">
+            <div className="avatar-student">
               <FaUserGraduate />
             </div>
-            <div className="user-info-purple">
+            <div className="user-info-student">
               <h4>{lang === 'en' ? 'Student & Advisor' : 'นักศึกษาและอาจารย์'}</h4>
-              <span className="role-tag">{currentUser?.username || 'User Panel'}</span>
+              <span className="role-tag-student">{currentUser?.username || 'User Panel'}</span>
             </div>
           </div>
 
