@@ -14,7 +14,6 @@ import {
   FaUserGraduate,
   FaLanguage,
   FaCalendarAlt,
-  FaFileAlt as FaPages,
   FaEye,
   FaDownload,
   FaArrowLeft
@@ -175,17 +174,17 @@ function Favorites() {
             onClick={() => navigate("/dashboard")}
             style={{ cursor: "pointer" }}
           >
-            <div className="avatar-purple" style={{ marginRight: "10px" }}>ICT</div>
+            <div className="avatar-student" style={{ marginRight: "10px" }}>ICT</div>
             <span>ICT Cooperative</span>
           </div>
 
-          <div className="user-profile-purple">
-            <div className="avatar-purple">
+          <div className="user-profile-student">
+            <div className="avatar-student">
               <FaUserGraduate />
             </div>
-            <div className="user-info-purple">
+            <div className="user-info-student">
               <h4>{lang === "en" ? "Student & Advisor" : "นักศึกษาและอาจารย์"}</h4>
-              <span className="role-tag">{currentUser?.username || "User Panel"}</span>
+              <span className="role-tag-student">{currentUser?.username || "User Panel"}</span>
             </div>
           </div>
 
@@ -438,12 +437,6 @@ function Favorites() {
                             <FaCalendarAlt style={{ color: "#a855f7" }} />{" "}
                             {formatUploadDate(item.UploadDate)}
                           </span>
-                          <span className="coop-meta-item">
-                            <FaPages style={{ color: "#a855f7" }} />{" "}
-                            {item.PageCount != null
-                              ? (lang === "en" ? `${item.PageCount} pages` : `${item.PageCount} หน้า`)
-                              : "-"}
-                          </span>
                         </div>
                       </div>
 
@@ -454,13 +447,6 @@ function Favorites() {
                       >
                         <FaHeart />
                       </button>
-                    </div>
-
-                    <div className="coop-keyword-box">
-                      {lang === "en" ? "Keyword" : "คีย์เวิร์ด"} :{" "}
-                      <span style={{ color: "#c084fc", fontWeight: 500 }}>
-                        {item.Keywords || item.CategoryName || "-"}
-                      </span>
                     </div>
 
                     <div className="coop-actions">
