@@ -113,6 +113,8 @@ export default function UserManagement() {
   });
 
   const selectedUser = users.find(u => u.id === selectedUserId) || null;
+  const adminCount = users.filter(u => u.role === 'Admin').length;
+  const isLastAdmin = !!selectedUser && selectedUser.role === 'Admin' && adminCount <= 1;
 
   const handleRowClick = (userId) => {
     setSelectedUserId(prev => (prev === userId ? null : userId));
@@ -124,6 +126,7 @@ export default function UserManagement() {
 
     if (action === 'makeAdmin' && selectedUser.role === 'Admin') return;
     if (action === 'removeAdmin' && selectedUser.role !== 'Admin') return;
+    if (action === 'removeAdmin' && isLastAdmin) return;
 
     setConfirmAction(action);
     setConfirmPassword('');
@@ -191,7 +194,7 @@ export default function UserManagement() {
   };
 
   const canMakeAdmin = !!selectedUser && selectedUser.role !== 'Admin';
-  const canRemoveAdmin = !!selectedUser && selectedUser.role === 'Admin';
+  const canRemoveAdmin = !!selectedUser && selectedUser.role === 'Admin' && !isLastAdmin;
 
   return (
     <div className="admin-purple-container">
@@ -303,6 +306,7 @@ export default function UserManagement() {
               onClick={() => openConfirm('removeAdmin')}
               disabled={!canRemoveAdmin}
               className={`btn-action-danger-purple ${canRemoveAdmin ? 'active' : ''}`}
+              title={isLastAdmin ? (lang === 'en' ? 'Cannot remove the last remaining admin' : 'ไม่สามารถถอดสิทธิ์ Admin คนสุดท้ายในระบบได้') : undefined}
             >
               <FaUserMinus size={14} />
               <span>{lang === 'en' ? 'Remove Admin' : 'ยกเลิก Admin'}</span>

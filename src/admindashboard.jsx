@@ -50,12 +50,9 @@ function AdminDashboard() {
   const [hasSearched, setHasSearched] = useState(false);
   const resultRef = useRef(null);
 
-  const initialCategory = 'UX/UI';
-  const initialWorkTypes = { onsite: true, hybrid: true, wfh: false };
-
-  const [selectedCategory, setSelectedCategory] = useState(initialCategory);
-  const [workTypes, setWorkTypes] = useState(initialWorkTypes);
-  const [businessType, setBusinessType] = useState('Software House');
+  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [workTypes, setWorkTypes] = useState({});
+  const [businessType, setBusinessType] = useState('');
   const [location, setLocation] = useState('');
   const [keyword, setKeyword] = useState('');
 
@@ -63,6 +60,14 @@ function AdminDashboard() {
   const [popularVideo, setPopularVideo] = useState(null);
   const [weeklySummaries, setWeeklySummaries] = useState([]);
   const [dashboardLoading, setDashboardLoading] = useState(true);
+
+  // ✅ State สำหรับตัวเลือกตัวกรอง (ดึงจาก DB จริง)
+  const [filterOptions, setFilterOptions] = useState({
+    categories: [],
+    businessTypes: [],
+    locations: [],
+    workTypes: [],
+  });
 
   // 🔒 เช็กล็อกอิน
   useEffect(() => {
@@ -96,16 +101,35 @@ function AdminDashboard() {
     fetchDashboardData();
   }, []);
 
+  // ✅ ดึงตัวเลือกตัวกรอง (Category, Business Type, Location, Work Style) จาก DB จริง
+  useEffect(() => {
+    const fetchFilterOptions = async () => {
+      try {
+        const res = await fetch('http://localhost:5000/api/videos/filters');
+        const data = await res.json();
+        setFilterOptions({
+          categories: data.categories || [],
+          businessTypes: data.businessTypes || [],
+          locations: data.locations || [],
+          workTypes: data.workTypes || [],
+        });
+        const allWorkTypesOn = {};
+        (data.workTypes || []).forEach((wt) => { allWorkTypesOn[wt] = true; });
+        setWorkTypes(allWorkTypesOn);
+      } catch (err) {
+        console.error('Filter options fetch error:', err);
+      }
+    };
+    fetchFilterOptions();
+  }, []);
+
   const [videoResults, setVideoResults] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSearch = async () => {
     setIsLoading(true);
     try {
-      const workTypeList = [];
-      if (workTypes.onsite) workTypeList.push('Onsite');
-      if (workTypes.hybrid) workTypeList.push('Hybrid');
-      if (workTypes.wfh) workTypeList.push('Work from Home');
+      const workTypeList = Object.keys(workTypes).filter((wt) => workTypes[wt]);
 
       const params = new URLSearchParams({
         category: selectedCategory,
@@ -140,8 +164,10 @@ function AdminDashboard() {
   };
 
   const handleResetFilter = () => {
-    setSelectedCategory(initialCategory);
-    setWorkTypes(initialWorkTypes);
+    setSelectedCategory('All');
+    const allWorkTypesOn = {};
+    filterOptions.workTypes.forEach((wt) => { allWorkTypesOn[wt] = true; });
+    setWorkTypes(allWorkTypesOn);
     setBusinessType('');
     setLocation('');
     setKeyword('');
@@ -296,21 +322,14 @@ function AdminDashboard() {
             <div className="filter-col">
               <label>{t.jobCategory || 'Category'}</label>
               <div className="tag-group-purple">
-                {[
-                  { id: 'ทั้งหมด', label: t.all || 'All' },
-                  { id: 'Developer', label: 'Developer' },
-                  { id: 'UX/UI', label: 'UX/UI' },
-                  { id: 'Data/AI', label: 'Data/AI' },
-                  { id: 'Network', label: 'Network' },
-                  { id: 'Graphic', label: 'Graphic' },
-                ].map((cat) => (
+                {['All', ...filterOptions.categories].map((cat) => (
                   <button
-                    key={cat.id}
+                    key={cat}
                     type="button"
-                    className={`tag-btn-purple ${selectedCategory === cat.id ? 'active' : ''}`}
-                    onClick={() => setSelectedCategory(cat.id)}
+                    className={`tag-btn-purple ${selectedCategory === cat ? 'active' : ''}`}
+                    onClick={() => setSelectedCategory(cat)}
                   >
-                    {cat.label}
+                    {cat === 'All' ? (t.all || 'All') : cat}
                   </button>
                 ))}
               </div>
@@ -319,9 +338,9 @@ function AdminDashboard() {
                 <label>{t.businessType || 'Business Type'}</label>
                 <select className="dark-purple-input" value={businessType} onChange={(e) => setBusinessType(e.target.value)}>
                   <option value="">{lang === 'en' ? 'All' : 'ทั้งหมด'}</option>
-                  <option value="Software House">Software House</option>
-                  <option value="E-Commerce">E-Commerce</option>
-                  <option value="Banking & Finance">Banking & Finance</option>
+                  {filterOptions.businessTypes.map((bt) => (
+                    <option key={bt} value={bt}>{bt}</option>
+                  ))}
                 </select>
               </div>
 
@@ -329,9 +348,9 @@ function AdminDashboard() {
                 <label>{lang === 'en' ? 'Location' : 'สถานที่ปฏิบัติงาน'}</label>
                 <select className="dark-purple-input" value={location} onChange={(e) => setLocation(e.target.value)}>
                   <option value="">{lang === 'en' ? 'All' : 'ทั้งหมด'}</option>
-                  <option value="กรุงเทพมหานคร">{lang === 'en' ? 'Bangkok' : 'กรุงเทพมหานคร'}</option>
-                  <option value="นนทบุรี">{lang === 'en' ? 'Nonthaburi' : 'นนทบุรี'}</option>
-                  <option value="ปทุมธานี">{lang === 'en' ? 'Pathum Thani' : 'ปทุมธานี'}</option>
+                  {filterOptions.locations.map((loc) => (
+                    <option key={loc.en} value={loc.en}>{lang === 'en' ? loc.en : loc.th}</option>
+                  ))}
                 </select>
               </div>
             </div>
@@ -339,9 +358,11 @@ function AdminDashboard() {
             <div className="filter-col">
               <label>{t.workStyle || 'Work Style'}</label>
               <div className="checkbox-group-purple">
-                <label><input type="checkbox" name="onsite" checked={workTypes.onsite} onChange={handleCheckboxChange} /> Onsite</label>
-                <label><input type="checkbox" name="hybrid" checked={workTypes.hybrid} onChange={handleCheckboxChange} /> Hybrid Work</label>
-                <label><input type="checkbox" name="wfh" checked={workTypes.wfh} onChange={handleCheckboxChange} /> Work from Home</label>
+                {filterOptions.workTypes.map((wt) => (
+                  <label key={wt}>
+                    <input type="checkbox" name={wt} checked={!!workTypes[wt]} onChange={handleCheckboxChange} /> {wt}
+                  </label>
+                ))}
               </div>
 
               <div className="form-group-purple">
