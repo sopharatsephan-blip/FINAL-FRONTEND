@@ -10,6 +10,17 @@ import {
 
 const API_BASE = 'http://localhost:5000/api'; // เปลี่ยนเป็น base URL จริงของ backend คุณ
 
+// ✅ ตัวเลือกตำแหน่งงานยอดฮิตสำหรับนักศึกษาจบใหม่ (fix ไว้ที่ frontend ไม่ได้ดึงจาก DB)
+const POSITION_OPTIONS = [
+  'Software Developer',
+  'Web Developer',
+  'Mobile Developer',
+  'UX/UI Designer',
+  'Data Analyst',
+  'QA / Software Tester',
+  'System Analyst',
+];
+
 export default function EditSummary() {
   const navigate = useNavigate();
   const { videoId } = useParams(); // route: /edit-summary-detail/:videoId
@@ -19,15 +30,24 @@ export default function EditSummary() {
   const [summaryId, setSummaryId] = useState(null); // เก็บ SummaryID ไว้ใช้ตอนกด Save
 
   const [formData, setFormData] = useState({
-    jobTitle: '',
     company: '',
     category: '',
     province: '',
+    workStyle: '',
+    position: '',
     summaryContent: ''
+  });
+
+  // ✅ ตัวเลือก Category / Province / Work Style ดึงจาก DB จริง เหมือนหน้า Dashboard (Position ใช้ POSITION_OPTIONS คงที่)
+  const [filterOptions, setFilterOptions] = useState({
+    categories: [],
+    locations: [],
+    workTypes: [],
   });
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [sharing, setSharing] = useState(false);
   const [error, setError] = useState(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false); // ✅ ป๊อปอัปแจ้งบันทึกสำเร็จ
 
@@ -36,6 +56,24 @@ export default function EditSummary() {
     if (savedUser) {
       setCurrentUser(JSON.parse(savedUser));
     }
+  }, []);
+
+  // ✅ ดึงตัวเลือก Category / Work Style จาก DB จริง (ตัวเลือกชุดเดียวกับหน้า Dashboard)
+  useEffect(() => {
+    const fetchFilterOptions = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/videos/filters`);
+        const data = await res.json();
+        setFilterOptions({
+          categories: data.categories || [],
+          locations: data.locations || [],
+          workTypes: data.workTypes || [],
+        });
+      } catch (err) {
+        console.error('Filter options fetch error:', err);
+      }
+    };
+    fetchFilterOptions();
   }, []);
 
   // ดึงข้อมูลสรุปจริงจากฐานข้อมูลตาม videoId
@@ -57,10 +95,11 @@ export default function EditSummary() {
         const data = await res.json();
         setSummaryId(data.summaryId); // เก็บไว้ใช้ตอน PUT
         setFormData({
-          jobTitle: data.jobTitle,
           company: data.company,
           category: data.category,
           province: data.province,
+          workStyle: data.workStyle,
+          position: data.position,
           summaryContent: data.summaryContent,
         });
       } catch (err) {
@@ -96,9 +135,10 @@ export default function EditSummary() {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          jobTitle: formData.jobTitle,
+          category: formData.category,
+          province: formData.province,
+          workStyle: formData.workStyle,
           summaryContent: formData.summaryContent,
-          // ถ้า backend รองรับการแก้ company/category/province เพิ่ม field ตรงนี้ได้
         }),
       });
       if (!res.ok) throw new Error('บันทึกไม่สำเร็จ');
@@ -115,8 +155,24 @@ export default function EditSummary() {
     setShowSuccessModal(false);
   };
 
-  // ✅ ปุ่ม Share -> ไปยังหน้า Public Summary พร้อม videoId
-  const handleShare = () => {
+  // ✅ ปุ่ม Share -> บันทึก Position ลงฐานข้อมูลก่อน แล้วค่อยไปยังหน้า Public Summary
+  const handleShare = async () => {
+    if (!summaryId) {
+      navigate(`/publish-summary/${videoId}`, { state: { videoId, ...formData } });
+      return;
+    }
+    setSharing(true);
+    try {
+      await fetch(`${API_BASE}/summaries/${summaryId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ position: formData.position }),
+      });
+    } catch (err) {
+      console.error('Failed to save position before share:', err);
+    } finally {
+      setSharing(false);
+    }
     navigate(`/publish-summary/${videoId}`, {
       state: {
         videoId,
@@ -245,6 +301,7 @@ export default function EditSummary() {
                 type="button"
                 className="btn-action btn-share"
                 onClick={handleShare}
+                disabled={sharing}
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
@@ -260,16 +317,11 @@ export default function EditSummary() {
                 }}
               >
                 <FaShareAlt size={14} />
-                <span>{lang === 'en' ? 'Share' : 'แชร์'}</span>
+                <span>{sharing ? (lang === 'en' ? 'Sharing...' : 'กำลังแชร์...') : (lang === 'en' ? 'Share' : 'แชร์')}</span>
               </button>
             </div>
 
             <form className="edit-form-purple" onSubmit={handleSave}>
-              <div className="form-group-purple">
-                <label>{lang === 'en' ? 'Job Title' : 'ชื่อตำแหน่งงาน'} <span className="req-star">*</span></label>
-                <input type="text" name="jobTitle" value={formData.jobTitle} onChange={handleChange} className="input-purple" />
-              </div>
-
               <div className="form-group-purple">
                 <label>{lang === 'en' ? 'Company / Organization' : 'บริษัท/องค์กร'} <span className="req-star">*</span></label>
                 <input type="text" name="company" value={formData.company} onChange={handleChange} className="input-purple" disabled />
@@ -278,11 +330,42 @@ export default function EditSummary() {
               <div className="form-row-purple">
                 <div className="form-group-purple">
                   <label>{lang === 'en' ? 'Category' : 'หมวดหมู่'} <span className="req-star">*</span></label>
-                  <input type="text" name="category" value={formData.category} onChange={handleChange} className="input-purple" disabled />
+                  <select name="category" value={formData.category} onChange={handleChange} className="select-purple">
+                    <option value="">{lang === 'en' ? 'Select category' : 'เลือกหมวดหมู่'}</option>
+                    {filterOptions.categories.map((cat) => (
+                      <option key={cat} value={cat}>{cat}</option>
+                    ))}
+                  </select>
                 </div>
                 <div className="form-group-purple">
                   <label>{lang === 'en' ? 'Province' : 'จังหวัด'} <span className="req-star">*</span></label>
-                  <input type="text" name="province" value={formData.province} onChange={handleChange} className="input-purple" disabled />
+                  <select name="province" value={formData.province} onChange={handleChange} className="select-purple">
+                    <option value="">{lang === 'en' ? 'Select province' : 'เลือกจังหวัด'}</option>
+                    {filterOptions.locations.map((loc) => (
+                      <option key={loc.en} value={loc.en}>{lang === 'en' ? loc.en : loc.th}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="form-row-purple">
+                <div className="form-group-purple">
+                  <label>{lang === 'en' ? 'Work Style' : 'รูปแบบการทำงาน'} <span className="req-star">*</span></label>
+                  <select name="workStyle" value={formData.workStyle} onChange={handleChange} className="select-purple">
+                    <option value="">{lang === 'en' ? 'Select work style' : 'เลือกรูปแบบการทำงาน'}</option>
+                    {filterOptions.workTypes.map((wt) => (
+                      <option key={wt} value={wt}>{wt}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="form-group-purple">
+                  <label>{lang === 'en' ? 'Position' : 'ตำแหน่งงาน'}</label>
+                  <select name="position" value={formData.position} onChange={handleChange} className="select-purple">
+                    <option value="">{lang === 'en' ? 'Select position' : 'เลือกตำแหน่งงาน'}</option>
+                    {POSITION_OPTIONS.map((pos) => (
+                      <option key={pos} value={pos}>{pos}</option>
+                    ))}
+                  </select>
                 </div>
               </div>
 

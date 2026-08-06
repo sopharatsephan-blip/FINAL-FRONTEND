@@ -54,6 +54,7 @@ function AdminDashboard() {
   const [workTypes, setWorkTypes] = useState({});
   const [businessType, setBusinessType] = useState('');
   const [location, setLocation] = useState('');
+  const [position, setPosition] = useState('');
   const [keyword, setKeyword] = useState('');
 
   // ✅ State สำหรับข้อมูลจริงจาก API
@@ -67,6 +68,7 @@ function AdminDashboard() {
     businessTypes: [],
     locations: [],
     workTypes: [],
+    positions: [],
   });
 
   // 🔒 เช็กล็อกอิน
@@ -112,6 +114,7 @@ function AdminDashboard() {
           businessTypes: data.businessTypes || [],
           locations: data.locations || [],
           workTypes: data.workTypes || [],
+          positions: data.positions || [],
         });
         const allWorkTypesOn = {};
         (data.workTypes || []).forEach((wt) => { allWorkTypesOn[wt] = true; });
@@ -136,6 +139,7 @@ function AdminDashboard() {
         businessType,
         location,
         workType: workTypeList.join(','),
+        position,
         keyword,
       });
 
@@ -170,6 +174,7 @@ function AdminDashboard() {
     setWorkTypes(allWorkTypesOn);
     setBusinessType('');
     setLocation('');
+    setPosition('');
     setKeyword('');
     setHasSearched(false);
   };
@@ -350,6 +355,16 @@ function AdminDashboard() {
                   <option value="">{lang === 'en' ? 'All' : 'ทั้งหมด'}</option>
                   {filterOptions.locations.map((loc) => (
                     <option key={loc.en} value={loc.en}>{lang === 'en' ? loc.en : loc.th}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="form-group-purple">
+                <label>{lang === 'en' ? 'Position' : 'ตำแหน่งงาน'}</label>
+                <select className="dark-purple-input" value={position} onChange={(e) => setPosition(e.target.value)}>
+                  <option value="">{lang === 'en' ? 'All' : 'ทั้งหมด'}</option>
+                  {filterOptions.positions.map((pos) => (
+                    <option key={pos} value={pos}>{pos}</option>
                   ))}
                 </select>
               </div>
