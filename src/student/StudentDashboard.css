@@ -61,6 +61,47 @@
   color: #c4b5fd;
 }
 
+/* ===== เฉพาะฝั่งนักศึกษา (Student) — โทนสีเหลือง ===== */
+.user-profile-student {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #facc15;
+  border: 1px solid #facc15;
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 20px;
+}
+
+.avatar-student {
+  width: 36px;
+  height: 36px;
+  background: #ffffff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: #8b5cf6;
+  flex-shrink: 0;
+}
+
+.user-info-student h4 {
+  margin: 0;
+  font-size: 14px;
+  color: #2b2200;
+}
+
+.role-tag-student {
+  font-size: 11px;
+  color: #ffffff;
+  background: #6d28d9;
+  border: 1px solid #4c1d95;
+  border-radius: 999px;
+  padding: 2px 8px;
+  display: inline-block;
+}
+
 .menu-list-purple {
   display: flex;
   flex-direction: column;
