@@ -15,7 +15,6 @@ import {
   FaUserGraduate,
   FaLanguage,
   FaCalendarAlt,
-  FaFileAlt as FaPages,
   FaEye,
   FaDownload,
   FaArrowLeft,
@@ -213,17 +212,17 @@ function CoopContent() {
             onClick={() => navigate("/dashboard")}
             style={{ cursor: "pointer" }}
           >
-            <div className="avatar-purple" style={{ marginRight: "10px" }}>ICT</div>
+            <div className="avatar-student" style={{ marginRight: "10px" }}>ICT</div>
             <span>ICT Cooperative</span>
           </div>
 
-          <div className="user-profile-purple">
-            <div className="avatar-purple">
+          <div className="user-profile-student">
+            <div className="avatar-student">
               <FaUserGraduate />
             </div>
-            <div className="user-info-purple">
+            <div className="user-info-student">
               <h4>{lang === "en" ? "Student & Advisor" : "นักศึกษาและอาจารย์"}</h4>
-              <span className="role-tag">{currentUser?.username || "User Panel"}</span>
+              <span className="role-tag-student">{currentUser?.username || "User Panel"}</span>
             </div>
           </div>
 
@@ -326,7 +325,7 @@ function CoopContent() {
         <div style={{ margin: "16px 0" }}>
           <button
             type="button"
-            onClick={() => navigate("/dashboard")}
+            onClick={() => (viewingItem ? handleBackFromSummary() : navigate("/dashboard"))}
             style={{
               display: "inline-flex",
               alignItems: "center",
@@ -341,7 +340,10 @@ function CoopContent() {
               cursor: "pointer"
             }}
           >
-            <FaArrowLeft /> {lang === "en" ? "Back to Dashboard" : "กลับไปหน้าแดชบอร์ด"}
+            <FaArrowLeft />{" "}
+            {viewingItem
+              ? (lang === "en" ? "Back" : "ย้อนกลับ")
+              : (lang === "en" ? "Back to Dashboard" : "กลับไปหน้าแดชบอร์ด")}
           </button>
         </div>
 
@@ -355,27 +357,7 @@ function CoopContent() {
               padding: "28px clamp(20px, 4vw, 40px)"
             }}
           >
-            <button
-              data-html2canvas-ignore="true"
-              onClick={handleBackFromSummary}
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "8px",
-                background: "rgba(139, 92, 246, 0.12)",
-                border: "1px solid rgba(139, 92, 246, 0.4)",
-                borderRadius: "999px",
-                padding: "8px 16px",
-                color: "#c4b5fd",
-                fontWeight: 600,
-                fontSize: "13px",
-                cursor: "pointer"
-              }}
-            >
-              <FaArrowLeft /> {lang === "en" ? "Back" : "ย้อนกลับ"}
-            </button>
-
-            <div style={{ display: "flex", alignItems: "center", gap: "10px", margin: "24px 0 6px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px", margin: "0 0 6px" }}>
               <FaFileAlt style={{ color: "#a855f7" }} size={20} />
               <h2 style={{ margin: 0, fontSize: "20px", fontWeight: 700, color: "#fff" }}>
                 {`${lang === "en" ? "Position" : "ตำแหน่ง"} ${viewingItem.Position || viewingItem.VideoTitle} | ${viewingItem.CompanyName || "-"}`}
@@ -474,12 +456,6 @@ function CoopContent() {
                               <FaCalendarAlt style={{ color: "#a855f7" }} />{" "}
                               {formatUploadDate(item.UploadDate)}
                             </span>
-                            <span className="coop-meta-item">
-                              <FaPages style={{ color: "#a855f7" }} />{" "}
-                              {item.PageCount != null
-                                ? (lang === "en" ? `${item.PageCount} pages` : `${item.PageCount} หน้า`)
-                                : "-"}
-                            </span>
                           </div>
                         </div>
 
@@ -490,13 +466,6 @@ function CoopContent() {
                         >
                           {isFav ? <FaHeart /> : <FaRegHeart />}
                         </button>
-                      </div>
-
-                      <div className="coop-keyword-box">
-                        {lang === "en" ? "Keyword" : "คีย์เวิร์ด"} :{" "}
-                        <span style={{ color: "#c084fc", fontWeight: 500 }}>
-                          {item.Keywords || item.CategoryName || "-"}
-                        </span>
                       </div>
 
                       <div className="coop-actions">
