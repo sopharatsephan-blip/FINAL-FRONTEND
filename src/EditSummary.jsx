@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useLanguage } from './LanguageContext';
+import './admindashboard.css';
 import './EditSummary.css';
 
 import { 
@@ -181,22 +182,6 @@ export default function EditSummary() {
     });
   };
 
-  if (loading) {
-    return (
-      <div className="admin-purple-container">
-        <p style={{ padding: 40 }}>{lang === 'en' ? 'Loading...' : 'กำลังโหลดข้อมูล...'}</p>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="admin-purple-container">
-        <p style={{ padding: 40, color: 'red' }}>{error}</p>
-      </div>
-    );
-  }
-
   return (
     <div className="admin-purple-container">
       {/* ===== Sidebar ===== */}
@@ -285,117 +270,131 @@ export default function EditSummary() {
           </button>
         </div>
 
-        <div className="detail-body-area" style={{ marginTop: '8px' }}>
-          <div className="edit-card-purple">
-            <div
-              className="edit-card-header"
-              style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span className="orange-dot">●</span>
-                <h3>{lang === 'en' ? 'Edit Summary Data' : 'แก้ไขข้อมูลของสรุป'}</h3>
-              </div>
-
-              {/* ✅ ปุ่ม Share ใหม่ */}
-              <button
-                type="button"
-                className="btn-action btn-share"
-                onClick={handleShare}
-                disabled={sharing}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  padding: '8px 16px',
-                  borderRadius: '8px',
-                  border: 'none',
-                  background: '#3b82f6',
-                  color: '#fff',
-                  fontSize: '13px',
-                  fontWeight: '600',
-                  cursor: 'pointer'
-                }}
-              >
-                <FaShareAlt size={14} />
-                <span>{sharing ? (lang === 'en' ? 'Sharing...' : 'กำลังแชร์...') : (lang === 'en' ? 'Share' : 'แชร์')}</span>
-              </button>
-            </div>
-
-            <form className="edit-form-purple" onSubmit={handleSave}>
-              <div className="form-group-purple">
-                <label>{lang === 'en' ? 'Company / Organization' : 'บริษัท/องค์กร'} <span className="req-star">*</span></label>
-                <input type="text" name="company" value={formData.company} onChange={handleChange} className="input-purple" disabled />
-              </div>
-
-              <div className="form-row-purple">
-                <div className="form-group-purple">
-                  <label>{lang === 'en' ? 'Category' : 'หมวดหมู่'} <span className="req-star">*</span></label>
-                  <select name="category" value={formData.category} onChange={handleChange} className="select-purple">
-                    <option value="">{lang === 'en' ? 'Select category' : 'เลือกหมวดหมู่'}</option>
-                    {filterOptions.categories.map((cat) => (
-                      <option key={cat} value={cat}>{cat}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="form-group-purple">
-                  <label>{lang === 'en' ? 'Province' : 'จังหวัด'} <span className="req-star">*</span></label>
-                  <select name="province" value={formData.province} onChange={handleChange} className="select-purple">
-                    <option value="">{lang === 'en' ? 'Select province' : 'เลือกจังหวัด'}</option>
-                    {filterOptions.locations.map((loc) => (
-                      <option key={loc.en} value={loc.en}>{lang === 'en' ? loc.en : loc.th}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div className="form-row-purple">
-                <div className="form-group-purple">
-                  <label>{lang === 'en' ? 'Work Style' : 'รูปแบบการทำงาน'} <span className="req-star">*</span></label>
-                  <select name="workStyle" value={formData.workStyle} onChange={handleChange} className="select-purple">
-                    <option value="">{lang === 'en' ? 'Select work style' : 'เลือกรูปแบบการทำงาน'}</option>
-                    {filterOptions.workTypes.map((wt) => (
-                      <option key={wt} value={wt}>{wt}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="form-group-purple">
-                  <label>{lang === 'en' ? 'Position' : 'ตำแหน่งงาน'}</label>
-                  <select name="position" value={formData.position} onChange={handleChange} className="select-purple">
-                    <option value="">{lang === 'en' ? 'Select position' : 'เลือกตำแหน่งงาน'}</option>
-                    {POSITION_OPTIONS.map((pos) => (
-                      <option key={pos} value={pos}>{pos}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div className="form-group-purple">
-                <label>{lang === 'en' ? 'Summary Content' : 'เนื้อหาที่สรุป'} <span className="req-star">*</span></label>
-                <div className="summary-content-box">
-                  <p className="summary-content-label">{lang === 'en' ? 'Summary Results:' : 'ผลสรุปเนื้อหา:'}</p>
-                  <textarea
-                    name="summaryContent"
-                    value={formData.summaryContent}
-                    onChange={handleChange}
-                    rows={6}
-                    className="textarea-purple"
-                    style={{ border: 'none', background: 'transparent', padding: 0 }}
-                  />
-                </div>
-              </div>
-
-              <div className="form-actions-purple">
-                <button type="button" className="btn-cancel-purple" onClick={() => navigate('/admin')}>
-                  {lang === 'en' ? 'Cancel' : 'ยกเลิก'}
-                </button>
-                <button type="submit" className="btn-save-purple" disabled={saving}>
-                  <FaSave size={14} />
-                  <span>{saving ? (lang === 'en' ? 'Saving...' : 'กำลังบันทึก...') : (lang === 'en' ? 'Save Changes' : 'บันทึกการแก้ไข')}</span>
-                </button>
-              </div>
-            </form>
+        {loading && (
+          <div className="purple-card" style={{ color: '#94a3b8', padding: '24px', marginTop: '8px' }}>
+            {lang === 'en' ? 'Loading...' : 'กำลังโหลดข้อมูล...'}
           </div>
-        </div>
+        )}
+
+        {!loading && error && (
+          <div className="purple-card" style={{ color: '#f87171', padding: '24px', marginTop: '8px' }}>
+            {error}
+          </div>
+        )}
+
+        {!loading && !error && (
+          <div className="detail-body-area" style={{ marginTop: '8px' }}>
+            <div className="edit-card-purple">
+              <div
+                className="edit-card-header"
+                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span className="orange-dot">●</span>
+                  <h3>{lang === 'en' ? 'Edit Summary Data' : 'แก้ไขข้อมูลของสรุป'}</h3>
+                </div>
+
+                {/* ✅ ปุ่ม Share ใหม่ */}
+                <button
+                  type="button"
+                  className="btn-action btn-share"
+                  onClick={handleShare}
+                  disabled={sharing}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    padding: '8px 16px',
+                    borderRadius: '8px',
+                    border: 'none',
+                    background: '#3b82f6',
+                    color: '#fff',
+                    fontSize: '13px',
+                    fontWeight: '600',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <FaShareAlt size={14} />
+                  <span>{sharing ? (lang === 'en' ? 'Sharing...' : 'กำลังแชร์...') : (lang === 'en' ? 'Share' : 'แชร์')}</span>
+                </button>
+              </div>
+
+              <form className="edit-form-purple" onSubmit={handleSave}>
+                <div className="form-group-purple">
+                  <label>{lang === 'en' ? 'Company / Organization' : 'บริษัท/องค์กร'} <span className="req-star">*</span></label>
+                  <input type="text" name="company" value={formData.company} onChange={handleChange} className="input-purple" disabled />
+                </div>
+
+                <div className="form-row-purple">
+                  <div className="form-group-purple">
+                    <label>{lang === 'en' ? 'Category' : 'หมวดหมู่'} <span className="req-star">*</span></label>
+                    <select name="category" value={formData.category} onChange={handleChange} className="select-purple">
+                      <option value="">{lang === 'en' ? 'Select category' : 'เลือกหมวดหมู่'}</option>
+                      {filterOptions.categories.map((cat) => (
+                        <option key={cat} value={cat}>{cat}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="form-group-purple">
+                    <label>{lang === 'en' ? 'Province' : 'จังหวัด'} <span className="req-star">*</span></label>
+                    <select name="province" value={formData.province} onChange={handleChange} className="select-purple">
+                      <option value="">{lang === 'en' ? 'Select province' : 'เลือกจังหวัด'}</option>
+                      {filterOptions.locations.map((loc) => (
+                        <option key={loc.en} value={loc.en}>{lang === 'en' ? loc.en : loc.th}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div className="form-row-purple">
+                  <div className="form-group-purple">
+                    <label>{lang === 'en' ? 'Work Style' : 'รูปแบบการทำงาน'} <span className="req-star">*</span></label>
+                    <select name="workStyle" value={formData.workStyle} onChange={handleChange} className="select-purple">
+                      <option value="">{lang === 'en' ? 'Select work style' : 'เลือกรูปแบบการทำงาน'}</option>
+                      {filterOptions.workTypes.map((wt) => (
+                        <option key={wt} value={wt}>{wt}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="form-group-purple">
+                    <label>{lang === 'en' ? 'Position' : 'ตำแหน่งงาน'}</label>
+                    <select name="position" value={formData.position} onChange={handleChange} className="select-purple">
+                      <option value="">{lang === 'en' ? 'Select position' : 'เลือกตำแหน่งงาน'}</option>
+                      {POSITION_OPTIONS.map((pos) => (
+                        <option key={pos} value={pos}>{pos}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div className="form-group-purple">
+                  <label>{lang === 'en' ? 'Summary Content' : 'เนื้อหาที่สรุป'} <span className="req-star">*</span></label>
+                  <div className="summary-content-box">
+                    <p className="summary-content-label">{lang === 'en' ? 'Summary Results:' : 'ผลสรุปเนื้อหา:'}</p>
+                    <textarea
+                      name="summaryContent"
+                      value={formData.summaryContent}
+                      onChange={handleChange}
+                      rows={6}
+                      className="textarea-purple"
+                      style={{ border: 'none', background: 'transparent', padding: 0 }}
+                    />
+                  </div>
+                </div>
+
+                <div className="form-actions-purple">
+                  <button type="button" className="btn-cancel-purple" onClick={() => navigate('/admin')}>
+                    {lang === 'en' ? 'Cancel' : 'ยกเลิก'}
+                  </button>
+                  <button type="submit" className="btn-save-purple" disabled={saving}>
+                    <FaSave size={14} />
+                    <span>{saving ? (lang === 'en' ? 'Saving...' : 'กำลังบันทึก...') : (lang === 'en' ? 'Save Changes' : 'บันทึกการแก้ไข')}</span>
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
       </main>
 
       {/* ===== ป๊อปอัปแจ้งบันทึกสำเร็จ ===== */}

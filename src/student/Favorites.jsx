@@ -358,11 +358,6 @@ function Favorites() {
 
             {!isSummaryLoading && summaryData && !summaryData.notFound && (
               <div>
-                {summaryData.MainTopic && (
-                  <h3 style={{ color: "#a855f7", fontSize: "15px", fontWeight: 700, margin: "0 0 10px" }}>
-                    {summaryData.MainTopic}
-                  </h3>
-                )}
                 <p style={{ margin: 0, color: "#d4d4d8", lineHeight: 1.8, whiteSpace: "pre-wrap" }}>
                   {summaryData.SummaryText || (lang === "en" ? "No summary text." : "ไม่มีเนื้อหาสรุป")}
                 </p>

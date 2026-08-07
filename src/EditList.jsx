@@ -132,7 +132,7 @@ export default function EditList() {
       <main className="main-content-purple">
         <header className="top-header-purple">
           <div className="header-title">
-            <div style={{ background: 'rgba(139, 92, 246, 0.2)', color: '#c084fc', padding: '8px', borderRadius: '8px', display: 'flex' }}>
+            <div className="header-icon-box" style={{ background: 'rgba(139, 92, 246, 0.2)', color: '#c084fc', padding: '8px', borderRadius: '8px', display: 'flex' }}>
               <FaEdit size={18} />
             </div>
             <div>
