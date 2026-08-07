@@ -41,7 +41,7 @@ export default function SummaryDetail() {
     }
   }, []);
 
-  // 📌 ดึงข้อมูลสรุป (LexRank) จริงจากฐานข้อมูล ตาม videoId
+  // 📌 ดึงข้อมูลสรุป (Typhoon) จริงจากฐานข้อมูล ตาม videoId
   useEffect(() => {
     if (!videoId) {
       setLoading(false);
@@ -199,7 +199,7 @@ export default function SummaryDetail() {
               </button>
             </div>
 
-            {/* เนื้อหาสรุป: ดึงจาก LexRank จริงจากฐานข้อมูล */}
+            {/* เนื้อหาสรุป: ดึงจาก Typhoon จริงจากฐานข้อมูล */}
             <div className="summary-text-box">
               <h3 className="card-title-purple" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '20px', fontSize: '18px' }}>
                 <FaFileAlt style={{ color: '#c084fc' }} />
@@ -225,7 +225,7 @@ export default function SummaryDetail() {
                   )}
 
                   <h4 style={{ color: '#c084fc', marginBottom: '10px', fontSize: '15px' }}>
-                    {lang === 'en' ? 'SummaryText (from LexRank):' : 'ข้อความสรุป (จาก LexRank):'}
+                    {lang === 'en' ? 'SummaryText (from Typhoon):' : 'ข้อความสรุป (จาก Typhoon):'}
                   </h4>
                   <p style={{ color: '#e2e8f0', margin: '0 0 28px 0', lineHeight: '1.8', whiteSpace: 'pre-wrap' }}>
                     {summaryText || (lang === 'en' ? 'No summary available.' : 'ยังไม่มีข้อความสรุป')}

@@ -293,7 +293,7 @@ export default function SummaryResult() {
                   onClick={handleViewSummary}
                   aria-expanded={isSummaryOpen}
                 >
-                  <FaEye /> {lang === 'en' ? 'View Summary (LexRank)' : 'ดูสรุป (LexRank)'}
+                  <FaEye /> {lang === 'en' ? 'View Summary (Typhoon)' : 'ดูสรุป (Typhoon)'}
                   <FaChevronDown 
                     size={12} 
                     style={{ 

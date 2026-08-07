@@ -52,7 +52,7 @@ export default function UploadVideo() {
     }
   };
 
-  // 🎬 ฟังก์ชันอัปโหลดวิดีโอเข้าระบบจริง + เรียกสรุปด้วย Whisper + LexRank
+  // 🎬 ฟังก์ชันอัปโหลดวิดีโอเข้าระบบจริง + เรียกสรุปด้วย Whisper + Typhoon
   const handleUpload = async () => {
     if (!selectedFile) {
       setUploadError(
@@ -87,14 +87,10 @@ export default function UploadVideo() {
       setIsUploading(false);
       setIsSummarizing(true);
 
-      // 2️⃣ เรียกสรุปวิดีโอจริง (Whisper ถอดเสียง + LexRank สรุป)
+      // 2️⃣ เรียกสรุปวิดีโอจริง (Whisper ถอดเสียง + Typhoon สรุป)
       const summarizeRes = await fetch(
         `http://localhost:5000/api/videos/${uploadData.videoId}/summarize`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ numSentences: 5 })
-        }
+        { method: 'POST' }
       );
 
       const summarizeData = await summarizeRes.json();

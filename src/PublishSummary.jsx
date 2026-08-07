@@ -321,7 +321,7 @@ export default function PublishSummary() {
               </div>
             </div>
 
-            {/* การ์ดบทสรุปที่จะเผยแพร่ (กล่องใหญ่ด้านล่าง) - เนื้อหาสรุปจริงจาก LexRank */}
+            {/* การ์ดบทสรุปที่จะเผยแพร่ (กล่องใหญ่ด้านล่าง) - เนื้อหาสรุปจริงจาก Typhoon */}
             <div className="purple-card main-summary-card-dark">
               <div className="card-header-purple">
                 <span className="green-status-dot"></span>
