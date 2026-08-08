@@ -50,7 +50,6 @@ function AdminDashboard() {
   const [hasSearched, setHasSearched] = useState(false);
   const resultRef = useRef(null);
 
-  const [selectedCategory, setSelectedCategory] = useState('All');
   const [workTypes, setWorkTypes] = useState({});
   const [businessType, setBusinessType] = useState('');
   const [location, setLocation] = useState('');
@@ -64,7 +63,6 @@ function AdminDashboard() {
 
   // ✅ State สำหรับตัวเลือกตัวกรอง (ดึงจาก DB จริง)
   const [filterOptions, setFilterOptions] = useState({
-    categories: [],
     businessTypes: [],
     locations: [],
     workTypes: [],
@@ -110,7 +108,6 @@ function AdminDashboard() {
         const res = await fetch('http://localhost:5000/api/videos/filters');
         const data = await res.json();
         setFilterOptions({
-          categories: data.categories || [],
           businessTypes: data.businessTypes || [],
           locations: data.locations || [],
           workTypes: data.workTypes || [],
@@ -135,7 +132,6 @@ function AdminDashboard() {
       const workTypeList = Object.keys(workTypes).filter((wt) => workTypes[wt]);
 
       const params = new URLSearchParams({
-        category: selectedCategory,
         businessType,
         location,
         workType: workTypeList.join(','),
@@ -168,7 +164,6 @@ function AdminDashboard() {
   };
 
   const handleResetFilter = () => {
-    setSelectedCategory('All');
     const allWorkTypesOn = {};
     filterOptions.workTypes.forEach((wt) => { allWorkTypesOn[wt] = true; });
     setWorkTypes(allWorkTypesOn);
@@ -325,20 +320,6 @@ function AdminDashboard() {
 
           <div className="filter-grid-purple">
             <div className="filter-col">
-              <label>{t.jobCategory || 'Category'}</label>
-              <div className="tag-group-purple">
-                {['All', ...filterOptions.categories].map((cat) => (
-                  <button
-                    key={cat}
-                    type="button"
-                    className={`tag-btn-purple ${selectedCategory === cat ? 'active' : ''}`}
-                    onClick={() => setSelectedCategory(cat)}
-                  >
-                    {cat === 'All' ? (t.all || 'All') : cat}
-                  </button>
-                ))}
-              </div>
-
               <div className="form-group-purple">
                 <label>{t.businessType || 'Business Type'}</label>
                 <select className="dark-purple-input" value={businessType} onChange={(e) => setBusinessType(e.target.value)}>

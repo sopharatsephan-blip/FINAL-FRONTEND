@@ -11,17 +11,6 @@ import {
 
 const API_BASE = 'http://localhost:5000/api'; // เปลี่ยนเป็น base URL จริงของ backend คุณ
 
-// ✅ ตัวเลือกตำแหน่งงานยอดฮิตสำหรับนักศึกษาจบใหม่ (fix ไว้ที่ frontend ไม่ได้ดึงจาก DB)
-const POSITION_OPTIONS = [
-  'Software Developer',
-  'Web Developer',
-  'Mobile Developer',
-  'UX/UI Designer',
-  'Data Analyst',
-  'QA / Software Tester',
-  'System Analyst',
-];
-
 export default function EditSummary() {
   const navigate = useNavigate();
   const { videoId } = useParams(); // route: /edit-summary-detail/:videoId
@@ -32,18 +21,20 @@ export default function EditSummary() {
 
   const [formData, setFormData] = useState({
     company: '',
-    category: '',
     province: '',
     workStyle: '',
     position: '',
+    businessType: '',
     summaryContent: ''
   });
 
-  // ✅ ตัวเลือก Category / Province / Work Style ดึงจาก DB จริง เหมือนหน้า Dashboard (Position ใช้ POSITION_OPTIONS คงที่)
+  // ✅ ตัวเลือก Category / Province / Work Style / Position / Business Type ดึงจาก DB จริง เหมือนหน้า Dashboard
   const [filterOptions, setFilterOptions] = useState({
     categories: [],
     locations: [],
     workTypes: [],
+    positions: [],
+    businessTypes: [],
   });
 
   const [loading, setLoading] = useState(true);
@@ -69,6 +60,8 @@ export default function EditSummary() {
           categories: data.categories || [],
           locations: data.locations || [],
           workTypes: data.workTypes || [],
+          positions: data.positions || [],
+          businessTypes: data.businessTypes || [],
         });
       } catch (err) {
         console.error('Filter options fetch error:', err);
@@ -97,10 +90,10 @@ export default function EditSummary() {
         setSummaryId(data.summaryId); // เก็บไว้ใช้ตอน PUT
         setFormData({
           company: data.company,
-          category: data.category,
           province: data.province,
           workStyle: data.workStyle,
           position: data.position,
+          businessType: data.businessType,
           summaryContent: data.summaryContent,
         });
       } catch (err) {
@@ -136,9 +129,10 @@ export default function EditSummary() {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          category: formData.category,
+          company: formData.company,
           province: formData.province,
           workStyle: formData.workStyle,
+          businessType: formData.businessType,
           summaryContent: formData.summaryContent,
         }),
       });
@@ -322,19 +316,10 @@ export default function EditSummary() {
               <form className="edit-form-purple" onSubmit={handleSave}>
                 <div className="form-group-purple">
                   <label>{lang === 'en' ? 'Company / Organization' : 'บริษัท/องค์กร'} <span className="req-star">*</span></label>
-                  <input type="text" name="company" value={formData.company} onChange={handleChange} className="input-purple" disabled />
+                  <input type="text" name="company" value={formData.company} onChange={handleChange} className="input-purple" />
                 </div>
 
                 <div className="form-row-purple">
-                  <div className="form-group-purple">
-                    <label>{lang === 'en' ? 'Category' : 'หมวดหมู่'} <span className="req-star">*</span></label>
-                    <select name="category" value={formData.category} onChange={handleChange} className="select-purple">
-                      <option value="">{lang === 'en' ? 'Select category' : 'เลือกหมวดหมู่'}</option>
-                      {filterOptions.categories.map((cat) => (
-                        <option key={cat} value={cat}>{cat}</option>
-                      ))}
-                    </select>
-                  </div>
                   <div className="form-group-purple">
                     <label>{lang === 'en' ? 'Province' : 'จังหวัด'} <span className="req-star">*</span></label>
                     <select name="province" value={formData.province} onChange={handleChange} className="select-purple">
@@ -360,8 +345,20 @@ export default function EditSummary() {
                     <label>{lang === 'en' ? 'Position' : 'ตำแหน่งงาน'}</label>
                     <select name="position" value={formData.position} onChange={handleChange} className="select-purple">
                       <option value="">{lang === 'en' ? 'Select position' : 'เลือกตำแหน่งงาน'}</option>
-                      {POSITION_OPTIONS.map((pos) => (
+                      {filterOptions.positions.map((pos) => (
                         <option key={pos} value={pos}>{pos}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div className="form-row-purple">
+                  <div className="form-group-purple">
+                    <label>{lang === 'en' ? 'Business Type' : 'ประเภทธุรกิจ'}</label>
+                    <select name="businessType" value={formData.businessType} onChange={handleChange} className="select-purple">
+                      <option value="">{lang === 'en' ? 'Select business type' : 'เลือกประเภทธุรกิจ'}</option>
+                      {filterOptions.businessTypes.map((bt) => (
+                        <option key={bt} value={bt}>{bt}</option>
                       ))}
                     </select>
                   </div>
