@@ -403,7 +403,7 @@ function AdminDashboard() {
                   <div className="card-body-purple">
                     <h5>{`${item.Position || item.VideoTitle} | ${item.CompanyName || '-'}`}</h5>
                     <p className="url-text-purple">
-                      👁️ {item.ViewCount} views · {item.WorkType}
+                      {item.WorkType}
                     </p>
                     <button
                       type="button"

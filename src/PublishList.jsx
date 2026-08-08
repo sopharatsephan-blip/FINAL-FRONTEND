@@ -315,7 +315,6 @@ export default function PublishList() {
                       {video.UploadDate
                         ? new Date(video.UploadDate).toLocaleDateString(lang === 'th' ? 'th-TH' : 'en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
                         : ''}
-                      {` · 👁 ${video.ViewCount ?? 0} views`}
                       {` · ${video.VisibilityType === 'Public' ? (lang === 'en' ? 'Published' : 'เผยแพร่แล้ว') : (lang === 'en' ? 'Not published' : 'ยังไม่เผยแพร่')}`}
                     </p>
                     <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>

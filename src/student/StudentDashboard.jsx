@@ -23,14 +23,19 @@ function StudentDashboard() {
   const [hasSearched, setHasSearched] = useState(false);
   const resultRef = useRef(null);
 
-  const initialCategory = 'UX/UI';
-  const initialWorkTypes = { onsite: true, hybrid: true, wfh: false };
-
-  const [selectedCategory, setSelectedCategory] = useState(initialCategory);
-  const [workTypes, setWorkTypes] = useState(initialWorkTypes);
+  const [workTypes, setWorkTypes] = useState({});
   const [businessType, setBusinessType] = useState('');
   const [location, setLocation] = useState('');
+  const [position, setPosition] = useState('');
   const [keyword, setKeyword] = useState('');
+
+  // ✅ ตัวเลือกตัวกรอง (Business Type / Location / Work Style / Position) ดึงจาก DB จริง เหมือนหน้า Admin Dashboard
+  const [filterOptions, setFilterOptions] = useState({
+    businessTypes: [],
+    locations: [],
+    workTypes: [],
+    positions: [],
+  });
 
   const [videoResults, setVideoResults] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -81,6 +86,28 @@ function StudentDashboard() {
     fetchDashboardData();
   }, []);
 
+  // ✅ ดึงตัวเลือกตัวกรอง (Business Type, Location, Work Style, Position) จาก DB จริง เหมือนหน้า Admin Dashboard
+  useEffect(() => {
+    const fetchFilterOptions = async () => {
+      try {
+        const res = await fetch('http://localhost:5000/api/videos/filters');
+        const data = await res.json();
+        setFilterOptions({
+          businessTypes: data.businessTypes || [],
+          locations: data.locations || [],
+          workTypes: data.workTypes || [],
+          positions: data.positions || [],
+        });
+        const allWorkTypesOn = {};
+        (data.workTypes || []).forEach((wt) => { allWorkTypesOn[wt] = true; });
+        setWorkTypes(allWorkTypesOn);
+      } catch (err) {
+        console.error('Filter options fetch error:', err);
+      }
+    };
+    fetchFilterOptions();
+  }, []);
+
   // แปลง Duration รูปแบบ "mm:ss" จาก DB ให้อยู่ในรูปแบบข้อความอ่านง่าย
   const formatDuration = (duration) => {
     if (!duration) return '-';
@@ -113,10 +140,12 @@ function StudentDashboard() {
   };
 
   const handleResetFilter = () => {
-    setSelectedCategory(initialCategory);
-    setWorkTypes(initialWorkTypes);
+    const allWorkTypesOn = {};
+    filterOptions.workTypes.forEach((wt) => { allWorkTypesOn[wt] = true; });
+    setWorkTypes(allWorkTypesOn);
     setBusinessType('');
     setLocation('');
+    setPosition('');
     setKeyword('');
     setHasSearched(false);
   };
@@ -124,16 +153,13 @@ function StudentDashboard() {
   const handleSearch = async () => {
     setIsLoading(true);
     try {
-      const workTypeList = [];
-      if (workTypes.onsite) workTypeList.push('Onsite');
-      if (workTypes.hybrid) workTypeList.push('Hybrid');
-      if (workTypes.wfh) workTypeList.push('Work from Home');
+      const workTypeList = Object.keys(workTypes).filter((wt) => workTypes[wt]);
 
       const params = new URLSearchParams({
-        category: selectedCategory,
         businessType,
         location,
         workType: workTypeList.join(','),
+        position,
         keyword
       });
 
@@ -314,10 +340,6 @@ function StudentDashboard() {
                     {`${lang === 'en' ? 'Position' : 'ตำแหน่ง'} ${popularVideo.Position || popularVideo.VideoTitle} | ${popularVideo.CompanyName || '-'}`}
                   </h4>
                   <p>{[popularVideo.CategoryName, popularVideo.WorkType].filter(Boolean).join(' · ')}</p>
-                  <div className="stats-purple">
-                    <span>👁️ {popularVideo.ViewCount ?? 0} {lang === 'en' ? 'views' : 'คน'}</span>
-                    <span>⏱️ {formatDuration(popularVideo.Duration)} {lang === 'en' ? 'mins' : 'นาที'}</span>
-                  </div>
                 </div>
                 <div className="chart-icon">
                   <FaArrowUp />
@@ -349,11 +371,7 @@ function StudentDashboard() {
                       <strong>
                         {`${lang === 'en' ? 'Position' : 'ตำแหน่ง'} ${item.Position || item.VideoTitle} | ${item.CompanyName || '-'}`}
                       </strong>
-                      <p>
-                        {lang === 'en'
-                          ? `${formatUploadDate(item.UploadDate)} · ${formatDuration(item.Duration)} mins · ${item.ViewCount ?? 0} views`
-                          : `${formatUploadDate(item.UploadDate)} · ${formatDuration(item.Duration)} นาที · ผู้ชม ${item.ViewCount ?? 0} คน`}
-                      </p>
+                      <p>{formatUploadDate(item.UploadDate)}</p>
                     </div>
                     <span className="purple-badge">{item.CategoryName || '-'}</span>
                   </li>
@@ -376,27 +394,6 @@ function StudentDashboard() {
 
           <div className="filter-grid-purple">
             <div className="filter-col">
-              <label>{lang === 'en' ? 'Category' : 'ประเภทงาน'}</label>
-              <div className="tag-group-purple">
-                {[
-                  { id: 'ทั้งหมด', label: lang === 'en' ? 'All' : 'ทั้งหมด' },
-                  { id: 'Developer', label: 'Developer' },
-                  { id: 'UX/UI', label: 'UX/UI' },
-                  { id: 'Data/AI', label: 'Data/AI' },
-                  { id: 'Network', label: 'Network' },
-                  { id: 'Graphic', label: 'Graphic' }
-                ].map((cat) => (
-                  <button
-                    key={cat.id}
-                    type="button"
-                    className={`tag-btn-purple ${selectedCategory === cat.id ? 'active' : ''}`}
-                    onClick={() => setSelectedCategory(cat.id)}
-                  >
-                    {cat.label}
-                  </button>
-                ))}
-              </div>
-
               <div className="form-group-purple">
                 <label>{lang === 'en' ? 'Business Type' : 'ประเภทธุรกิจ'}</label>
                 <select
@@ -405,9 +402,9 @@ function StudentDashboard() {
                   onChange={(e) => setBusinessType(e.target.value)}
                 >
                   <option value="">{lang === 'en' ? 'All' : 'ทั้งหมด'}</option>
-                  <option value="Software & IT Services">Software & IT Services</option>
-                  <option value="E-Commerce">E-Commerce</option>
-                  <option value="Banking & Finance">Banking & Finance</option>
+                  {filterOptions.businessTypes.map((bt) => (
+                    <option key={bt} value={bt}>{bt}</option>
+                  ))}
                 </select>
               </div>
 
@@ -419,9 +416,23 @@ function StudentDashboard() {
                   onChange={(e) => setLocation(e.target.value)}
                 >
                   <option value="">{lang === 'en' ? 'All' : 'ทั้งหมด'}</option>
-                  <option value="Bangkok">Bangkok</option>
-                  <option value="Nonthaburi">Nonthaburi</option>
-                  <option value="Chiang Mai">Chiang Mai</option>
+                  {filterOptions.locations.map((loc) => (
+                    <option key={loc.en} value={loc.en}>{lang === 'en' ? loc.en : loc.th}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="form-group-purple">
+                <label>{lang === 'en' ? 'Position' : 'ตำแหน่งงาน'}</label>
+                <select
+                  className="dark-purple-input"
+                  value={position}
+                  onChange={(e) => setPosition(e.target.value)}
+                >
+                  <option value="">{lang === 'en' ? 'All' : 'ทั้งหมด'}</option>
+                  {filterOptions.positions.map((pos) => (
+                    <option key={pos} value={pos}>{pos}</option>
+                  ))}
                 </select>
               </div>
             </div>
@@ -429,25 +440,18 @@ function StudentDashboard() {
             <div className="filter-col">
               <label>{lang === 'en' ? 'Work Style' : 'รูปแบบการทำงาน'}</label>
               <div className="checkbox-group-purple">
-                <label>
-                  <input type="checkbox" name="onsite" checked={workTypes.onsite} onChange={handleCheckboxChange} />
-                  Onsite
-                </label>
-                <label>
-                  <input type="checkbox" name="hybrid" checked={workTypes.hybrid} onChange={handleCheckboxChange} />
-                  Hybrid Work
-                </label>
-                <label>
-                  <input type="checkbox" name="wfh" checked={workTypes.wfh} onChange={handleCheckboxChange} />
-                  Work from Home
-                </label>
+                {filterOptions.workTypes.map((wt) => (
+                  <label key={wt}>
+                    <input type="checkbox" name={wt} checked={!!workTypes[wt]} onChange={handleCheckboxChange} /> {wt}
+                  </label>
+                ))}
               </div>
 
               <div className="form-group-purple">
                 <label>{lang === 'en' ? 'Detailed Search' : 'ค้นหาอย่างละเอียด'}</label>
-                <textarea
+                <input
+                  type="text"
                   className="dark-purple-input"
-                  style={{ minHeight: '80px', resize: 'vertical' }}
                   placeholder={lang === 'en' ? 'Type keyword or student name...' : 'พิมพ์คีย์เวิร์ด หรือชื่อนักศึกษา...'}
                   value={keyword}
                   onChange={(e) => setKeyword(e.target.value)}

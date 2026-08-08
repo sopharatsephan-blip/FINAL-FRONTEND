@@ -244,7 +244,6 @@ export default function EditList() {
                     <p style={{ color: '#cbd5e1', fontSize: '0.88rem', margin: 0 }}>
                       {new Date(video.UploadDate).toLocaleDateString(lang === 'th' ? 'th-TH' : 'en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                       {video.CompanyName ? ` · ${video.CompanyName}` : ''}
-                      {` · 👁 ${video.ViewCount} views`}
                     </p>
                     <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
                       {video.CategoryName && (

@@ -55,6 +55,22 @@
   color: #ef4444;
 }
 
+.share-error-banner {
+  margin: 0 0 16px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background-color: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  color: #f87171;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.select-purple.field-error {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+}
+
 .form-row-purple {
   display: grid;
   grid-template-columns: 1fr 1fr;

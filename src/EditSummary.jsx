@@ -41,6 +41,7 @@ export default function EditSummary() {
   const [saving, setSaving] = useState(false);
   const [sharing, setSharing] = useState(false);
   const [error, setError] = useState(null);
+  const [shareError, setShareError] = useState(''); // ✅ ข้อความแจ้งเตือนตอนยังกรอก dropdown ไม่ครบก่อนกด Share
   const [showSuccessModal, setShowSuccessModal] = useState(false); // ✅ ป๊อปอัปแจ้งบันทึกสำเร็จ
 
   useEffect(() => {
@@ -115,6 +116,7 @@ export default function EditSummary() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+    if (shareError) setShareError(''); // เคลียร์ข้อความเตือนทันทีที่ผู้ใช้เริ่มแก้ไข
   };
 
   const handleSave = async (e) => {
@@ -150,8 +152,18 @@ export default function EditSummary() {
     setShowSuccessModal(false);
   };
 
-  // ✅ ปุ่ม Share -> บันทึก Position ลงฐานข้อมูลก่อน แล้วค่อยไปยังหน้า Public Summary
+  // ✅ ปุ่ม Share -> ต้องกรอก dropdown ให้ครบก่อน แล้วค่อยบันทึก Position ลงฐานข้อมูล แล้วไปยังหน้า Public Summary
   const handleShare = async () => {
+    if (!formData.province || !formData.workStyle || !formData.position || !formData.businessType) {
+      setShareError(
+        lang === 'en'
+          ? 'Please select all dropdown fields (Province, Work Style, Position, Business Type) before continuing.'
+          : 'กรุณาเลือกข้อมูลให้ครบทุกช่อง Dropdown (จังหวัด, รูปแบบการทำงาน, ตำแหน่งงาน, ประเภทธุรกิจ) ก่อนไปต่อ'
+      );
+      return;
+    }
+    setShareError('');
+
     if (!summaryId) {
       navigate(`/publish-summary/${videoId}`, { state: { videoId, ...formData } });
       return;
@@ -313,16 +325,25 @@ export default function EditSummary() {
                 </button>
               </div>
 
+              {shareError && (
+                <div className="share-error-banner">{shareError}</div>
+              )}
+
               <form className="edit-form-purple" onSubmit={handleSave}>
                 <div className="form-group-purple">
-                  <label>{lang === 'en' ? 'Company / Organization' : 'บริษัท/องค์กร'} <span className="req-star">*</span></label>
+                  <label>{lang === 'en' ? 'Name Summary' : 'ชื่อสรุป'} <span className="req-star">*</span></label>
                   <input type="text" name="company" value={formData.company} onChange={handleChange} className="input-purple" />
                 </div>
 
                 <div className="form-row-purple">
                   <div className="form-group-purple">
                     <label>{lang === 'en' ? 'Province' : 'จังหวัด'} <span className="req-star">*</span></label>
-                    <select name="province" value={formData.province} onChange={handleChange} className="select-purple">
+                    <select
+                      name="province"
+                      value={formData.province}
+                      onChange={handleChange}
+                      className={`select-purple${shareError && !formData.province ? ' field-error' : ''}`}
+                    >
                       <option value="">{lang === 'en' ? 'Select province' : 'เลือกจังหวัด'}</option>
                       {filterOptions.locations.map((loc) => (
                         <option key={loc.en} value={loc.en}>{lang === 'en' ? loc.en : loc.th}</option>
@@ -334,7 +355,12 @@ export default function EditSummary() {
                 <div className="form-row-purple">
                   <div className="form-group-purple">
                     <label>{lang === 'en' ? 'Work Style' : 'รูปแบบการทำงาน'} <span className="req-star">*</span></label>
-                    <select name="workStyle" value={formData.workStyle} onChange={handleChange} className="select-purple">
+                    <select
+                      name="workStyle"
+                      value={formData.workStyle}
+                      onChange={handleChange}
+                      className={`select-purple${shareError && !formData.workStyle ? ' field-error' : ''}`}
+                    >
                       <option value="">{lang === 'en' ? 'Select work style' : 'เลือกรูปแบบการทำงาน'}</option>
                       {filterOptions.workTypes.map((wt) => (
                         <option key={wt} value={wt}>{wt}</option>
@@ -342,8 +368,13 @@ export default function EditSummary() {
                     </select>
                   </div>
                   <div className="form-group-purple">
-                    <label>{lang === 'en' ? 'Position' : 'ตำแหน่งงาน'}</label>
-                    <select name="position" value={formData.position} onChange={handleChange} className="select-purple">
+                    <label>{lang === 'en' ? 'Position' : 'ตำแหน่งงาน'} <span className="req-star">*</span></label>
+                    <select
+                      name="position"
+                      value={formData.position}
+                      onChange={handleChange}
+                      className={`select-purple${shareError && !formData.position ? ' field-error' : ''}`}
+                    >
                       <option value="">{lang === 'en' ? 'Select position' : 'เลือกตำแหน่งงาน'}</option>
                       {filterOptions.positions.map((pos) => (
                         <option key={pos} value={pos}>{pos}</option>
@@ -354,8 +385,13 @@ export default function EditSummary() {
 
                 <div className="form-row-purple">
                   <div className="form-group-purple">
-                    <label>{lang === 'en' ? 'Business Type' : 'ประเภทธุรกิจ'}</label>
-                    <select name="businessType" value={formData.businessType} onChange={handleChange} className="select-purple">
+                    <label>{lang === 'en' ? 'Business Type' : 'ประเภทธุรกิจ'} <span className="req-star">*</span></label>
+                    <select
+                      name="businessType"
+                      value={formData.businessType}
+                      onChange={handleChange}
+                      className={`select-purple${shareError && !formData.businessType ? ' field-error' : ''}`}
+                    >
                       <option value="">{lang === 'en' ? 'Select business type' : 'เลือกประเภทธุรกิจ'}</option>
                       {filterOptions.businessTypes.map((bt) => (
                         <option key={bt} value={bt}>{bt}</option>

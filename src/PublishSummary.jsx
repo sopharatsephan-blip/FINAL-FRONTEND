@@ -73,7 +73,10 @@ export default function PublishSummary() {
     const fetchVideo = async () => {
       try {
         setLoading(true);
-        const res = await fetch(`${API_BASE}/videos/${videoId}`);
+        // ✅ ส่ง roleId ของแอดมินไปด้วย เพื่อให้ backend อนุญาตให้เห็นวิดีโอ Private ได้ (หน้านี้ใช้จัดการ/publish)
+        const savedUser = localStorage.getItem('user');
+        const roleId = savedUser ? (JSON.parse(savedUser).roleId || '') : '';
+        const res = await fetch(`${API_BASE}/videos/${videoId}?roleId=${encodeURIComponent(roleId)}`);
         const data = await res.json();
 
         if (!res.ok) {
