@@ -4,16 +4,16 @@
 .admin-purple-container {
   display: flex;
   min-height: 100vh;
-  background: #0b0715;
+  background: #ffffff;
   font-family: 'Sarabun', 'Segoe UI', sans-serif;
-  color: #ffffff; /* ปรับตัวหนังสือหลักเป็นสีขาว */
+  color: #1f2937; /* ตัวหนังสือหลักเป็นสีเข้ม/ดำ */
 }
 
 /* ===== Sidebar ===== */
 .sidebar-purple {
   width: 240px;
-  background: #150c26;
-  border-right: 1px solid rgba(139, 92, 246, 0.15);
+  background: #f5edfc;
+  border-right: 1px solid #ddd6fe;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -26,7 +26,7 @@
   margin-bottom: 20px;
   font-weight: bold;
   font-size: 16px;
-  color: #ffffff;
+  color: #4c1d95;
 }
 
 .user-profile-purple {
@@ -55,12 +55,12 @@
 .user-info-purple h4 {
   margin: 0;
   font-size: 14px;
-  color: #ffffff;
+  color: #4c1d95;
 }
 
 .role-tag {
   font-size: 11px;
-  color: #e9d5ff; /* สีม่วงสว่าง */
+  color: #7c3aed;
   font-weight: 500;
 }
 
@@ -78,7 +78,7 @@
   border: none;
   background: transparent;
   border-radius: 10px;
-  color: #f1f5f9; /* ตัวหนังสือสว่างเป็นสีขาว */
+  color: #374151;
   font-weight: 500;
   font-size: 14px;
   cursor: pointer;
@@ -89,7 +89,7 @@
 
 .menu-item-purple:hover {
   background: rgba(139, 92, 246, 0.12);
-  color: #ffffff;
+  color: #4c1d95;
 }
 
 .menu-item-purple.active {
@@ -137,13 +137,13 @@
 
 /* กำหนดสีของหัวข้อ Dashboard ให้ขาวเด่น */
 .main-title-text {
-  color: #ffffff;
+  color: #4c1d95;
   font-weight: 700;
 }
 
 .subtitle-purple {
   margin: 2px 0 0;
-  color: #94a3b8; /* ปรับเป็นสีเทาสว่าง มองเห็นชัดเจน */
+  color: #6b7280;
   font-size: 13px;
 }
 
@@ -162,7 +162,7 @@
   border-radius: 10px;
   background: rgba(139, 92, 246, 0.15);
   border: 1px solid rgba(139, 92, 246, 0.35);
-  color: #c084fc;
+  color: #7c3aed;
   cursor: pointer;
   transition: background 0.15s ease, border-color 0.15s ease;
 }
@@ -179,7 +179,7 @@
   gap: 6px;
   background: rgba(139, 92, 246, 0.18);
   border: 1px solid rgba(139, 92, 246, 0.4);
-  color: #ffffff;
+  color: #4c1d95;
   padding: 8px 14px;
   border-radius: 999px;
   font-size: 13px;
@@ -190,7 +190,7 @@
 }
 
 .lang-toggle-purple svg {
-  color: #c084fc;
+  color: #7c3aed;
 }
 
 .lang-toggle-purple:hover {
@@ -200,16 +200,16 @@
 
 /* ===== Cards & Inputs ===== */
 .purple-card {
-  background: #150c26;
+  background: #ffffff;
   border-radius: 14px;
   padding: 20px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
-  border: 1px solid rgba(139, 92, 246, 0.2);
+  box-shadow: 0 2px 10px rgba(139, 92, 246, 0.12);
+  border: 1px solid #e9d8fb;
 }
 
 .card-title-purple {
   font-size: 15px;
-  color: #ffffff;
+  color: #4c1d95;
   margin: 0 0 14px;
 }
 
@@ -224,8 +224,8 @@
   padding: 10px 12px;
   border-radius: 8px;
   border: 1px solid rgba(139, 92, 246, 0.35);
-  background: #0f0920;
-  color: #ffffff; /* ข้อความในตัวเลือกสีขาว */
+  background: #ffffff;
+  color: #1f2937;
   font-size: 14px;
   outline: none;
 }
@@ -236,7 +236,7 @@
   border-radius: 8px;
   padding: 6px 14px;
   font-size: 13px;
-  color: #ffffff;
+  color: #4c1d95;
   cursor: pointer;
 }
 
@@ -260,7 +260,7 @@
   gap: 8px;
   background: rgba(139, 92, 246, 0.12);
   border: 1px solid rgba(139, 92, 246, 0.25);
-  color: #94a3b8;
+  color: #6b7280;
   padding: 8px 16px;
   border-radius: 8px;
   font-size: 13px;
@@ -282,7 +282,7 @@
   gap: 8px;
   background: rgba(239, 68, 68, 0.1);
   border: 1px solid rgba(239, 68, 68, 0.2);
-  color: #94a3b8;
+  color: #6b7280;
   padding: 8px 16px;
   border-radius: 8px;
   font-size: 13px;
@@ -308,7 +308,7 @@
 .purple-table th {
   padding: 12px 14px;
   border-bottom: 1px solid rgba(139, 92, 246, 0.25);
-  color: #f8fafc; /* หัวตารางเป็นสีขาวเด่น */
+  color: #4c1d95;
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.5px;
@@ -317,7 +317,7 @@
 .purple-table td {
   padding: 14px;
   border-bottom: 1px solid rgba(139, 92, 246, 0.12);
-  color: #ffffff; /* ข้อความตารางเป็นสีขาว */
+  color: #1f2937;
   cursor: pointer;
 }
 
@@ -331,9 +331,9 @@
 
 .role-badge-purple {
   display: inline-block;
-  background: rgba(255, 255, 255, 0.1);
-  color: #ffffff; /* Badge เป็นสีขาว */
-  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(139, 92, 246, 0.12);
+  color: #4c1d95;
+  border: 1px solid rgba(139, 92, 246, 0.3);
   padding: 4px 12px;
   border-radius: 999px;
   font-size: 12px;
@@ -360,11 +360,11 @@
 .modal-content-purple {
   width: 400px;
   max-width: 90vw;
-  background: #150c26;
+  background: #ffffff;
   border: 1px solid rgba(139, 92, 246, 0.4);
   border-radius: 14px;
   padding: 20px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 10px 30px rgba(139, 92, 246, 0.2);
 }
 
 .modal-header-purple {
@@ -377,19 +377,19 @@
 .modal-header-purple h3 {
   margin: 0;
   font-size: 16px;
-  color: #ffffff;
+  color: #4c1d95;
 }
 
 .btn-close-modal {
   background: transparent;
   border: none;
-  color: #cbd5e1;
+  color: #6b7280;
   cursor: pointer;
   font-size: 16px;
 }
 
 .btn-close-modal:hover {
-  color: #ffffff;
+  color: #4c1d95;
 }
 
 @media (max-width: 900px) {

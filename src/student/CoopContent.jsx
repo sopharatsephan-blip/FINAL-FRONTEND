@@ -186,7 +186,7 @@ function CoopContent() {
         filename,
         margin: 10,
         image: { type: "jpeg", quality: 0.98 },
-        html2canvas: { scale: 2, backgroundColor: "#150a1f", useCORS: true },
+        html2canvas: { scale: 2, backgroundColor: "#ffffff", useCORS: true },
         jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
         pagebreak: { mode: ["css", "legacy"] }
       })
@@ -226,7 +226,7 @@ function CoopContent() {
             </div>
           </div>
 
-          <p style={{ color: "#8b8ba0", fontSize: "12px", marginBottom: "8px", paddingLeft: "4px" }}>
+          <p style={{ color: "#6b7280", fontSize: "12px", marginBottom: "8px", paddingLeft: "4px" }}>
             {lang === "en" ? "Main Menu" : "เมนูหลัก"}
           </p>
 
@@ -267,14 +267,14 @@ function CoopContent() {
               className="avatar-purple"
               style={{
                 background: "rgba(139, 92, 246, 0.2)",
-                color: "#c4b5fd",
+                color: "#7c3aed",
                 border: "1px solid rgba(139, 92, 246, 0.4)"
               }}
             >
               <FaFileAlt />
             </div>
             <div>
-              <h2 style={{ margin: 0, fontSize: "18px", color: "#fff" }}>
+              <h2 style={{ margin: 0, fontSize: "18px", color: "#4c1d95" }}>
                 {viewingItem
                   ? (lang === "en" ? "Summary Details" : "รายละเอียดสรุป")
                   : (lang === "en" ? "Co-op Content" : "เนื้อหาสหกิจศึกษา")}
@@ -289,7 +289,7 @@ function CoopContent() {
 
           <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
             <div className="search-box-purple">
-              <FaSearch style={{ color: "#8b8ba0" }} />
+              <FaSearch style={{ color: "#7c3aed" }} />
               <input
                 type="text"
                 placeholder={lang === "en" ? "Search summary, position..." : "ค้นหาสรุป, ตำแหน่งงาน..."}
@@ -309,7 +309,7 @@ function CoopContent() {
                 border: "1px solid rgba(139, 92, 246, 0.4)",
                 borderRadius: "999px",
                 padding: "8px 16px",
-                color: "#c4b5fd",
+                color: "#4c1d95",
                 fontWeight: "600",
                 fontSize: "13px",
                 cursor: "pointer",
@@ -334,7 +334,7 @@ function CoopContent() {
               border: "1px solid rgba(139, 92, 246, 0.4)",
               borderRadius: "999px",
               padding: "8px 16px",
-              color: "#c4b5fd",
+              color: "#7c3aed",
               fontWeight: 600,
               fontSize: "13px",
               cursor: "pointer"
@@ -358,28 +358,28 @@ function CoopContent() {
             }}
           >
             <div style={{ display: "flex", alignItems: "center", gap: "10px", margin: "0 0 6px" }}>
-              <FaFileAlt style={{ color: "#a855f7" }} size={20} />
-              <h2 style={{ margin: 0, fontSize: "20px", fontWeight: 700, color: "#fff" }}>
+              <FaFileAlt style={{ color: "#7c3aed" }} size={20} />
+              <h2 style={{ margin: 0, fontSize: "20px", fontWeight: 700, color: "#1f2937" }}>
                 {`${lang === "en" ? "Position" : "ตำแหน่ง"} ${viewingItem.Position || viewingItem.VideoTitle} | ${viewingItem.CompanyName || "-"}`}
               </h2>
             </div>
-            <p style={{ margin: "0 0 20px", color: "#8b8ba0", fontSize: "13px" }}>
+            <p style={{ margin: "0 0 20px", color: "#6b7280", fontSize: "13px" }}>
               {formatUploadDate(viewingItem.UploadDate)}
             </p>
 
             {isSummaryLoading && (
-              <p style={{ color: "#c4b5fd" }}>{lang === "en" ? "Loading summary..." : "กำลังโหลดสรุป..."}</p>
+              <p style={{ color: "#6b7280" }}>{lang === "en" ? "Loading summary..." : "กำลังโหลดสรุป..."}</p>
             )}
 
             {!isSummaryLoading && summaryData?.notFound && (
-              <p style={{ color: "#8b8ba0" }}>
+              <p style={{ color: "#6b7280" }}>
                 {lang === "en" ? "No summary available for this video yet." : "วิดีโอนี้ยังไม่มีข้อมูลสรุป"}
               </p>
             )}
 
             {!isSummaryLoading && summaryData && !summaryData.notFound && (
               <div>
-                <p style={{ margin: 0, color: "#d4d4d8", lineHeight: 1.8, whiteSpace: "pre-wrap" }}>
+                <p style={{ margin: 0, color: "#374151", lineHeight: 1.8, whiteSpace: "pre-wrap" }}>
                   {summaryData.SummaryText || (lang === "en" ? "No summary text." : "ไม่มีเนื้อหาสรุป")}
                 </p>
               </div>
@@ -420,17 +420,17 @@ function CoopContent() {
             </div>
 
             {isLoading && (
-              <p style={{ color: "#c4b5fd" }}>{lang === "en" ? "Loading..." : "กำลังโหลด..."}</p>
+              <p style={{ color: "#6b7280" }}>{lang === "en" ? "Loading..." : "กำลังโหลด..."}</p>
             )}
 
             {!isLoading && coopItems.length === 0 && (
-              <p style={{ color: "#8b8ba0" }}>
+              <p style={{ color: "#6b7280" }}>
                 {lang === "en" ? "No published content yet." : "ยังไม่มีเนื้อหาที่เผยแพร่"}
               </p>
             )}
 
             {!isLoading && coopItems.length > 0 && filteredCoopItems.length === 0 && (
-              <p style={{ color: "#8b8ba0" }}>
+              <p style={{ color: "#6b7280" }}>
                 {lang === "en" ? "No results match your search." : "ไม่พบข้อมูลที่ตรงกับคำค้นหา"}
               </p>
             )}
@@ -448,7 +448,7 @@ function CoopContent() {
                           </h3>
                           <div className="coop-card-meta">
                             <span className="coop-meta-item">
-                              <FaCalendarAlt style={{ color: "#a855f7" }} />{" "}
+                              <FaCalendarAlt style={{ color: "#7c3aed" }} />{" "}
                               {formatUploadDate(item.UploadDate)}
                             </span>
                           </div>
@@ -538,7 +538,7 @@ function CoopContent() {
 
               <p
                 style={{
-                  color: "#64748b",
+                  color: "#6b7280",
                   fontSize: "14px",
                   lineHeight: "1.5",
                   margin: 0

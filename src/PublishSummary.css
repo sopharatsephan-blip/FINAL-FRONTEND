@@ -16,7 +16,7 @@
   border-radius: 10px;
   background: rgba(139, 92, 246, 0.15);
   border: 1px solid rgba(139, 92, 246, 0.35);
-  color: #c084fc;
+  color: #7c3aed;
   cursor: pointer;
   transition: background 0.15s ease, border-color 0.15s ease;
 }
@@ -33,7 +33,7 @@
   gap: 6px;
   background: rgba(139, 92, 246, 0.18);
   border: 1px solid rgba(139, 92, 246, 0.4);
-  color: #ffffff;
+  color: #4c1d95;
   padding: 8px 14px;
   border-radius: 999px;
   font-size: 13px;
@@ -44,7 +44,7 @@
 }
 
 .lang-toggle-purple svg {
-  color: #c084fc;
+  color: #7c3aed;
 }
 
 .lang-toggle-purple:hover {
@@ -140,7 +140,7 @@
 
 .target-box-dark {
   flex: 1;
-  background-color: rgba(15, 10, 30, 0.6);
+  background-color: rgba(139, 92, 246, 0.06);
   border: 1px solid rgba(139, 92, 246, 0.2);
   border-radius: 12px;
   padding: 10px;
@@ -150,7 +150,7 @@
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s ease;
-  color: #94a3b8;
+  color: #6b7280;
 }
 
 .target-box-dark:hover {
@@ -160,8 +160,8 @@
 
 .target-box-dark.active {
   background-color: rgba(139, 92, 246, 0.25);
-  border-color: #c084fc;
-  color: #c084fc;
+  border-color: #8b5cf6;
+  color: #7c3aed;
   box-shadow: 0 0 12px rgba(192, 132, 252, 0.2);
 }
 
@@ -169,12 +169,12 @@
   font-weight: 600;
   font-size: 0.85rem;
   margin-top: 4px;
-  color: #f1f5f9;
+  color: #374151;
 }
 
 .target-count {
   font-size: 0.72rem;
-  color: #94a3b8;
+  color: #6b7280;
 }
 
 /* การ์ดบทสรุปหลัก */
@@ -183,7 +183,7 @@
 }
 
 .summary-text-box-dark {
-  background-color: rgba(15, 10, 30, 0.5);
+  background-color: rgba(139, 92, 246, 0.05);
   border-radius: 12px;
   padding: 18px;
   border: 1px solid rgba(139, 92, 246, 0.15);
@@ -237,7 +237,7 @@
 }
 
 .read-more-purple {
-  color: #c084fc;
+  color: #7c3aed;
   font-weight: 600;
   cursor: pointer;
 }
@@ -262,7 +262,7 @@
   align-items: center;
   gap: 16px;
   cursor: pointer;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.25);
   transition: all 0.2s ease;
 }
 
@@ -274,7 +274,7 @@
 .btn-text {
   font-size: 0.95rem;
   font-weight: 700;
-  color: #0f172a;
+  color: #1f2937;
 }
 
 .go-pill-purple {

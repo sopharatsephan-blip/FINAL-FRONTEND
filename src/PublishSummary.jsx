@@ -142,7 +142,7 @@ export default function PublishSummary() {
         <div>
           {/* Brand Logo */}
           <div className="brand-logo-purple" onClick={() => navigate('/admin')} style={{ cursor: 'pointer' }}>
-            <FaAsterisk className="logo-icon" style={{ color: '#c084fc', marginRight: '8px' }} size={18} />
+            <FaAsterisk className="logo-icon" style={{ color: '#7c3aed', marginRight: '8px' }} size={18} />
             <span>{t.appName || 'ICT Video Summary'}</span>
           </div>
 
@@ -201,11 +201,11 @@ export default function PublishSummary() {
         {/* Header Bar */}
         <header className="top-header-purple">
           <div className="header-title">
-            <div className="header-icon-box" style={{ background: 'rgba(139, 92, 246, 0.2)', color: '#c084fc', padding: '8px', borderRadius: '8px', display: 'flex' }}>
+            <div className="header-icon-box" style={{ background: 'rgba(139, 92, 246, 0.2)', color: '#7c3aed', padding: '8px', borderRadius: '8px', display: 'flex' }}>
               <FaGlobe size={18} />
             </div>
             <div>
-              <h2 style={{ margin: 0, color: '#ffffff' }}>
+              <h2 style={{ margin: 0, color: '#4c1d95' }}>
                 {lang === 'en' ? 'Publish Summary' : 'เผยแพร่สรุปเนื้อหา'}
               </h2>
               <p className="subtitle-purple" style={{ margin: '4px 0 0 0' }}>
@@ -229,7 +229,7 @@ export default function PublishSummary() {
         </div>
 
         {loading && (
-          <div className="purple-card" style={{ color: '#94a3b8', padding: '24px', marginTop: '20px' }}>
+          <div className="purple-card" style={{ color: '#6b7280', padding: '24px', marginTop: '20px' }}>
             {lang === 'en' ? 'Loading...' : 'กำลังโหลด...'}
           </div>
         )}
@@ -247,7 +247,7 @@ export default function PublishSummary() {
               <div className="purple-card">
                 <div className="card-header-purple">
                   <span className="green-status-dot"></span>
-                  <h3 style={{ margin: 0, color: '#ffffff', fontSize: '1.05rem', fontWeight: '600' }}>
+                  <h3 style={{ margin: 0, color: '#4c1d95', fontSize: '1.05rem', fontWeight: '600' }}>
                     {lang === 'en' ? 'Summary Completed' : 'สรุปเสร็จสิ้น'}
                   </h3>
                 </div>
@@ -266,12 +266,12 @@ export default function PublishSummary() {
                     </div>
                   )}
                   <div className="video-details">
-                    <h4 style={{ color: '#ffffff', margin: '0 0 6px 0', fontSize: '1rem', fontWeight: '600' }}>
-                      {video.Position 
+                    <h4 style={{ color: '#1f2937', margin: '0 0 6px 0', fontSize: '1rem', fontWeight: '600' }}>
+                      {video.Position
                         ? `Internship ตำแหน่ง ${video.Position}${video.CompanyName ? ` | ${video.CompanyName}` : ''}`
                         : video.VideoTitle}
                     </h4>
-                    <p style={{ color: '#cbd5e1', fontSize: '0.85rem', margin: '0 0 10px 0' }}>
+                    <p style={{ color: '#6b7280', fontSize: '0.85rem', margin: '0 0 10px 0' }}>
                       {video.UploadDate
                         ? new Date(video.UploadDate).toLocaleDateString(lang === 'th' ? 'th-TH' : 'en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
                         : ''}
@@ -293,7 +293,7 @@ export default function PublishSummary() {
               <div className="purple-card">
                 <div className="card-header-purple">
                   <span className="green-status-dot"></span>
-                  <h3 style={{ margin: 0, color: '#ffffff', fontSize: '1.05rem', fontWeight: '600' }}>
+                  <h3 style={{ margin: 0, color: '#4c1d95', fontSize: '1.05rem', fontWeight: '600' }}>
                     {lang === 'en' ? 'Target Audience' : 'เผยแพร่ถึงใคร'}
                   </h3>
                 </div>
@@ -328,7 +328,7 @@ export default function PublishSummary() {
             <div className="purple-card main-summary-card-dark">
               <div className="card-header-purple">
                 <span className="green-status-dot"></span>
-                <h3 style={{ margin: 0, color: '#ffffff', fontSize: '1.05rem', fontWeight: '600' }}>
+                <h3 style={{ margin: 0, color: '#4c1d95', fontSize: '1.05rem', fontWeight: '600' }}>
                   {lang === 'en' ? 'Summary to Publish' : 'บทสรุปที่จะเผยแพร่'}
                 </h3>
               </div>
@@ -336,7 +336,7 @@ export default function PublishSummary() {
               <div className="summary-text-box-dark">
                 <div className="summary-item-header">
                   <div className="item-number">1</div>
-                  <h4 style={{ margin: 0, color: '#ffffff', fontSize: '1rem', fontWeight: '600' }}>
+                  <h4 style={{ margin: 0, color: '#1f2937', fontSize: '1rem', fontWeight: '600' }}>
                     {video.Position 
                       ? `ตำแหน่ง ${video.Position}${video.CompanyName ? ` | ${video.CompanyName}` : ''}`
                       : video.VideoTitle}
@@ -344,21 +344,21 @@ export default function PublishSummary() {
                 </div>
 
                 <div className="summary-section-dark">
-                  <h5 style={{ margin: '0 0 8px 0', color: '#c084fc', fontSize: '0.95rem', fontWeight: '600' }}>
+                  <h5 style={{ margin: '0 0 8px 0', color: '#7c3aed', fontSize: '0.95rem', fontWeight: '600' }}>
                     {lang === 'en' ? 'Summary Results:' : 'ผลสรุป:'}
                   </h5>
-                  <p style={{ margin: 0, color: '#cbd5e1', fontSize: '0.9rem', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>
+                  <p style={{ margin: 0, color: '#374151', fontSize: '0.9rem', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>
                     {video.SummaryText || (lang === 'en' ? 'No summary available.' : 'ยังไม่มีข้อความสรุป')}
                   </p>
                 </div>
 
                 {/* ✅ ซับไตเติ้ล / บทถอดเสียงเต็ม แสดงคู่กับผลสรุป */}
                 <div className="summary-section-dark subtitle-section-dark">
-                  <h5 style={{ margin: '0 0 8px 0', color: '#c084fc', fontSize: '0.95rem', fontWeight: '600' }}>
+                  <h5 style={{ margin: '0 0 8px 0', color: '#7c3aed', fontSize: '0.95rem', fontWeight: '600' }}>
                     {lang === 'en' ? 'Subtitle / Transcript:' : 'ซับไตเติ้ล / บทถอดเสียง:'}
                   </h5>
                   <div className="subtitle-scroll-box">
-                    <p style={{ margin: 0, color: '#94a3b8', fontSize: '0.85rem', lineHeight: '1.7', whiteSpace: 'pre-wrap' }}>
+                    <p style={{ margin: 0, color: '#6b7280', fontSize: '0.85rem', lineHeight: '1.7', whiteSpace: 'pre-wrap' }}>
                       {video.Transcript || video.TranscriptText || video.SubtitleText || video.Subtitle ||
                         (lang === 'en' ? 'No subtitle/transcript available.' : 'ยังไม่มีข้อมูลซับไตเติ้ล')}
                     </p>

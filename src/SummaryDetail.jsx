@@ -85,7 +85,7 @@ export default function SummaryDetail() {
       <aside className="sidebar-purple">
         <div>
           <div className="brand-logo-purple" onClick={() => navigate('/admin')} style={{ cursor: 'pointer' }}>
-            <FaAsterisk style={{ color: '#c084fc' }} />
+            <FaAsterisk style={{ color: '#7c3aed' }} />
             <span>{t.appName || 'ICT Video Summary'}</span>
           </div>
 
@@ -140,7 +140,7 @@ export default function SummaryDetail() {
         {/* Top Header */}
         <header className="top-header-purple" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div className="header-title-box" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div className="header-icon-badge" style={{ background: 'rgba(139, 92, 246, 0.2)', color: '#c084fc', padding: '10px', borderRadius: '10px', display: 'flex' }}>
+            <div className="header-icon-badge" style={{ background: 'rgba(139, 92, 246, 0.2)', color: '#7c3aed', padding: '10px', borderRadius: '10px', display: 'flex' }}>
               <FaFileAlt size={18} />
             </div>
             <h2 style={{ margin: 0, fontSize: '20px', fontWeight: 'bold' }}>
@@ -170,7 +170,7 @@ export default function SummaryDetail() {
                 borderRadius: '20px',
                 border: '1px solid rgba(192, 132, 252, 0.4)',
                 background: 'rgba(139, 92, 246, 0.15)',
-                color: '#c084fc',
+                color: '#4c1d95',
                 fontSize: '12px',
                 fontWeight: '600',
                 cursor: 'pointer',
@@ -202,12 +202,12 @@ export default function SummaryDetail() {
             {/* เนื้อหาสรุป: ดึงจาก Typhoon จริงจากฐานข้อมูล */}
             <div className="summary-text-box">
               <h3 className="card-title-purple" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '20px', fontSize: '18px' }}>
-                <FaFileAlt style={{ color: '#c084fc' }} />
+                <FaFileAlt style={{ color: '#7c3aed' }} />
                 {lang === 'en' ? 'Topic Summary' : 'สรุปเนื้อหา'}
               </h3>
 
               {loading && (
-                <p style={{ color: '#94a3b8' }}>
+                <p style={{ color: '#6b7280' }}>
                   {lang === 'en' ? 'Loading summary...' : 'กำลังโหลดข้อมูลสรุป...'}
                 </p>
               )}
@@ -219,22 +219,22 @@ export default function SummaryDetail() {
               {!loading && !error && (
                 <>
                   {summaryId && (
-                    <p style={{ color: '#94a3b8', fontSize: '13px', marginBottom: '20px' }}>
+                    <p style={{ color: '#6b7280', fontSize: '13px', marginBottom: '20px' }}>
                       SummaryID: {summaryId}
                     </p>
                   )}
 
-                  <h4 style={{ color: '#c084fc', marginBottom: '10px', fontSize: '15px' }}>
+                  <h4 style={{ color: '#7c3aed', marginBottom: '10px', fontSize: '15px' }}>
                     {lang === 'en' ? 'SummaryText (from Typhoon):' : 'ข้อความสรุป (จาก Typhoon):'}
                   </h4>
-                  <p style={{ color: '#e2e8f0', margin: '0 0 28px 0', lineHeight: '1.8', whiteSpace: 'pre-wrap' }}>
+                  <p style={{ color: '#374151', margin: '0 0 28px 0', lineHeight: '1.8', whiteSpace: 'pre-wrap' }}>
                     {summaryText || (lang === 'en' ? 'No summary available.' : 'ยังไม่มีข้อความสรุป')}
                   </p>
 
-                  <h4 style={{ color: '#c084fc', marginBottom: '10px', fontSize: '15px' }}>
+                  <h4 style={{ color: '#7c3aed', marginBottom: '10px', fontSize: '15px' }}>
                     {lang === 'en' ? 'Transcript (Full Text):' : 'ข้อความถอดเสียงเต็ม:'}
                   </h4>
-                  <p style={{ color: '#e2e8f0', margin: 0, lineHeight: '1.8', whiteSpace: 'pre-wrap' }}>
+                  <p style={{ color: '#374151', margin: 0, lineHeight: '1.8', whiteSpace: 'pre-wrap' }}>
                     {transcriptText || (lang === 'en' ? 'No transcript available.' : 'ยังไม่มีข้อความถอดเสียง')}
                   </p>
                 </>

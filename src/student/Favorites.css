@@ -24,7 +24,7 @@
   align-items: center;
   justify-content: center;
   padding: 64px 24px;
-  background: rgba(26, 22, 51, 0.6);
+  background: rgba(139, 92, 246, 0.05);
   border: 1.5px dashed rgba(168, 85, 247, 0.25);
   border-radius: 20px;
   margin-top: 16px;
@@ -35,7 +35,7 @@
 
 .favorites-empty-card:hover {
   border-color: rgba(168, 85, 247, 0.4);
-  background: rgba(26, 22, 51, 0.8);
+  background: rgba(139, 92, 246, 0.1);
 }
 
 .favorites-empty-icon {
@@ -68,14 +68,14 @@
 }
 
 .favorites-empty-title {
-  color: #f3f4f6;
+  color: #4c1d95;
   font-size: 18px;
   font-weight: 600;
   margin: 0 0 8px 0;
 }
 
 .favorites-empty-desc {
-  color: #9ca3af;
+  color: #6b7280;
   font-size: 14px;
   margin: 0;
   max-width: 320px;

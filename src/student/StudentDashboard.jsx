@@ -226,7 +226,7 @@ function StudentDashboard() {
             </div>
           </div>
 
-          <p style={{ color: '#8b8ba0', fontSize: '12px', marginBottom: '8px', paddingLeft: '4px' }}>
+          <p style={{ color: '#6b7280', fontSize: '12px', marginBottom: '8px', paddingLeft: '4px' }}>
             {lang === 'en' ? 'Main Menu' : 'เมนูหลัก'}
           </p>
 
@@ -260,11 +260,11 @@ function StudentDashboard() {
       <main className="main-content-purple">
         <header className="top-header-purple" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div className="header-title" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div className="avatar-purple" style={{ background: 'rgba(139, 92, 246, 0.2)', color: '#c4b5fd', border: '1px solid rgba(139, 92, 246, 0.4)' }}>
+            <div className="avatar-purple" style={{ background: 'rgba(139, 92, 246, 0.2)', color: '#7c3aed', border: '1px solid rgba(139, 92, 246, 0.4)' }}>
               <FaHome />
             </div>
             <div>
-              <h2 style={{ margin: 0, fontSize: '18px', color: '#fff' }}>
+              <h2 style={{ margin: 0, fontSize: '18px', color: '#4c1d95' }}>
                 {lang === 'en' ? 'Dashboard' : 'แดชบอร์ด'}
               </h2>
               <p className="subtitle-purple">
@@ -276,7 +276,7 @@ function StudentDashboard() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
             <div className="search-box-purple">
               <FaSearch
-                style={{ color: '#8b8ba0', cursor: 'pointer' }}
+                style={{ color: '#7c3aed', cursor: 'pointer' }}
                 onClick={handleHeaderSearch}
               />
               <input
@@ -300,7 +300,7 @@ function StudentDashboard() {
                 border: '1px solid rgba(139, 92, 246, 0.4)',
                 borderRadius: '999px',
                 padding: '8px 16px',
-                color: '#c4b5fd',
+                color: '#4c1d95',
                 fontWeight: '600',
                 fontSize: '13px',
                 cursor: 'pointer',
@@ -321,11 +321,11 @@ function StudentDashboard() {
               {lang === 'en' ? 'Popular Video Rank' : 'อันดับวิดีโอยอดฮิต'}
             </h3>
             {isDashboardLoading && (
-              <p style={{ color: '#c4b5fd' }}>{lang === 'en' ? 'Loading...' : 'กำลังโหลด...'}</p>
+              <p style={{ color: '#6b7280' }}>{lang === 'en' ? 'Loading...' : 'กำลังโหลด...'}</p>
             )}
 
             {!isDashboardLoading && !popularVideo && (
-              <p style={{ color: '#8b8ba0' }}>
+              <p style={{ color: '#6b7280' }}>
                 {lang === 'en' ? 'No video data yet.' : 'ยังไม่มีข้อมูลวิดีโอ'}
               </p>
             )}
@@ -354,11 +354,11 @@ function StudentDashboard() {
               {lang === 'en' ? 'Weekly Video Summaries' : 'สรุปวิดีโอประจำสัปดาห์'}
             </h3>
             {isDashboardLoading && (
-              <p style={{ color: '#c4b5fd' }}>{lang === 'en' ? 'Loading...' : 'กำลังโหลด...'}</p>
+              <p style={{ color: '#6b7280' }}>{lang === 'en' ? 'Loading...' : 'กำลังโหลด...'}</p>
             )}
 
             {!isDashboardLoading && weeklyVideos.length === 0 && (
-              <p style={{ color: '#8b8ba0' }}>
+              <p style={{ color: '#6b7280' }}>
                 {lang === 'en' ? 'No videos this week.' : 'ยังไม่มีวิดีโอในสัปดาห์นี้'}
               </p>
             )}
@@ -475,9 +475,9 @@ function StudentDashboard() {
             </div>
 
             <div className="cards-grid-purple">
-              {isLoading && <p style={{ color: '#c4b5fd' }}>{lang === 'en' ? 'Loading...' : 'กำลังโหลด...'}</p>}
+              {isLoading && <p style={{ color: '#6b7280' }}>{lang === 'en' ? 'Loading...' : 'กำลังโหลด...'}</p>}
               {!isLoading && videoResults.length === 0 && (
-                <p style={{ color: '#8b8ba0' }}>{lang === 'en' ? 'No results found.' : 'ไม่พบข้อมูลที่ตรงกับตัวกรอง'}</p>
+                <p style={{ color: '#6b7280' }}>{lang === 'en' ? 'No results found.' : 'ไม่พบข้อมูลที่ตรงกับตัวกรอง'}</p>
               )}
               {videoResults.map((item) => (
                 <div className="job-card-purple" key={item.VideoID}>

@@ -139,7 +139,7 @@ export default function SummaryResult() {
       <aside className="sidebar-purple">
         <div>
           <div className="brand-logo-purple" onClick={() => navigate('/admin')} style={{ cursor: 'pointer' }}>
-            <FaAsterisk style={{ color: '#c084fc' }} />
+            <FaAsterisk style={{ color: '#7c3aed' }} />
             <span>{t.appName || 'ICT Video Summary'}</span>
           </div>
 
@@ -221,7 +221,7 @@ export default function SummaryResult() {
                 borderRadius: '20px',
                 border: '1px solid rgba(192, 132, 252, 0.4)',
                 background: 'rgba(139, 92, 246, 0.15)',
-                color: '#c084fc',
+                color: '#4c1d95',
                 fontSize: '12px',
                 fontWeight: '600',
                 cursor: 'pointer',
@@ -316,7 +316,7 @@ export default function SummaryResult() {
               >
                 <div className="summary-expand-inner" ref={summaryContentRef}>
                   {dbLoading && (
-                    <p style={{ color: '#94a3b8' }}>
+                    <p style={{ color: '#6b7280' }}>
                       {lang === 'en' ? 'Loading summary...' : 'กำลังโหลดข้อมูลสรุป...'}
                     </p>
                   )}
@@ -329,19 +329,19 @@ export default function SummaryResult() {
 
                   {!dbLoading && dbSummary && (
                     <div>
-                      <h5 style={{ color: '#c084fc', marginTop: 0 }}>
+                      <h5 style={{ color: '#7c3aed', marginTop: 0 }}>
                         {lang === 'en' ? 'Summary Text:' : 'ข้อความสรุป:'}
                       </h5>
-                      <p style={{ whiteSpace: 'pre-wrap', color: '#e5e7eb', lineHeight: '1.6' }}>
+                      <p style={{ whiteSpace: 'pre-wrap', color: '#374151', lineHeight: '1.6' }}>
                         {dbSummary.SummaryText || (lang === 'en' ? '(No data)' : '(ไม่มีข้อมูล)')}
                       </p>
 
-                      <h5 style={{ color: '#c084fc', marginTop: '16px' }}>
+                      <h5 style={{ color: '#7c3aed', marginTop: '16px' }}>
                         {lang === 'en' ? 'Full Transcript:' : 'ข้อความถอดเสียงเต็ม:'}
                       </h5>
-                      <p style={{ 
-                        whiteSpace: 'pre-wrap', 
-                        color: '#9ca3af', 
+                      <p style={{
+                        whiteSpace: 'pre-wrap',
+                        color: '#6b7280',
                         fontSize: '13px', 
                         lineHeight: '1.6', 
                         maxHeight: '300px', 

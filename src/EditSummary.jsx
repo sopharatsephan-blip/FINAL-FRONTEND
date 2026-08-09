@@ -198,7 +198,7 @@ export default function EditSummary() {
             onClick={() => navigate('/admin')}
             style={{ cursor: 'pointer' }}
           >
-            <FaAsterisk className="logo-icon" style={{ color: '#c084fc', marginRight: '8px' }} />
+            <FaAsterisk className="logo-icon" style={{ color: '#7c3aed', marginRight: '8px' }} />
             <span>{t.appName || 'ICT Video Summary'}</span>
           </div>
 
@@ -250,7 +250,7 @@ export default function EditSummary() {
           <div className="header-title">
             <div
               className="header-icon-box"
-              style={{ background: 'rgba(139, 92, 246, 0.2)', color: '#c084fc', padding: '8px', borderRadius: '8px', display: 'flex' }}
+              style={{ background: 'rgba(139, 92, 246, 0.2)', color: '#7c3aed', padding: '8px', borderRadius: '8px', display: 'flex' }}
             >
               <FaEdit size={18} />
             </div>
@@ -277,7 +277,7 @@ export default function EditSummary() {
         </div>
 
         {loading && (
-          <div className="purple-card" style={{ color: '#94a3b8', padding: '24px', marginTop: '8px' }}>
+          <div className="purple-card" style={{ color: '#6b7280', padding: '24px', marginTop: '8px' }}>
             {lang === 'en' ? 'Loading...' : 'กำลังโหลดข้อมูล...'}
           </div>
         )}

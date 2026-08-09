@@ -18,20 +18,20 @@ export default function Sidebar() {
   ];
 
   return (
-    <aside className="sidebar" style={{ width: '260px', background: '#0e091f', minHeight: '100vh', padding: '20px', color: '#fff' }}>
+    <aside className="sidebar" style={{ width: '260px', background: '#f5edfc', minHeight: '100vh', padding: '20px', color: '#374151' }}>
       {/* Logo */}
-      <div className="logo" style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '30px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-        <span style={{ color: '#a855f7' }}>✻</span> {t.appName}
+      <div className="logo" style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '30px', display: 'flex', alignItems: 'center', gap: '10px', color: '#4c1d95' }}>
+        <span style={{ color: '#7c3aed' }}>✻</span> {t.appName}
       </div>
 
       {/* Profile */}
-      <div className="profile-card" style={{ background: '#18112e', padding: '15px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '25px' }}>
-        <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#8b5cf6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
+      <div className="profile-card" style={{ background: '#ffffff', border: '1px solid rgba(139, 92, 246, 0.3)', padding: '15px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '25px' }}>
+        <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#8b5cf6', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
           {user.firstName ? user.firstName[0] : 'S'}
         </div>
         <div>
-          <div style={{ fontWeight: 'bold', fontSize: '0.95rem' }}>{user.firstName} {user.lastName}</div>
-          <span style={{ fontSize: '0.75rem', background: 'rgba(168, 85, 247, 0.2)', color: '#c084fc', padding: '2px 8px', borderRadius: '10px' }}>Admin</span>
+          <div style={{ fontWeight: 'bold', fontSize: '0.95rem', color: '#4c1d95' }}>{user.firstName} {user.lastName}</div>
+          <span style={{ fontSize: '0.75rem', background: 'rgba(168, 85, 247, 0.2)', color: '#7c3aed', padding: '2px 8px', borderRadius: '10px' }}>Admin</span>
         </div>
       </div>
 
@@ -49,7 +49,7 @@ export default function Sidebar() {
               borderRadius: '10px',
               border: 'none',
               background: location.pathname === item.path ? '#8b5cf6' : 'transparent',
-              color: '#fff',
+              color: location.pathname === item.path ? '#ffffff' : '#374151',
               cursor: 'pointer',
               textAlign: 'left',
               fontSize: '0.95rem',
@@ -79,7 +79,7 @@ export default function Sidebar() {
           padding: '10px',
           background: 'rgba(139, 92, 246, 0.15)',
           border: '1px solid rgba(168, 85, 247, 0.4)',
-          color: '#c084fc',
+          color: '#4c1d95',
           borderRadius: '10px',
           cursor: 'pointer',
           fontWeight: 'bold'

@@ -122,7 +122,7 @@ function VideoPlayer() {
               border: "1px solid rgba(139, 92, 246, 0.4)",
               borderRadius: "999px",
               padding: "8px 16px",
-              color: "#c4b5fd",
+              color: "#7c3aed",
               fontWeight: 600,
               fontSize: "13px",
               cursor: "pointer"
@@ -133,12 +133,12 @@ function VideoPlayer() {
         </div>
 
         {isLoading && (
-          <p style={{ color: "#c4b5fd" }}>{lang === "en" ? "Loading video..." : "กำลังโหลดวิดีโอ..."}</p>
+          <p style={{ color: "#6b7280" }}>{lang === "en" ? "Loading video..." : "กำลังโหลดวิดีโอ..."}</p>
         )}
 
         {!isLoading && notFound && (
           <div className="purple-card">
-            <p style={{ color: "#8b8ba0", margin: 0 }}>
+            <p style={{ color: "#6b7280", margin: 0 }}>
               {lang === "en" ? "Video not found." : "ไม่พบวิดีโอนี้ในระบบ"}
             </p>
           </div>
@@ -146,10 +146,10 @@ function VideoPlayer() {
 
         {!isLoading && video && !notFound && (
           <div className="purple-card" style={{ maxWidth: "900px", margin: "0 auto" }}>
-            <h2 style={{ margin: "0 0 4px", fontSize: "18px", color: "#fff" }}>
+            <h2 style={{ margin: "0 0 4px", fontSize: "18px", color: "#1f2937" }}>
               {`${lang === "en" ? "Position" : "ตำแหน่ง"} ${video.Position || video.VideoTitle} | ${video.CompanyName || "-"}`}
             </h2>
-            <p style={{ margin: "0 0 20px", color: "#8b8ba0", fontSize: "13px" }}>
+            <p style={{ margin: "0 0 20px", color: "#6b7280", fontSize: "13px" }}>
               {video.CategoryName || "-"}
               {video.UploadDate ? ` · ${new Date(video.UploadDate).toLocaleDateString(lang === "en" ? "en-GB" : "th-TH")}` : ""}
             </p>
@@ -171,17 +171,17 @@ function VideoPlayer() {
                   : "เบราว์เซอร์ของคุณไม่รองรับการเล่นวิดีโอ"}
               </video>
             ) : (
-              <p style={{ color: "#8b8ba0" }}>
+              <p style={{ color: "#6b7280" }}>
                 {lang === "en" ? "No video file available." : "ไม่พบไฟล์วิดีโอ"}
               </p>
             )}
 
             {video.SummaryText && (
               <div style={{ marginTop: "24px" }}>
-                <h3 style={{ color: "#a855f7", fontSize: "15px", fontWeight: 700, margin: "0 0 8px" }}>
+                <h3 style={{ color: "#7c3aed", fontSize: "15px", fontWeight: 700, margin: "0 0 8px" }}>
                   {lang === "en" ? "Summary" : "สรุปเนื้อหา"}
                 </h3>
-                <p style={{ margin: 0, color: "#d4d4d8", lineHeight: 1.8, whiteSpace: "pre-wrap" }}>
+                <p style={{ margin: 0, color: "#374151", lineHeight: 1.8, whiteSpace: "pre-wrap" }}>
                   {video.SummaryText}
                 </p>
               </div>

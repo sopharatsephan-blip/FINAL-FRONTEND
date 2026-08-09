@@ -1,14 +1,14 @@
 /* SummaryResult.css - Dark Purple Theme */
 
 :root {
-  --bg-dark: #0d0b18;
-  --bg-sidebar: #130f26;
-  --bg-card: #181332;
+  --bg-dark: #ffffff;
+  --bg-sidebar: #f5edfc;
+  --bg-card: #ffffff;
   --purple-accent: #8b5cf6;
   --purple-hover: #7c3aed;
-  --purple-light: #c084fc;
-  --text-white: #ffffff;
-  --text-gray: #a1a1aa;
+  --purple-light: #7c3aed;
+  --text-white: #4c1d95;
+  --text-gray: #6b7280;
   --border-subtle: rgba(139, 92, 246, 0.2);
 }
 
@@ -27,7 +27,7 @@
   border: 1px solid var(--border-subtle);
   border-radius: 20px;
   padding: 28px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 10px 30px rgba(139, 92, 246, 0.15);
 }
 
 .summary-card-header {
@@ -80,7 +80,7 @@
 /* กล่องแสดงผลความสำเร็จ */
 .result-box-purple {
   position: relative;
-  background-color: rgba(24, 19, 50, 0.7);
+  background-color: rgba(139, 92, 246, 0.05);
   border: 2px solid rgba(139, 92, 246, 0.4);
   border-radius: 18px;
   padding: 28px 24px;
@@ -141,7 +141,7 @@
 
 .result-info-text .job-title-text {
   font-size: 15px;
-  color: #e4e4e7;
+  color: #1f2937;
   font-weight: 500;
 }
 
@@ -210,12 +210,12 @@
 
 .algo-label {
   font-size: 14px;
-  color: #a1a1aa;
+  color: #6b7280;
 }
 
 .algo-button-group {
   display: flex;
-  background-color: #130f26;
+  background-color: #f5edfc;
   padding: 4px;
   border-radius: 10px;
   border: 1px solid rgba(139, 92, 246, 0.2);
@@ -225,7 +225,7 @@
   padding: 6px 16px;
   border: none;
   background: transparent;
-  color: #a1a1aa;
+  color: #6b7280;
   font-size: 13px;
   border-radius: 8px;
   cursor: pointer;

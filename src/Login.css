@@ -9,8 +9,8 @@ body {
   width: 100vw;
   height: 100vh;
   overflow: hidden;
-  background-color: #16171d;
-  color: #f3f4f6;
+  background-color: #ffffff;
+  color: #1f2937;
 }
 
 /* Container เต็มจอ ไร้กรอบ */
@@ -18,26 +18,26 @@ body {
   display: flex;
   width: 100vw;
   height: 100vh;
-  background: #16171d;
+  background: #ffffff;
 }
 
-/* --- ฝั่งซ้าย (Info Panel โทนเดียวกับหน้า Home) --- */
+/* --- ฝั่งซ้าย (Info Panel โทนพาสเทลม่วง) --- */
 .info-panel {
   flex: 1;
-  background: #1f2028;
-  color: #fff;
+  background: #f5edfc;
+  color: #4c1d95;
   padding: 60px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   position: relative;
-  border-right: 1px solid #2e303a;
+  border-right: 1px solid #ddd6fe;
 }
 
 .info-panel .logo-icon {
   font-size: 48px;
   margin-bottom: 30px;
-  color: #c084fc;
+  color: #8b5cf6;
 }
 
 .info-panel h1 {
@@ -45,13 +45,13 @@ body {
   line-height: 1.2;
   font-weight: 800;
   margin-bottom: 20px;
-  color: #f3f4f6;
+  color: #4c1d95;
 }
 
 .info-panel p {
   font-size: 16px;
   line-height: 1.6;
-  color: #9ca3af;
+  color: #4b5563;
   max-width: 450px;
 }
 
@@ -63,10 +63,10 @@ body {
   color: #6b7280;
 }
 
-/* --- ฝั่งขวา (Login Box โทนเข้ม) --- */
+/* --- ฝั่งขวา (Login Box) --- */
 .login-box {
   flex: 1;
-  background: #16171d;
+  background: #ffffff;
   padding: 60px 80px;
   display: flex;
   flex-direction: column;
@@ -83,23 +83,23 @@ body {
   font-size: 20px;
   font-weight: 600;
   margin-bottom: 20px;
-  color: #c084fc;
+  color: #7c3aed;
 }
 
 .login-box h3 {
   font-size: 32px;
   font-weight: 700;
   margin-bottom: 8px;
-  color: #f3f4f6;
+  color: #4c1d95;
 }
 
 .subtitle {
   font-size: 14px;
-  color: #9ca3af;
+  color: #6b7280;
 }
 
 .subtitle a, .forgot-password a {
-  color: #c084fc;
+  color: #7c3aed;
   text-decoration: none;
   font-weight: 600;
 }
@@ -108,14 +108,14 @@ body {
   text-decoration: underline;
 }
 
-/* ช่องกรอกข้อมูล (Input พื้นหลังเข้มขอบสวยงาม) */
+/* ช่องกรอกข้อมูล */
 .login-box input {
   width: 100%;
   padding: 14px 18px;
   margin-bottom: 16px;
-  background-color: #1f2028;
-  color: #f3f4f6;
-  border: 1px solid #2e303a;
+  background-color: #ffffff;
+  color: #1f2937;
+  border: 1px solid #ddd6fe;
   border-radius: 8px;
   font-size: 15px;
   transition: border-color 0.2s;
@@ -123,11 +123,11 @@ body {
 
 .login-box input:focus {
   outline: none;
-  border-color: #c084fc;
+  border-color: #8b5cf6;
 }
 
 ::placeholder {
-  color: #6b7280;
+  color: #9ca3af;
   opacity: 1;
 }
 
@@ -140,8 +140,8 @@ body {
   font-weight: 600;
   cursor: pointer;
   border: none;
-  background-color: #c084fc;
-  color: #16171d;
+  background-color: #8b5cf6;
+  color: #ffffff;
   transition: opacity 0.2s;
   margin-top: 10px;
 }
@@ -158,9 +158,9 @@ body {
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-  border: 1px solid #2e303a;
-  background-color: #1f2028;
-  color: #f3f4f6;
+  border: 1px solid #ddd6fe;
+  background-color: #ffffff;
+  color: #1f2937;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -169,20 +169,20 @@ body {
 }
 
 .btn-google:hover {
-  background-color: #292a35;
+  background-color: #f5edfc;
 }
 
 .google-icon {
   margin-right: 10px;
   font-weight: bold;
-  color: #c084fc;
+  color: #7c3aed;
 }
 
 /* เส้นแบ่ง OR */
 .divider {
   width: 100%;
   text-align: center;
-  color: #6b7280;
+  color: #9ca3af;
   font-size: 14px;
   margin: 20px 0;
   position: relative;
@@ -195,7 +195,7 @@ body {
   top: 50%;
   width: 42%;
   height: 1px;
-  background-color: #2e303a;
+  background-color: #ddd6fe;
 }
 
 .divider::before { left: 0; }
@@ -205,7 +205,7 @@ body {
 .forgot-password {
   margin-top: 24px;
   font-size: 14px;
-  color: #9ca3af;
+  color: #6b7280;
   width: 100%;
   text-align: center;
 }

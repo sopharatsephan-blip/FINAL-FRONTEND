@@ -6,11 +6,11 @@
 }
 
 .detail-card-purple {
-  background-color: #15102a;
+  background-color: #ffffff;
   border: 1px solid rgba(139, 92, 246, 0.25);
   border-radius: 16px;
   padding: 24px;
-  color: #ffffff;
+  color: #1f2937;
 }
 
 .detail-card-header {
@@ -24,7 +24,7 @@
 
 .algorithm-toggle-group {
   display: flex;
-  background-color: #1d1739;
+  background-color: #f5edfc;
   padding: 4px;
   border-radius: 10px;
   border: 1px solid rgba(139, 92, 246, 0.2);
@@ -34,7 +34,7 @@
   padding: 8px 20px;
   border: none;
   background: transparent;
-  color: #9ca3af;
+  color: #6b7280;
   font-size: 14px;
   border-radius: 8px;
   cursor: pointer;
@@ -48,7 +48,7 @@
 }
 
 .summary-text-box {
-  color: #e2e8f0;
+  color: #374151;
 }
 
 .summary-title-head {
@@ -67,19 +67,19 @@
 
 .summary-item h4 {
   font-size: 15px;
-  color: #c084fc;
+  color: #7c3aed;
   margin-bottom: 6px;
 }
 
 .summary-item p {
   font-size: 14px;
-  color: #cbd5e1;
+  color: #374151;
   line-height: 1.6;
 }
 
 .summary-item ul {
   margin: 6px 0 0 20px;
-  color: #cbd5e1;
+  color: #374151;
   font-size: 14px;
   line-height: 1.6;
 }

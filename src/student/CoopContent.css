@@ -4,16 +4,16 @@
 .coop-page-container {
   display: flex;
   min-height: 100vh;
-  background-color: #0d0b18; /* พื้นหลังดำอมม่วง */
-  color: #e2e8f0;
+  background-color: #ffffff;
+  color: #1f2937;
   font-family: 'Prompt', 'Kanit', sans-serif;
 }
 
 /* Sidebar */
 .coop-sidebar {
   width: 260px;
-  background: #141026;
-  border-right: 1px solid #2a2247;
+  background: #f5edfc;
+  border-right: 1px solid #ddd6fe;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -27,7 +27,7 @@
   gap: 12px;
   font-weight: bold;
   font-size: 1.2rem;
-  color: #a855f7;
+  color: #7c3aed;
   margin-bottom: 24px;
 }
 
@@ -47,7 +47,7 @@
 
 .coop-menu-label {
   font-size: 0.75rem;
-  color: #64748b;
+  color: #6b7280;
   text-transform: uppercase;
   margin-bottom: 12px;
   padding-left: 8px;
@@ -68,15 +68,15 @@
   gap: 12px;
   padding: 12px 16px;
   border-radius: 10px;
-  color: #94a3b8;
+  color: #6b7280;
   cursor: pointer;
   transition: all 0.2s ease;
   font-size: 0.95rem;
 }
 
 .coop-menu-item:hover {
-  background: #231b3e;
-  color: #c084fc;
+  background: rgba(139, 92, 246, 0.12);
+  color: #7c3aed;
 }
 
 .coop-menu-item.active {
@@ -120,7 +120,7 @@
 .coop-title {
   font-size: 1.4rem;
   font-weight: 700;
-  color: #f3e8ff;
+  color: #4c1d95;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -134,10 +134,10 @@
 .coop-search input {
   width: 100%;
   padding: 10px 16px 10px 40px;
-  background: #19142d;
-  border: 1px solid #3b2d54;
+  background: #ffffff;
+  border: 1px solid #ddd6fe;
   border-radius: 20px;
-  color: #fff;
+  color: #1f2937;
   font-size: 0.88rem;
   outline: none;
   box-sizing: border-box;
@@ -145,7 +145,7 @@
 }
 
 .coop-search input:focus {
-  border-color: #a855f7;
+  border-color: #8b5cf6;
   box-shadow: 0 0 12px rgba(168, 85, 247, 0.3);
 }
 
@@ -159,15 +159,15 @@
 
 /* Card Section Outer Box */
 .coop-card-wrapper {
-  background: #141026;
-  border: 1px solid #2a2247;
+  background: #ffffff;
+  border: 1px solid #e9d8fb;
   border-radius: 16px;
   padding: 24px;
 }
 
 .coop-section-head {
   font-size: 1.05rem;
-  color: #c084fc;
+  color: #7c3aed;
   margin-bottom: 20px;
   display: flex;
   align-items: center;
@@ -190,8 +190,8 @@
 }
 
 .coop-card {
-  background: #1c1635;
-  border: 1px solid #332854;
+  background: #faf5fd;
+  border: 1px solid #e9d8fb;
   border-radius: 14px;
   padding: 20px;
   transition: transform 0.2s, border-color 0.2s;
@@ -200,7 +200,7 @@
 .coop-card:hover {
   transform: translateY(-2px);
   border-color: #8b5cf6;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 8px 24px rgba(139, 92, 246, 0.15);
 }
 
 .coop-card-top {
@@ -213,7 +213,7 @@
 .coop-card-title {
   font-size: 1.05rem;
   font-weight: 600;
-  color: #f8fafc;
+  color: #1f2937;
   margin: 0 0 8px 0;
 }
 
@@ -221,7 +221,7 @@
   display: flex;
   gap: 16px;
   font-size: 0.85rem;
-  color: #94a3b8;
+  color: #6b7280;
 }
 
 .coop-meta-item {
@@ -233,7 +233,7 @@
 .coop-fav-btn {
   background: none;
   border: none;
-  color: #64748b;
+  color: #9ca3af;
   font-size: 1.3rem;
   cursor: pointer;
   transition: color 0.2s, transform 0.2s;
@@ -250,11 +250,11 @@
 
 /* Keyword Area */
 .coop-keyword-box {
-  background: #120e24;
-  border: 1px dashed #3b2d54;
+  background: #f5edfc;
+  border: 1px dashed #ddd6fe;
   border-radius: 8px;
   padding: 12px 16px;
-  color: #cbd5e1;
+  color: #4b5563;
   font-size: 0.88rem;
   margin-bottom: 18px;
 }
@@ -268,7 +268,7 @@
 .btn-view-video {
   flex: 1;
   background: rgba(168, 85, 247, 0.12);
-  color: #c084fc;
+  color: #7c3aed;
   border: 1px solid #a855f7;
   padding: 10px;
   border-radius: 20px;

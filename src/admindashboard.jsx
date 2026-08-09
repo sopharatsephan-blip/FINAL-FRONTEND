@@ -180,7 +180,7 @@ function AdminDashboard() {
       <aside className="sidebar-purple">
         <div>
           <div className="brand-logo-purple" onClick={() => navigate('/admin')} style={{ cursor: 'pointer' }}>
-            <FaAsterisk className="logo-icon" style={{ color: '#c084fc', marginRight: '8px' }} />
+            <FaAsterisk className="logo-icon" style={{ color: '#7c3aed', marginRight: '8px' }} />
             <span>{t.appName || 'ICT Video Summary'}</span>
           </div>
 
@@ -230,7 +230,7 @@ function AdminDashboard() {
       <main className="main-content-purple">
         <header className="top-header-purple">
           <div className="header-title">
-            <div className="header-icon-box" style={{ background: 'rgba(139, 92, 246, 0.2)', color: '#c084fc', padding: '8px', borderRadius: '8px', display: 'flex' }}>
+            <div className="header-icon-box" style={{ background: 'rgba(139, 92, 246, 0.2)', color: '#7c3aed', padding: '8px', borderRadius: '8px', display: 'flex' }}>
               <FaHome size={18} />
             </div>
             <div>
@@ -264,7 +264,7 @@ function AdminDashboard() {
               🟢 {t.popularVideoTitle || 'Popular Video Rank'}
             </h3>
             {dashboardLoading ? (
-              <div style={{ color: '#94a3b8', fontSize: '14px' }}>กำลังโหลด...</div>
+              <div style={{ color: '#6b7280', fontSize: '14px' }}>กำลังโหลด...</div>
             ) : popularVideo ? (
               <div className="hero-banner-purple">
                 <span className="top-badge">👑 {t.rankBadge || 'Rank 1 This Week'}</span>
@@ -287,7 +287,7 @@ function AdminDashboard() {
               🔹 {t.weeklySummaryListTitle || 'Weekly Video Summaries'}
             </h3>
             {dashboardLoading ? (
-              <div style={{ color: '#94a3b8', fontSize: '14px' }}>กำลังโหลด...</div>
+              <div style={{ color: '#6b7280', fontSize: '14px' }}>กำลังโหลด...</div>
             ) : (
               <ul className="weekly-list-purple">
                 {weeklySummaries.map((video) => (

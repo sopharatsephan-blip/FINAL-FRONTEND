@@ -124,7 +124,7 @@ export default function PublishList() {
         <div>
           {/* Brand Logo - ดอกไม้สีม่วงสว่าง */}
           <div className="brand-logo-purple" onClick={() => navigate('/admin')} style={{ cursor: 'pointer' }}>
-            <FaAsterisk className="logo-icon" style={{ color: '#c084fc', marginRight: '8px' }} size={18} />
+            <FaAsterisk className="logo-icon" style={{ color: '#7c3aed', marginRight: '8px' }} size={18} />
             <span>{t.appName || 'ICT Video Summary'}</span>
           </div>
 
@@ -183,11 +183,11 @@ export default function PublishList() {
         {/* Header Bar */}
         <header className="top-header-purple">
           <div className="header-title">
-            <div className="header-icon-box" style={{ background: 'rgba(139, 92, 246, 0.2)', color: '#c084fc', padding: '8px', borderRadius: '8px', display: 'flex' }}>
+            <div className="header-icon-box" style={{ background: 'rgba(139, 92, 246, 0.2)', color: '#7c3aed', padding: '8px', borderRadius: '8px', display: 'flex' }}>
               <FaGlobe size={18} />
             </div>
             <div>
-              <h2 style={{ margin: 0, color: '#ffffff' }}>
+              <h2 style={{ margin: 0, color: '#4c1d95' }}>
                 {lang === 'en' ? 'Publish Summary' : 'เผยแพร่สรุปเนื้อหา'}
               </h2>
               <p className="subtitle-purple" style={{ margin: '4px 0 0 0' }}>
@@ -213,7 +213,7 @@ export default function PublishList() {
         {/* รายการวิดีโอที่มีสรุปแล้ว จากฐานข้อมูลจริง */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '10px' }}>
           {loading && (
-            <div className="purple-card" style={{ color: '#94a3b8', padding: '24px' }}>
+            <div className="purple-card" style={{ color: '#6b7280', padding: '24px' }}>
               {lang === 'en' ? 'Loading...' : 'กำลังโหลด...'}
             </div>
           )}
@@ -225,7 +225,7 @@ export default function PublishList() {
           )}
 
           {!loading && !error && filtered.length === 0 && (
-            <div className="purple-card" style={{ color: '#94a3b8', padding: '24px' }}>
+            <div className="purple-card" style={{ color: '#6b7280', padding: '24px' }}>
               {lang === 'en' ? 'No summarized video found.' : 'ไม่พบวิดีโอที่สรุปเสร็จแล้ว'}
             </div>
           )}
@@ -237,22 +237,22 @@ export default function PublishList() {
               style={{ width: '100%', padding: '0', cursor: 'pointer', position: 'relative' }}
               onClick={() => navigate(`/publish-summary/${video.VideoID}`)}
               onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(139, 92, 246, 0.08)'}
-              onMouseLeave={(e) => e.currentTarget.style.background = '#150c26'}
+              onMouseLeave={(e) => e.currentTarget.style.background = '#ffffff'}
             >
               <div style={{ padding: '24px 28px' }}>
                 {/* Header การ์ด */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <span style={{ width: '9px', height: '9px', background: '#22c55e', borderRadius: '50%', boxShadow: '0 0 8px #22c55e' }}></span>
-                    <span style={{ color: '#ffffff', fontSize: '0.95rem', fontWeight: '600' }}>
+                    <span style={{ color: '#1f2937', fontSize: '0.95rem', fontWeight: '600' }}>
                       {lang === 'en' ? 'Summary Completed' : 'สรุปเสร็จสิ้น'}
                     </span>
                   </div>
 
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#c4b5fd', fontSize: '0.82rem', fontWeight: '500', background: 'rgba(139, 92, 246, 0.2)', padding: '4px 12px', borderRadius: '20px', border: '1px solid rgba(139, 92, 246, 0.4)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#7c3aed', fontSize: '0.82rem', fontWeight: '500', background: 'rgba(139, 92, 246, 0.2)', padding: '4px 12px', borderRadius: '20px', border: '1px solid rgba(139, 92, 246, 0.4)' }}>
                       <span>{lang === 'en' ? 'Click to view summary' : 'คลิกเพื่อดูสรุป'}</span>
-                      <FaArrowRight size={10} style={{ color: '#c084fc' }} />
+                      <FaArrowRight size={10} style={{ color: '#7c3aed' }} />
                     </div>
 
                     {/* ✅ ปุ่มถังขยะ - ลบวิดีโอ (สไตล์เดียวกับ EditList) */}
@@ -298,7 +298,7 @@ export default function PublishList() {
                     display: 'flex', 
                     alignItems: 'center', 
                     justifyContent: 'center', 
-                    color: '#ffffff', 
+                    color: '#ffffff',
                     flexShrink: 0,
                     boxShadow: '0 4px 12px rgba(139, 92, 246, 0.3)'
                   }}>
@@ -306,12 +306,12 @@ export default function PublishList() {
                   </div>
 
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                    <h3 style={{ color: '#ffffff', margin: 0, fontSize: '1.1rem', fontWeight: '600', lineHeight: '1.4' }}>
-                      {video.Position 
+                    <h3 style={{ color: '#1f2937', margin: 0, fontSize: '1.1rem', fontWeight: '600', lineHeight: '1.4' }}>
+                      {video.Position
                         ? `Internship ตำแหน่ง ${video.Position}${video.CompanyName ? ` | ${video.CompanyName}` : ''}`
                         : video.VideoTitle}
                     </h3>
-                    <p style={{ color: '#cbd5e1', fontSize: '0.88rem', margin: 0 }}>
+                    <p style={{ color: '#6b7280', fontSize: '0.88rem', margin: 0 }}>
                       {video.UploadDate
                         ? new Date(video.UploadDate).toLocaleDateString(lang === 'th' ? 'th-TH' : 'en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
                         : ''}
@@ -350,7 +350,7 @@ export default function PublishList() {
           <div
             onClick={(e) => e.stopPropagation()} // กันไม่ให้คลิกในกล่องแล้วปิด modal
             style={{
-              background: '#150c26',
+              background: '#ffffff',
               border: '1px solid rgba(139, 92, 246, 0.25)',
               borderRadius: '14px',
               padding: '28px',
@@ -377,13 +377,13 @@ export default function PublishList() {
               <FaTrash size={20} />
             </div>
 
-            <h3 style={{ color: '#f1f5f9', margin: '0 0 8px 0', fontSize: '16px', fontWeight: 600 }}>
+            <h3 style={{ color: '#1f2937', margin: '0 0 8px 0', fontSize: '16px', fontWeight: 600 }}>
               {lang === 'en' ? 'Delete this video?' : 'ยืนยันการลบวิดีโอนี้?'}
             </h3>
-            <p style={{ color: '#94a3b8', margin: '0 0 22px 0', fontSize: '13px', lineHeight: 1.6 }}>
+            <p style={{ color: '#6b7280', margin: '0 0 22px 0', fontSize: '13px', lineHeight: 1.6 }}>
               {lang === 'en'
-                ? <>Are you sure you want to delete <strong style={{ color: '#e2e8f0' }}>"{videoToDelete.VideoTitle}"</strong>? This action cannot be undone and all related data will be removed.</>
-                : <>ต้องการลบ <strong style={{ color: '#e2e8f0' }}>"{videoToDelete.VideoTitle}"</strong> ใช่หรือไม่? การกระทำนี้ไม่สามารถย้อนกลับได้ และข้อมูลที่เกี่ยวข้องทั้งหมดจะถูกลบไปด้วย</>
+                ? <>Are you sure you want to delete <strong style={{ color: '#1f2937' }}>"{videoToDelete.VideoTitle}"</strong>? This action cannot be undone and all related data will be removed.</>
+                : <>ต้องการลบ <strong style={{ color: '#1f2937' }}>"{videoToDelete.VideoTitle}"</strong> ใช่หรือไม่? การกระทำนี้ไม่สามารถย้อนกลับได้ และข้อมูลที่เกี่ยวข้องทั้งหมดจะถูกลบไปด้วย</>
               }
             </p>
 
@@ -394,7 +394,7 @@ export default function PublishList() {
                 style={{
                   flex: 1,
                   background: 'transparent',
-                  color: '#cbd5e1',
+                  color: '#374151',
                   border: '1px solid rgba(139, 92, 246, 0.35)',
                   padding: '10px 16px',
                   borderRadius: '8px',

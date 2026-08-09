@@ -203,7 +203,7 @@ export default function UserManagement() {
       <aside className="sidebar-purple">
         <div>
           <div className="brand-logo-purple" onClick={() => navigate('/admin')} style={{ cursor: 'pointer' }}>
-            <FaAsterisk className="logo-icon" style={{ color: '#c084fc', marginRight: '8px' }} />
+            <FaAsterisk className="logo-icon" style={{ color: '#7c3aed', marginRight: '8px' }} />
             <span>{t.appName || 'ICT Video Summary'}</span>
           </div>
 
@@ -257,11 +257,11 @@ export default function UserManagement() {
       <main className="main-content-purple">
         <header className="top-header-purple">
           <div className="header-title">
-            <div className="header-icon-box" style={{ background: 'rgba(139, 92, 246, 0.2)', color: '#c084fc', padding: '8px', borderRadius: '8px', display: 'flex' }}>
+            <div className="header-icon-box" style={{ background: 'rgba(139, 92, 246, 0.2)', color: '#7c3aed', padding: '8px', borderRadius: '8px', display: 'flex' }}>
               <FaUsers size={18} />
             </div>
             <div>
-              <h2 style={{ margin: 0, color: '#ffffff' }}>{lang === 'en' ? 'User Management' : 'จัดการผู้ใช้งาน'}</h2>
+              <h2 style={{ margin: 0, color: '#4c1d95' }}>{lang === 'en' ? 'User Management' : 'จัดการผู้ใช้งาน'}</h2>
               <p className="subtitle-purple" style={{ margin: 0 }}>
                 {lang === 'en' ? 'Manage user roles and system privileges' : 'จัดการบทบาทและสิทธิ์ผู้ใช้งานระบบ'}
               </p>
@@ -284,11 +284,11 @@ export default function UserManagement() {
 
         {/* แถบสถานะผู้ใช้ที่เลือก & ปุ่มจัดการสิทธิ์ */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-          <div style={{ fontSize: '14px', color: '#ffffff' }}>
+          <div style={{ fontSize: '14px', color: '#1f2937' }}>
             {selectedUser
               ? (lang === 'en'
-                  ? <>Selected: <strong style={{ color: '#e9d5ff', textDecoration: 'underline' }}>{selectedUser.name}</strong> ({selectedUser.role})</>
-                  : <>เลือกอยู่: <strong style={{ color: '#e9d5ff', textDecoration: 'underline' }}>{selectedUser.name}</strong> ({selectedUser.role})</>)
+                  ? <>Selected: <strong style={{ color: '#7c3aed', textDecoration: 'underline' }}>{selectedUser.name}</strong> ({selectedUser.role})</>
+                  : <>เลือกอยู่: <strong style={{ color: '#7c3aed', textDecoration: 'underline' }}>{selectedUser.name}</strong> ({selectedUser.role})</>)
               : (lang === 'en' ? 'Click a row below to select a user' : 'คลิกที่แถวในตารางเพื่อเลือกผู้ใช้')}
           </div>
 
@@ -323,7 +323,7 @@ export default function UserManagement() {
 
             <div style={{ display: 'flex', gap: '10px' }}>
               <div className="search-box-purple" style={{ minWidth: '220px', padding: '6px 14px' }}>
-                <FaSearch style={{ color: '#ffffff', fontSize: '12px' }} />
+                <FaSearch style={{ color: '#7c3aed', fontSize: '12px' }} />
                 <input 
                   type="text" 
                   value={searchTerm}
@@ -346,7 +346,7 @@ export default function UserManagement() {
           </div>
 
           {loading ? (
-            <p style={{ textAlign: 'center', padding: '30px 0', color: '#ffffff' }}>
+            <p style={{ textAlign: 'center', padding: '30px 0', color: '#6b7280' }}>
               {lang === 'en' ? 'Loading users...' : 'กำลังโหลดข้อมูล...'}
             </p>
           ) : error ? (
@@ -354,7 +354,7 @@ export default function UserManagement() {
               {error}
             </p>
           ) : filteredUsers.length === 0 ? (
-            <p style={{ textAlign: 'center', padding: '30px 0', color: '#ffffff' }}>
+            <p style={{ textAlign: 'center', padding: '30px 0', color: '#6b7280' }}>
               {lang === 'en' ? 'No users found' : 'ไม่พบข้อมูลผู้ใช้งาน'}
             </p>
           ) : (
@@ -377,11 +377,11 @@ export default function UserManagement() {
                     >
                       <td>
                         <div style={{ display: 'flex', flexDirection: 'column' }}>
-                          <span style={{ fontWeight: '600', color: '#ffffff' }}>{user.name}</span>
-                          <span style={{ fontSize: '12px', color: '#e9d5ff', fontWeight: '500' }}>{user.id}</span>
+                          <span style={{ fontWeight: '600', color: '#1f2937' }}>{user.name}</span>
+                          <span style={{ fontSize: '12px', color: '#7c3aed', fontWeight: '500' }}>{user.id}</span>
                         </div>
                       </td>
-                      <td style={{ color: '#ffffff', fontWeight: '400' }}>{user.username}</td>
+                      <td style={{ color: '#1f2937', fontWeight: '400' }}>{user.username}</td>
                       <td style={{ textAlign: 'center' }}>
                         <span className={`role-badge-purple ${user.role === 'Admin' ? 'admin' : ''}`}>
                           {user.role}
@@ -402,7 +402,7 @@ export default function UserManagement() {
           <div className="modal-content-purple" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header-purple">
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                {confirmAction === 'makeAdmin' ? <FaUserShield style={{ color: '#c084fc' }} /> : <FaUserMinus style={{ color: '#ef4444' }} />}
+                {confirmAction === 'makeAdmin' ? <FaUserShield style={{ color: '#7c3aed' }} /> : <FaUserMinus style={{ color: '#ef4444' }} />}
                 <h3>
                   {confirmAction === 'makeAdmin'
                     ? (lang === 'en' ? 'Make Admin' : 'แต่งตั้ง Admin')
@@ -414,11 +414,11 @@ export default function UserManagement() {
               </button>
             </div>
 
-            <p style={{ color: '#ffffff', fontSize: '13.5px', margin: '0 0 16px', lineHeight: 1.5 }}>
+            <p style={{ color: '#6b7280', fontSize: '13.5px', margin: '0 0 16px', lineHeight: 1.5 }}>
               {confirmAction === 'makeAdmin'
                 ? (lang === 'en'
-                    ? <>You are about to make <strong style={{ color: '#e9d5ff' }}>{selectedUser.name}</strong> an Admin. Enter your password to confirm.</>
-                    : <>คุณกำลังจะแต่งตั้ง <strong style={{ color: '#e9d5ff' }}>{selectedUser.name}</strong> เป็น Admin กรุณาใส่รหัสผ่านของคุณเพื่อยืนยัน</>)
+                    ? <>You are about to make <strong style={{ color: '#7c3aed' }}>{selectedUser.name}</strong> an Admin. Enter your password to confirm.</>
+                    : <>คุณกำลังจะแต่งตั้ง <strong style={{ color: '#7c3aed' }}>{selectedUser.name}</strong> เป็น Admin กรุณาใส่รหัสผ่านของคุณเพื่อยืนยัน</>)
                 : (lang === 'en'
                     ? <>You are about to remove Admin rights from <strong style={{ color: '#ef4444' }}>{selectedUser.name}</strong>. Enter your password to confirm.</>
                     : <>คุณกำลังจะถอดสิทธิ์ Admin ของ <strong style={{ color: '#ef4444' }}>{selectedUser.name}</strong> กรุณาใส่รหัสผ่านของคุณเพื่อยืนยัน</>)}
@@ -427,7 +427,7 @@ export default function UserManagement() {
             <form onSubmit={handleConfirmSubmit}>
               <div className="form-group-purple">
                 <div style={{ position: 'relative' }}>
-                  <FaLock style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#ffffff', fontSize: '13px' }} />
+                  <FaLock style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#7c3aed', fontSize: '13px' }} />
                   <input
                     type="password"
                     autoFocus
@@ -450,7 +450,7 @@ export default function UserManagement() {
                 <button
                   type="button"
                   className="reset-btn-purple"
-                  style={{ flex: 1, color: '#ffffff', borderColor: 'rgba(255,255,255,0.4)' }}
+                  style={{ flex: 1, color: '#4c1d95', borderColor: 'rgba(139, 92, 246, 0.35)' }}
                   onClick={closeConfirm}
                   disabled={confirmLoading}
                 >

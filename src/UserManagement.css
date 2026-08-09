@@ -4,16 +4,16 @@
 .admin-purple-container {
   display: flex;
   min-height: 100vh;
-  background: #0b0715;
+  background: #ffffff;
   font-family: 'Sarabun', 'Segoe UI', sans-serif;
-  color: #ffffff; /* ปรับข้อความหลักเป็นสีขาว */
+  color: #1f2937;
 }
 
 /* ===== Sidebar ===== */
 .sidebar-purple {
   width: 240px;
-  background: #150c26;
-  border-right: 1px solid rgba(139, 92, 246, 0.15);
+  background: #f5edfc;
+  border-right: 1px solid #ddd6fe;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -26,7 +26,7 @@
   margin-bottom: 20px;
   font-weight: bold;
   font-size: 16px;
-  color: #ffffff;
+  color: #4c1d95;
 }
 
 .user-profile-purple {
@@ -55,12 +55,12 @@
 .user-info-purple h4 {
   margin: 0;
   font-size: 14px;
-  color: #ffffff;
+  color: #4c1d95;
 }
 
 .role-tag {
   font-size: 11px;
-  color: #e9d5ff; /* สีม่วงสว่างเกือบขาว */
+  color: #7c3aed;
   font-weight: 500;
 }
 
@@ -78,7 +78,7 @@
   border: none;
   background: transparent;
   border-radius: 10px;
-  color: #f1f5f9; /* เปลี่ยนให้สว่างเป็นสีขาวนวล */
+  color: #374151;
   font-weight: 500;
   font-size: 14px;
   cursor: pointer;
@@ -89,7 +89,7 @@
 
 .menu-item-purple:hover {
   background: rgba(139, 92, 246, 0.12);
-  color: #ffffff;
+  color: #4c1d95;
 }
 
 .menu-item-purple.active {
@@ -137,7 +137,7 @@
 
 .subtitle-purple {
   margin: 2px 0 0;
-  color: #cbd5e1; /* เปลี่ยนจากสีกรมมืดเป็นสีขาวสว่าง */
+  color: #6b7280;
   font-size: 13px;
 }
 
@@ -156,7 +156,7 @@
   border-radius: 10px;
   background: rgba(139, 92, 246, 0.15);
   border: 1px solid rgba(139, 92, 246, 0.35);
-  color: #c084fc;
+  color: #7c3aed;
   cursor: pointer;
   transition: background 0.15s ease, border-color 0.15s ease;
 }
@@ -173,7 +173,7 @@
   gap: 6px;
   background: rgba(139, 92, 246, 0.18);
   border: 1px solid rgba(139, 92, 246, 0.4);
-  color: #ffffff;
+  color: #4c1d95;
   padding: 8px 14px;
   border-radius: 999px;
   font-size: 13px;
@@ -184,7 +184,7 @@
 }
 
 .lang-toggle-purple svg {
-  color: #c084fc;
+  color: #7c3aed;
 }
 
 .lang-toggle-purple:hover {
@@ -196,7 +196,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  background: #150c26;
+  background: #f5edfc;
   border: 1px solid rgba(139, 92, 246, 0.35);
   border-radius: 999px;
   padding: 10px 18px;
@@ -207,27 +207,27 @@
   background: transparent;
   border: none;
   outline: none;
-  color: #ffffff; /* ปรับตัวอักษรค้นหาเป็นสีขาว */
+  color: #1f2937;
   width: 100%;
   font-size: 14px;
 }
 
 .search-box-purple input::placeholder {
-  color: #94a3b8; /* สี Placeholder อ่านง่าย */
+  color: #9ca3af;
 }
 
 /* ===== Cards & Inputs ===== */
 .purple-card {
-  background: #150c26;
+  background: #ffffff;
   border-radius: 14px;
   padding: 20px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
-  border: 1px solid rgba(139, 92, 246, 0.2);
+  box-shadow: 0 2px 10px rgba(139, 92, 246, 0.12);
+  border: 1px solid #e9d8fb;
 }
 
 .card-title-purple {
   font-size: 15px;
-  color: #ffffff; /* สีขาวเด่น */
+  color: #4c1d95;
   margin: 0 0 14px;
 }
 
@@ -242,8 +242,8 @@
   padding: 10px 12px;
   border-radius: 8px;
   border: 1px solid rgba(139, 92, 246, 0.35);
-  background: #0f0920;
-  color: #ffffff; /* ข้อความใน Dropdown/Input เป็นสีขาว */
+  background: #ffffff;
+  color: #1f2937;
   font-size: 14px;
   outline: none;
 }
@@ -254,7 +254,7 @@
   border-radius: 8px;
   padding: 6px 14px;
   font-size: 13px;
-  color: #ffffff;
+  color: #4c1d95;
   cursor: pointer;
 }
 
@@ -278,7 +278,7 @@
   gap: 8px;
   background: rgba(139, 92, 246, 0.12);
   border: 1px solid rgba(139, 92, 246, 0.25);
-  color: #94a3b8;
+  color: #6b7280;
   padding: 8px 16px;
   border-radius: 8px;
   font-size: 13px;
@@ -300,7 +300,7 @@
   gap: 8px;
   background: rgba(239, 68, 68, 0.1);
   border: 1px solid rgba(239, 68, 68, 0.2);
-  color: #94a3b8;
+  color: #6b7280;
   padding: 8px 16px;
   border-radius: 8px;
   font-size: 13px;
@@ -326,7 +326,7 @@
 .purple-table th {
   padding: 12px 14px;
   border-bottom: 1px solid rgba(139, 92, 246, 0.25);
-  color: #e2e8f0; /* หัวตารางปรับสว่างเป็นสีเทา-ขาว */
+  color: #4c1d95;
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.5px;
@@ -335,7 +335,7 @@
 .purple-table td {
   padding: 14px;
   border-bottom: 1px solid rgba(139, 92, 246, 0.12);
-  color: #ffffff; /* ตัวหนังสือในตารางเป็นสีขาวสว่าง */
+  color: #1f2937;
   cursor: pointer;
 }
 
@@ -349,9 +349,9 @@
 
 .role-badge-purple {
   display: inline-block;
-  background: rgba(255, 255, 255, 0.1);
-  color: #ffffff; /* ข้อความ Badge ปรับเป็นสีขาว */
-  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(139, 92, 246, 0.12);
+  color: #4c1d95;
+  border: 1px solid rgba(139, 92, 246, 0.3);
   padding: 4px 12px;
   border-radius: 999px;
   font-size: 12px;
@@ -360,7 +360,7 @@
 
 .role-badge-purple.admin {
   background: rgba(139, 92, 246, 0.35);
-  color: #ffffff; /* ปรับข้อความ Admin เป็นสีขาว */
+  color: #ffffff;
   border: 1px solid rgba(192, 132, 252, 0.6);
 }
 
@@ -378,11 +378,11 @@
 .modal-content-purple {
   width: 400px;
   max-width: 90vw;
-  background: #150c26;
+  background: #ffffff;
   border: 1px solid rgba(139, 92, 246, 0.4);
   border-radius: 14px;
   padding: 20px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 10px 30px rgba(139, 92, 246, 0.2);
 }
 
 .modal-header-purple {
@@ -395,19 +395,19 @@
 .modal-header-purple h3 {
   margin: 0;
   font-size: 16px;
-  color: #ffffff;
+  color: #4c1d95;
 }
 
 .btn-close-modal {
   background: transparent;
   border: none;
-  color: #cbd5e1;
+  color: #6b7280;
   cursor: pointer;
   font-size: 16px;
 }
 
 .btn-close-modal:hover {
-  color: #ffffff;
+  color: #4c1d95;
 }
 
 @media (max-width: 900px) {

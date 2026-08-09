@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from './LanguageContext';
 import './UploadVideo.css';
@@ -23,6 +23,14 @@ export default function UploadVideo() {
   const [isUploading, setIsUploading] = useState(false);
   const [isSummarizing, setIsSummarizing] = useState(false);
   const [uploadError, setUploadError] = useState('');
+  const [currentUser, setCurrentUser] = useState(null);
+
+  useEffect(() => {
+    const savedUser = localStorage.getItem('user');
+    if (savedUser) {
+      try { setCurrentUser(JSON.parse(savedUser)); } catch (e) {}
+    }
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem('user');
@@ -135,14 +143,14 @@ export default function UploadVideo() {
             onClick={() => navigate('/admin')} 
             style={{ cursor: 'pointer' }}
           >
-            <FaAsterisk style={{ color: '#c084fc' }} />
+            <FaAsterisk style={{ color: '#7c3aed' }} />
             <span>{t.appName || 'ICT Video Summary'}</span>
           </div>
 
           <div className="user-profile-purple">
-            <div className="avatar-purple">S</div>
+            <div className="avatar-purple">{currentUser?.firstName?.charAt(0) || 'S'}</div>
             <div className="user-info-purple">
-              <h4>Somchai Jaidee</h4>
+              <h4>{currentUser ? `${currentUser.firstName} ${currentUser.lastName}` : 'Somchai Jaidee'}</h4>
               <span className="role-tag">Admin</span>
             </div>
           </div>
@@ -255,7 +263,7 @@ export default function UploadVideo() {
             )}
 
             {isSummarizing && (
-              <p style={{ color: '#c084fc', marginTop: '12px', fontSize: '14px' }}>
+              <p style={{ color: '#7c3aed', marginTop: '12px', fontSize: '14px' }}>
                 {lang === 'en'
                   ? '⏳ Transcribing and summarizing video, this may take a while...'
                   : '⏳ กำลังถอดเสียงและสรุปวิดีโอ อาจใช้เวลาสักครู่...'}
