@@ -44,11 +44,11 @@ export default function UserManagement() {
   // แปลง RoleID จากฐานข้อมูล -> ชื่อ Role ที่แสดงผล
   const roleIdToName = {
     R001: 'Admin',
-    R002: 'Student',
+    R002: 'Watcher',
   };
   const roleNameToId = {
     Admin: 'R001',
-    Student: 'R002',
+    Watcher: 'R002',
   };
 
   useEffect(() => {
@@ -155,7 +155,7 @@ export default function UserManagement() {
       return;
     }
 
-    const newRole = confirmAction === 'makeAdmin' ? roleNameToId.Admin : roleNameToId.Student;
+    const newRole = confirmAction === 'makeAdmin' ? roleNameToId.Admin : roleNameToId.Watcher;
 
     setConfirmLoading(true);
     setConfirmError('');
@@ -340,7 +340,7 @@ export default function UserManagement() {
               >
                 <option value="All">{lang === 'en' ? 'All Roles' : 'ทุกบทบาท'}</option>
                 <option value="Admin">Admin</option>
-                <option value="Student">Student</option>
+                <option value="Watcher">Watcher</option>
               </select>
             </div>
           </div>

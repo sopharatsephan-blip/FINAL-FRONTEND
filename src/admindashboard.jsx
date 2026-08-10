@@ -14,12 +14,6 @@ import {
   FaArrowLeft
 } from 'react-icons/fa';
 
-// ✅ helper: แปลง Duration "15:30" → "15:30 mins"
-function formatDuration(duration) {
-  if (!duration) return '-';
-  return `${duration} mins`;
-}
-
 // ✅ helper: แปลงวันที่เป็น "30 January 2026" หรือ "30 มกราคม 2026"
 function formatDate(dateStr, lang) {
   if (!dateStr) return '-';
@@ -273,7 +267,6 @@ function AdminDashboard() {
                   <p>{popularVideo.CompanyName} · {popularVideo.Position}</p>
                   <div className="stats-purple">
                     <span>👁️ {popularVideo.ViewCount} {t.viewsCount || 'views'}</span>
-                    <span>⏱️ {formatDuration(popularVideo.Duration)}</span>
                   </div>
                 </div>
                 <div className="chart-icon">📈</div>
@@ -295,7 +288,7 @@ function AdminDashboard() {
                     <div>
                       <strong>{video.VideoTitle}</strong>
                       <p>
-                        {formatDate(video.UploadDate, lang)} · {formatDuration(video.Duration)} · {video.ViewCount} views
+                        {formatDate(video.UploadDate, lang)} · {video.ViewCount} views
                       </p>
                     </div>
                     <span className="purple-badge">{getCategoryBadge(video.Position)}</span>
