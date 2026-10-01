@@ -11,6 +11,55 @@ import {
 
 const API_BASE = 'http://localhost:5000/api'; // เปลี่ยนเป็น base URL จริงของ backend คุณ
 
+const getSummaryName = (summaryContent = '') => {
+  const lines = summaryContent.split(/\r?\n/).map(line => line.trim());
+  const topicHeadings = ['ชื่อหน่วยงานและสถานประกอบการ', 'ตำแหน่งและลักษณะงานที่ทำ'];
+  const answers = [1, 2].map(number => {
+    const lineIndex = lines.findIndex(line => new RegExp(`^${number}\\.\\s*`).test(line));
+    if (lineIndex === -1) return '';
+
+    const answer = lines[lineIndex].replace(new RegExp(`^${number}\\.\\s*`), '').trim();
+    const normalizedAnswer = answer.replace(/[:：]$/, '').trim();
+    if (answer && !topicHeadings.includes(normalizedAnswer)) return answer;
+
+    for (let index = lineIndex + 1; index < lines.length; index += 1) {
+      if (!lines[index]) continue;
+      if (/^\d+\.\s*/.test(lines[index])) break;
+      return lines[index];
+    }
+    return '';
+  });
+
+  return answers.filter(Boolean).join(' - ');
+};
+
+const requestFieldSuggestions = async (id, lang, setSuggestionStatus, setFormData) => {
+  setSuggestionStatus(lang === 'en' ? 'Typhoon is suggesting dropdown values...' : 'Typhoon กำลังแนะนำค่าใน Dropdown...');
+  try {
+    const res = await fetch(`${API_BASE}/summaries/${id}/suggestions`, { method: 'POST' });
+    if (!res.ok) throw new Error('ไม่สามารถขอคำแนะนำได้');
+    const data = await res.json();
+    const suggestions = data.suggestions || {};
+    const hasSuggestions = Object.values(suggestions).some(Boolean);
+
+    setFormData((prev) => ({
+      ...prev,
+      province: prev.province || suggestions.province || '',
+      workStyle: prev.workStyle || suggestions.workStyle || '',
+      position: prev.position || suggestions.position || '',
+      businessType: prev.businessType || suggestions.businessType || '',
+    }));
+    setSuggestionStatus(
+      hasSuggestions
+        ? (lang === 'en' ? 'Typhoon suggested defaults. Review or change them before saving.' : 'Typhoon เติมคำแนะนำแล้ว ตรวจสอบหรือเปลี่ยนค่าได้ก่อนบันทึก')
+        : (lang === 'en' ? 'No confident suggestions. Please select the dropdown values.' : 'Typhoon ยังแนะนำค่าไม่ได้ โปรดเลือกข้อมูลใน Dropdown เอง')
+    );
+  } catch (err) {
+    console.error('Field suggestions error:', err);
+    setSuggestionStatus(lang === 'en' ? 'Suggestions are unavailable. You can select the values manually.' : 'ขอคำแนะนำไม่สำเร็จ สามารถเลือกข้อมูลเองได้');
+  }
+};
+
 export default function EditSummary() {
   const navigate = useNavigate();
   const { videoId } = useParams(); // route: /edit-summary-detail/:videoId
@@ -40,6 +89,7 @@ export default function EditSummary() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [sharing, setSharing] = useState(false);
+  const [suggestionStatus, setSuggestionStatus] = useState('');
   const [error, setError] = useState(null);
   const [shareError, setShareError] = useState(''); // ✅ ข้อความแจ้งเตือนตอนยังกรอก dropdown ไม่ครบก่อนกด Share
   const [showSuccessModal, setShowSuccessModal] = useState(false); // ✅ ป๊อปอัปแจ้งบันทึกสำเร็จ
@@ -90,13 +140,16 @@ export default function EditSummary() {
         const data = await res.json();
         setSummaryId(data.summaryId); // เก็บไว้ใช้ตอน PUT
         setFormData({
-          company: data.company,
+          company: getSummaryName(data.summaryContent),
           province: data.province,
           workStyle: data.workStyle,
           position: data.position,
           businessType: data.businessType,
           summaryContent: data.summaryContent,
         });
+        if ([data.province, data.workStyle, data.position, data.businessType].some((value) => !value)) {
+          void requestFieldSuggestions(data.summaryId, lang, setSuggestionStatus, setFormData);
+        }
       } catch (err) {
         console.error(err);
         setError(lang === 'en' ? 'Failed to load summary data' : 'ไม่สามารถโหลดข้อมูลสรุปได้');
@@ -115,7 +168,10 @@ export default function EditSummary() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData(prev => ({
+      ...prev,
+      [name]: value,
+    }));
     if (shareError) setShareError(''); // เคลียร์ข้อความเตือนทันทีที่ผู้ใช้เริ่มแก้ไข
   };
 
@@ -135,6 +191,7 @@ export default function EditSummary() {
           province: formData.province,
           workStyle: formData.workStyle,
           businessType: formData.businessType,
+          position: formData.position,
           summaryContent: formData.summaryContent,
         }),
       });
@@ -330,9 +387,14 @@ export default function EditSummary() {
               )}
 
               <form className="edit-form-purple" onSubmit={handleSave}>
+                {suggestionStatus && (
+                  <p className="ai-suggestion-status" role="status" aria-live="polite">
+                    {suggestionStatus}
+                  </p>
+                )}
                 <div className="form-group-purple">
                   <label>{lang === 'en' ? 'Name Summary' : 'ชื่อสรุป'} <span className="req-star">*</span></label>
-                  <input type="text" name="company" value={formData.company} onChange={handleChange} className="input-purple" />
+                  <input type="text" name="company" value={formData.company} onChange={handleChange} maxLength={100} className="input-purple" />
                 </div>
 
                 <div className="form-row-purple">

@@ -260,6 +260,34 @@
   transition: opacity 0.35s ease, transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
+.summary-question-answer-list {
+  display: grid;
+  gap: 12px;
+}
+
+.summary-question-answer {
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(124, 58, 237, 0.16);
+}
+
+.summary-question-answer:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.summary-question-answer h6 {
+  margin: 0 0 4px;
+  color: #6d28d9;
+  font-size: 14px;
+}
+
+.summary-question-answer p {
+  margin: 0;
+  color: #374151;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
 .summary-expand-panel.open .summary-expand-inner {
   opacity: 1;
   transform: translateY(0);

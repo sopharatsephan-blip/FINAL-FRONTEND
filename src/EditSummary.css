@@ -38,6 +38,12 @@
   gap: 16px;
 }
 
+.ai-suggestion-status {
+  margin: 0;
+  color: #6d28d9;
+  font-size: 13px;
+}
+
 .form-group-purple {
   display: flex;
   flex-direction: column;

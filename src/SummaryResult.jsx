@@ -23,6 +23,28 @@ import {
   FaChevronDown
 } from 'react-icons/fa';
 
+const SUMMARY_QUESTIONS = [
+  'ชื่อหน่วยงาน',
+  'ตำแหน่งงาน',
+  'โปรเจ็ค',
+  'ปัญหาที่พบ',
+  'สิ่งที่ได้จากการฝึกงาน',
+  'คิดจะเปลี่ยนแนวทางการทำงานหรือไม่',
+  'แนะนำรุ่นน้องหรือไม่',
+  'ข้อเสนอแนะ',
+];
+
+const SUMMARY_TOPIC_HINTS = [
+  ['ชื่อหน่วยงาน', 'สถานประกอบการ'],
+  ['ตำแหน่ง'],
+  ['โปรเจ', 'project', 'งานที่ทำระหว่างฝึกงาน'],
+  ['ปัญหาที่พบ'],
+  ['สิ่งที่ได้', 'ได้จากการฝึกงาน'],
+  ['จากประสบการณ์', 'เปลี่ยนแนวอาชีพ', 'คิดจะเปลี่ยน'],
+  ['แนะนำรุ่นน้อง', 'ควรจะให้รุ่นน้อง', 'หน่วยงานที่นักศึกษา'],
+  ['ข้อเสนอแนะ'],
+];
+
 export default function SummaryResult() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -132,6 +154,40 @@ export default function SummaryResult() {
       }
     });
   };
+
+  const summaryLines = (dbSummary?.SummaryText || '')
+    .split(/\r?\n/)
+    .map(line => line.trim())
+    .filter(Boolean);
+  const summaryAnswers = Array(SUMMARY_QUESTIONS.length).fill('');
+  let activeSummaryQuestion = null;
+
+  for (const line of summaryLines) {
+    const numberedLine = line.match(/^(\d+)[.)]\s*(.*)$/);
+    if (numberedLine) {
+      const questionIndex = Number(numberedLine[1]) - 1;
+      const content = numberedLine[2].trim();
+      const headingHints = SUMMARY_TOPIC_HINTS[questionIndex] || [];
+      const isQuestionHeading = headingHints.some(hint =>
+        content.toLocaleLowerCase().includes(hint.toLocaleLowerCase())
+      );
+
+      if (isQuestionHeading) {
+        activeSummaryQuestion = questionIndex;
+      } else if (questionIndex >= 0 && questionIndex < summaryAnswers.length) {
+        summaryAnswers[questionIndex] = content;
+        activeSummaryQuestion = null;
+      }
+      continue;
+    }
+
+    if (activeSummaryQuestion !== null) {
+      summaryAnswers[activeSummaryQuestion] = [
+        summaryAnswers[activeSummaryQuestion],
+        line,
+      ].filter(Boolean).join('\n');
+    }
+  }
 
   return (
     <div className="admin-purple-container">
@@ -332,9 +388,20 @@ export default function SummaryResult() {
                       <h5 style={{ color: '#7c3aed', marginTop: 0 }}>
                         {lang === 'en' ? 'Summary Text:' : 'ข้อความสรุป:'}
                       </h5>
-                      <p style={{ whiteSpace: 'pre-wrap', color: '#374151', lineHeight: '1.6' }}>
-                        {dbSummary.SummaryText || (lang === 'en' ? '(No data)' : '(ไม่มีข้อมูล)')}
-                      </p>
+                      {summaryAnswers.length > 0 ? (
+                        <div className="summary-question-answer-list">
+                          {SUMMARY_QUESTIONS.map((question, index) => (
+                            <div className="summary-question-answer" key={question}>
+                              <h6>{index + 1}. {question}</h6>
+                              <p>{summaryAnswers[index] || (lang === 'en' ? '(No answer)' : '(ไม่มีคำตอบ)')}</p>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p style={{ whiteSpace: 'pre-wrap', color: '#374151', lineHeight: '1.6' }}>
+                          {lang === 'en' ? '(No data)' : '(ไม่มีข้อมูล)'}
+                        </p>
+                      )}
 
                       <h5 style={{ color: '#7c3aed', marginTop: '16px' }}>
                         {lang === 'en' ? 'Full Transcript:' : 'ข้อความถอดเสียงเต็ม:'}
