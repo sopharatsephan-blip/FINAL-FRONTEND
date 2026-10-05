@@ -6,26 +6,36 @@ import './EditSummary.css';
 
 import { 
   FaHome, FaVideo, FaEdit, FaGlobe, FaUsers, FaSignOutAlt, 
-  FaAsterisk, FaSave, FaArrowLeft, FaShareAlt, FaCheck
+  FaSave, FaArrowLeft, FaShareAlt, FaCheck
 } from 'react-icons/fa';
 
 const API_BASE = 'http://localhost:5000/api'; // เปลี่ยนเป็น base URL จริงของ backend คุณ
 
 const getSummaryName = (summaryContent = '') => {
   const lines = summaryContent.split(/\r?\n/).map(line => line.trim());
-  const topicHeadings = ['ชื่อหน่วยงานและสถานประกอบการ', 'ตำแหน่งและลักษณะงานที่ทำ'];
-  const answers = [1, 2].map(number => {
-    const lineIndex = lines.findIndex(line => new RegExp(`^${number}\\.\\s*`).test(line));
-    if (lineIndex === -1) return '';
+  const topicHeadings = [
+    [
+      'ชื่อหน่วยงานและสถานประกอบการที่นักศึกษาไปฝึกงานคืออะไร?',
+      'ชื่อหน่วยงานและสถานประกอบการ',
+    ],
+    [
+      'นักศึกษาฝึกงานในตำแหน่งใด และลักษณะงานที่ทำเป็นอย่างไร?',
+      'ตำแหน่งและลักษณะงานที่ทำ',
+    ],
+  ];
+  const answers = topicHeadings.map((headings, topicIndex) => {
+    const topicNumber = topicIndex + 1;
+    const topicLineIndex = lines.findIndex(line => new RegExp(`^${topicNumber}[.)、]\\s*`).test(line));
+    if (topicLineIndex === -1) return '';
 
-    const answer = lines[lineIndex].replace(new RegExp(`^${number}\\.\\s*`), '').trim();
-    const normalizedAnswer = answer.replace(/[:：]$/, '').trim();
-    if (answer && !topicHeadings.includes(normalizedAnswer)) return answer;
+    let answer = lines[topicLineIndex].replace(new RegExp(`^${topicNumber}[.)、]\\s*`), '').trim();
+    const heading = headings.find(candidate => answer.startsWith(candidate));
+    if (heading) answer = answer.slice(heading.length).replace(/^[\s:：\-–—]+/, '').trim();
+    if (answer) return answer;
 
-    for (let index = lineIndex + 1; index < lines.length; index += 1) {
-      if (!lines[index]) continue;
-      if (/^\d+\.\s*/.test(lines[index])) break;
-      return lines[index];
+    for (let index = topicLineIndex + 1; index < lines.length; index += 1) {
+      if (/^\d+[.)、]\s*/.test(lines[index])) break;
+      if (lines[index]) return lines[index];
     }
     return '';
   });
@@ -227,13 +237,24 @@ export default function EditSummary() {
     }
     setSharing(true);
     try {
-      await fetch(`${API_BASE}/summaries/${summaryId}`, {
+      const res = await fetch(`${API_BASE}/summaries/${summaryId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ position: formData.position }),
+        body: JSON.stringify({
+          company: formData.company,
+          position: formData.position,
+          isSharing: true,
+        }),
       });
+      if (!res.ok) throw new Error('บันทึกข้อมูลก่อนแชร์ไม่สำเร็จ');
     } catch (err) {
       console.error('Failed to save position before share:', err);
+      setShareError(
+        lang === 'en'
+          ? 'Failed to save the company name before sharing. Please try again.'
+          : 'บันทึกชื่อหน่วยงานก่อนแชร์ไม่สำเร็จ กรุณาลองอีกครั้ง'
+      );
+      return;
     } finally {
       setSharing(false);
     }
@@ -246,7 +267,7 @@ export default function EditSummary() {
   };
 
   return (
-    <div className="admin-purple-container">
+    <div className="admin-purple-container admin-workspace-page">
       {/* ===== Sidebar ===== */}
       <aside className="sidebar-purple">
         <div>
@@ -255,7 +276,7 @@ export default function EditSummary() {
             onClick={() => navigate('/admin')}
             style={{ cursor: 'pointer' }}
           >
-            <FaAsterisk className="logo-icon" style={{ color: '#7c3aed', marginRight: '8px' }} />
+            <img className="brand-logo-image" src="/video-summary-logo.png" alt="" />
             <span>{t.appName || 'ICT Video Summary'}</span>
           </div>
 
@@ -264,7 +285,9 @@ export default function EditSummary() {
               {currentUser ? currentUser.firstName.charAt(0) : 'S'}
             </div>
             <div className="user-info-purple">
-              <h4>{currentUser ? `${currentUser.firstName} ${currentUser.lastName}` : 'Somchai Jaidee'}</h4>
+              <h4>
+                {currentUser ? `${currentUser.firstName} ${currentUser.lastName}` : 'Somchai Jaidee'}
+              </h4>
               <span className="role-tag">Admin</span>
             </div>
           </div>
@@ -306,10 +329,10 @@ export default function EditSummary() {
         <header className="top-header-purple">
           <div className="header-title">
             <div
-              className="header-icon-box"
-              style={{ background: 'rgba(139, 92, 246, 0.2)', color: '#7c3aed', padding: '8px', borderRadius: '8px', display: 'flex' }}
+              className="header-icon-box edit-summary-title-icon"
+              aria-hidden="true"
             >
-              <FaEdit size={18} />
+              <img src="/edit-summary-icon.png" alt="" />
             </div>
             <div>
               <h2 style={{ margin: 0 }}>{t.editSummary || 'Edit Summary'}</h2>

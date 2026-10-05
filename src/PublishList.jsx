@@ -11,13 +11,37 @@ import {
   FaUsers, 
   FaSignOutAlt, 
   FaPlay,
-  FaAsterisk,
   FaArrowRight,
   FaArrowLeft,
-  FaTrash
+  FaTrash,
+  FaNetworkWired,
+  FaDatabase,
+  FaRobot,
+  FaPalette,
+  FaCode,
+  FaBug,
+  FaMobileAlt,
+  FaServer,
+  FaHeadset,
+  FaBriefcase
 } from 'react-icons/fa';
 
 const API_BASE = 'http://localhost:5000/api';
+
+function getPositionIcon(position) {
+  const normalizedPosition = (position || '').toLowerCase();
+
+  if (normalizedPosition.includes('network')) return FaNetworkWired;
+  if (normalizedPosition.includes('data') || normalizedPosition.includes('database')) return FaDatabase;
+  if (normalizedPosition.includes('ai') || normalizedPosition.includes('ml')) return FaRobot;
+  if (normalizedPosition.includes('ux') || normalizedPosition.includes('ui') || normalizedPosition.includes('graphic') || normalizedPosition.includes('design')) return FaPalette;
+  if (normalizedPosition.includes('qa') || normalizedPosition.includes('tester') || normalizedPosition.includes('test')) return FaBug;
+  if (normalizedPosition.includes('mobile')) return FaMobileAlt;
+  if (normalizedPosition.includes('system') || normalizedPosition.includes('devops') || normalizedPosition.includes('administrator')) return FaServer;
+  if (normalizedPosition.includes('support')) return FaHeadset;
+  if (normalizedPosition.includes('developer') || normalizedPosition.includes('engineer')) return FaCode;
+  return FaBriefcase;
+}
 
 export default function PublishList() {
   const navigate = useNavigate();
@@ -118,13 +142,13 @@ export default function PublishList() {
   );
 
   return (
-    <div className="admin-purple-container">
+    <div className="admin-purple-container admin-workspace-page">
       {/* ===== Sidebar ม่วงเข้ม (สไตล์ Admin Dashboard) ===== */}
       <aside className="sidebar-purple">
         <div>
           {/* Brand Logo - ดอกไม้สีม่วงสว่าง */}
           <div className="brand-logo-purple" onClick={() => navigate('/admin')} style={{ cursor: 'pointer' }}>
-            <FaAsterisk className="logo-icon" style={{ color: '#7c3aed', marginRight: '8px' }} size={18} />
+            <img className="brand-logo-image" src="/video-summary-logo.png" alt="" />
             <span>{t.appName || 'ICT Video Summary'}</span>
           </div>
 
@@ -134,7 +158,9 @@ export default function PublishList() {
               {currentUser && currentUser.firstName ? currentUser.firstName.charAt(0) : 'S'}
             </div>
             <div className="user-info-purple">
-              <h4>{currentUser ? `${currentUser.firstName} ${currentUser.lastName}` : 'Somchai Jaidee'}</h4>
+              <h4>
+                {currentUser ? `${currentUser.firstName} ${currentUser.lastName}` : 'Somchai Jaidee'}
+              </h4>
               <span className="role-tag">Admin</span>
             </div>
           </div>
@@ -183,8 +209,8 @@ export default function PublishList() {
         {/* Header Bar */}
         <header className="top-header-purple">
           <div className="header-title">
-            <div className="header-icon-box" style={{ background: 'rgba(139, 92, 246, 0.2)', color: '#7c3aed', padding: '8px', borderRadius: '8px', display: 'flex' }}>
-              <FaGlobe size={18} />
+            <div className="header-icon-box summary-management-title-icon" aria-hidden="true">
+              <img src="/summary-management-icon.png" alt="" />
             </div>
             <div>
               <h2 style={{ margin: 0, color: '#4c1d95' }}>
@@ -306,7 +332,20 @@ export default function PublishList() {
                   </div>
 
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                    <h3 style={{ color: '#1f2937', margin: 0, fontSize: '1.1rem', fontWeight: '600', lineHeight: '1.4' }}>
+                    <h3 style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#1f2937', margin: 0, fontSize: '1.1rem', fontWeight: '600', lineHeight: '1.4' }}>
+                      {React.createElement(getPositionIcon(video.Position), {
+                        'aria-hidden': true,
+                        style: {
+                          boxSizing: 'content-box',
+                          width: '18px',
+                          height: '18px',
+                          padding: '8px',
+                          borderRadius: '9px',
+                          background: 'rgba(139, 92, 246, 0.14)',
+                          color: '#7c3aed',
+                          flexShrink: 0
+                        }
+                      })}
                       {video.Position
                         ? `Internship ตำแหน่ง ${video.Position}${video.CompanyName ? ` | ${video.CompanyName}` : ''}`
                         : video.VideoTitle}
@@ -362,19 +401,19 @@ export default function PublishList() {
           >
             <div
               style={{
-                width: '56px',
-                height: '56px',
-                borderRadius: '50%',
-                background: 'rgba(239, 68, 68, 0.15)',
-                border: '1px solid rgba(239, 68, 68, 0.4)',
+                width: '64px',
+                height: '64px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 margin: '0 auto 16px auto',
-                color: '#f87171',
               }}
             >
-              <FaTrash size={20} />
+              <img
+                src="/delete-trash-illustration.png"
+                alt=""
+                style={{ width: '64px', height: '64px', objectFit: 'contain' }}
+              />
             </div>
 
             <h3 style={{ color: '#1f2937', margin: '0 0 8px 0', fontSize: '16px', fontWeight: 600 }}>

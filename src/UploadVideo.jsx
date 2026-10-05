@@ -11,7 +11,6 @@ import {
   FaUsers, 
   FaSignOutAlt, 
   FaCloudUploadAlt, 
-  FaAsterisk,
   FaArrowLeft
 } from 'react-icons/fa';
 
@@ -134,7 +133,7 @@ export default function UploadVideo() {
   };
 
   return (
-    <div className="admin-purple-container">
+    <div className="admin-purple-container admin-workspace-page upload-video-container">
       {/* Sidebar */}
       <aside className="sidebar-purple">
         <div>
@@ -143,14 +142,16 @@ export default function UploadVideo() {
             onClick={() => navigate('/admin')} 
             style={{ cursor: 'pointer' }}
           >
-            <FaAsterisk style={{ color: '#7c3aed' }} />
+            <img className="brand-logo-image" src="/video-summary-logo.png" alt="" />
             <span>{t.appName || 'ICT Video Summary'}</span>
           </div>
 
           <div className="user-profile-purple">
             <div className="avatar-purple">{currentUser?.firstName?.charAt(0) || 'S'}</div>
             <div className="user-info-purple">
-              <h4>{currentUser ? `${currentUser.firstName} ${currentUser.lastName}` : 'Somchai Jaidee'}</h4>
+              <h4>
+                {currentUser ? `${currentUser.firstName} ${currentUser.lastName}` : 'Somchai Jaidee'}
+              </h4>
               <span className="role-tag">Admin</span>
             </div>
           </div>
@@ -194,11 +195,18 @@ export default function UploadVideo() {
       {/* Main Content Area */}
       <main className="main-content-purple">
         <header className="top-header-purple" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div className="header-title-box">
-            <div className="header-icon-badge">
-              <FaVideo size={18} />
+          <div className="header-title">
+            <div className="header-icon-box upload-video-title-icon" aria-hidden="true">
+              <img src="/upload-video-icon.png" alt="" />
             </div>
-            <h2>{t.uploadVideo || 'Upload Video'}</h2>
+            <div>
+              <h2 style={{ margin: 0, color: '#4c1d95' }}>
+                {t.uploadVideo || 'Upload Video'}
+              </h2>
+              <p className="subtitle-purple">
+                {lang === 'en' ? 'Upload a video to generate a summary' : 'อัปโหลดวิดีโอเพื่อสร้างบทสรุป'}
+              </p>
+            </div>
           </div>
 
           {/* ✅ ปุ่มสลับภาษา ย้ายมาไว้ฝั่งขวาบน (ไอคอนโลก) - เหมือนหน้าอื่นๆ */}

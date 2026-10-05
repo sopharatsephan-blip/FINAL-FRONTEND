@@ -21,7 +21,8 @@ export default function Sidebar() {
     <aside className="sidebar" style={{ width: '260px', background: '#f5edfc', minHeight: '100vh', padding: '20px', color: '#374151' }}>
       {/* Logo */}
       <div className="logo" style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '30px', display: 'flex', alignItems: 'center', gap: '10px', color: '#4c1d95' }}>
-        <span style={{ color: '#7c3aed' }}>✻</span> {t.appName}
+        <img src="/video-summary-logo.png" alt="" style={{ width: '48px', height: '48px', objectFit: 'contain' }} />
+        {t.appName}
       </div>
 
       {/* Profile */}

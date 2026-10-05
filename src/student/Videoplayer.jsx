@@ -77,8 +77,14 @@ function VideoPlayer() {
               <FaUserGraduate />
             </div>
             <div className="user-info-student">
-              <h4>{lang === "en" ? "Student & Advisor" : "นักศึกษาและอาจารย์"}</h4>
-              <span className="role-tag-student">{currentUser?.username || "User Panel"}</span>
+              <h4 style={{ color: "#000000" }}>
+                {currentUser
+                  ? [currentUser.firstName, currentUser.lastName].filter(Boolean).join(" ") || currentUser.username || (lang === "en" ? "User" : "ผู้ใช้")
+                  : lang === "en" ? "User" : "ผู้ใช้"}
+              </h4>
+              <span className="role-tag-student" style={{ color: "#000000" }}>
+                {currentUser?.username || "User Panel"}
+              </span>
             </div>
           </div>
 

@@ -1,14 +1,12 @@
-* {
+.login-container,
+.login-container * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-body {
+.login-container {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
   background-color: #ffffff;
   color: #1f2937;
 }
@@ -16,14 +14,18 @@ body {
 /* Container เต็มจอ ไร้กรอบ */
 .login-container {
   display: flex;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100svh;
+  height: auto;
   background: #ffffff;
+  overflow-x: hidden;
 }
 
 /* --- ฝั่งซ้าย (Info Panel โทนพาสเทลม่วง) --- */
 .info-panel {
-  flex: 1;
+  flex: 1 1 50%;
+  min-width: 0;
   background: #f5edfc;
   color: #4c1d95;
   padding: 60px;
@@ -34,10 +36,11 @@ body {
   border-right: 1px solid #ddd6fe;
 }
 
-.info-panel .logo-icon {
-  font-size: 48px;
+.info-panel .auth-brand-image {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
   margin-bottom: 30px;
-  color: #8b5cf6;
 }
 
 .info-panel h1 {
@@ -65,7 +68,8 @@ body {
 
 /* --- ฝั่งขวา (Login Box) --- */
 .login-box {
-  flex: 1;
+  flex: 1 1 50%;
+  min-width: 0;
   background: #ffffff;
   padding: 60px 80px;
   display: flex;
@@ -208,4 +212,101 @@ body {
   color: #6b7280;
   width: 100%;
   text-align: center;
+}
+
+@media (max-width: 900px) {
+  .info-panel {
+    padding: 48px clamp(28px, 5vw, 56px);
+  }
+
+  .login-box {
+    padding: 40px clamp(28px, 5vw, 56px);
+  }
+
+  .info-panel h1 {
+    font-size: clamp(36px, 5vw, 44px);
+  }
+}
+
+@media (max-width: 700px) {
+  .login-container {
+    flex-direction: column;
+    width: 100%;
+    height: auto !important;
+    min-height: 100vh;
+    min-height: 100svh;
+    overflow-x: hidden;
+  }
+
+  .login-container > button[style] {
+    position: absolute !important;
+    top: 16px !important;
+    right: 16px !important;
+    min-height: 44px;
+    padding: 8px 14px !important;
+    box-shadow: 0 2px 8px rgba(47, 27, 72, 0.12) !important;
+  }
+
+  .info-panel {
+    flex: 0 0 auto;
+    min-height: 250px;
+    padding: 28px 24px 24px;
+    border-right: 0;
+    border-bottom: 1px solid #e7ddf1;
+  }
+
+  .info-panel .auth-brand-image {
+    width: 56px;
+    height: 56px;
+    margin-bottom: 12px;
+  }
+
+  .info-panel h1 {
+    margin-bottom: 8px;
+    font-size: 30px;
+    line-height: 1.12;
+  }
+
+  .info-panel p {
+    max-width: 48ch;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .login-box {
+    flex: 1 0 auto;
+    align-items: stretch;
+    justify-content: flex-start;
+    width: 100%;
+    padding: 36px 24px 48px;
+  }
+
+  .form-header,
+  .login-box > input,
+  .login-box > button,
+  .login-box > .forgot-password {
+    width: 100%;
+    max-width: 440px;
+    margin-right: auto;
+    margin-left: auto;
+  }
+
+  .login-box h3 {
+    font-size: 28px;
+  }
+
+  .login-box input {
+    min-height: 48px;
+  }
+}
+
+@media (max-width: 380px) {
+  .info-panel {
+    min-height: 230px;
+    padding: 24px 20px 20px;
+  }
+
+  .login-box {
+    padding: 32px 20px 40px;
+  }
 }

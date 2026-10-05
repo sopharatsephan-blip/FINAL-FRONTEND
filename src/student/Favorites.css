@@ -91,3 +91,44 @@
   border-color: rgba(239, 68, 68, 0.6) !important;
   box-shadow: 0 8px 24px rgba(239, 68, 68, 0.15) !important;
 }
+
+.student-content-page .favorites-empty-card {
+  margin-top: 8px;
+  padding: 48px 24px;
+  border-color: #e7e0ed;
+  border-radius: 14px;
+  background: #faf8fd;
+  backdrop-filter: none;
+  transition: border-color 150ms ease, background-color 150ms ease;
+}
+
+.student-content-page .favorites-empty-card:hover {
+  border-color: #d8c8eb;
+  background: #f7f3fb;
+}
+
+.student-content-page .favorites-empty-icon {
+  animation: none;
+  background: #f1eafa;
+  color: #7042ad;
+}
+
+.student-content-page .favorites-empty-title {
+  color: #36264a;
+}
+
+.student-content-page .favorites-empty-desc {
+  color: #766a84;
+}
+
+.student-content-page .coop-card-favorite-active,
+.student-content-page .coop-card-favorite-active:hover {
+  border-color: #e7e0ed !important;
+  box-shadow: 0 4px 16px rgba(51, 35, 68, 0.045) !important;
+}
+
+.student-content-page .coop-card-favorite-active:hover {
+  transform: translateY(-1px);
+  border-color: #cbb7e3 !important;
+  box-shadow: 0 8px 22px rgba(69, 42, 107, 0.08) !important;
+}

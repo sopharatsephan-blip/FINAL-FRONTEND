@@ -12,22 +12,44 @@ import {
   FaRegHeart,
   FaSignOutAlt,
   FaSearch,
-  FaUserGraduate,
-  FaLanguage,
   FaCalendarAlt,
   FaEye,
   FaDownload,
   FaArrowLeft,
-  FaCheck
+  FaGlobe,
+  FaCheck,
+  FaNetworkWired,
+  FaDatabase,
+  FaRobot,
+  FaPalette,
+  FaCode,
+  FaBug,
+  FaMobileAlt,
+  FaServer,
+  FaHeadset,
+  FaBriefcase
 } from "react-icons/fa";
 
 const API_BASE = "http://localhost:5000";
 
+function getPositionIcon(position) {
+  const normalizedPosition = (position || "").toLowerCase();
+
+  if (normalizedPosition.includes("network")) return FaNetworkWired;
+  if (normalizedPosition.includes("data") || normalizedPosition.includes("database")) return FaDatabase;
+  if (normalizedPosition.includes("ai") || normalizedPosition.includes("ml")) return FaRobot;
+  if (normalizedPosition.includes("ux") || normalizedPosition.includes("ui") || normalizedPosition.includes("graphic") || normalizedPosition.includes("design")) return FaPalette;
+  if (normalizedPosition.includes("qa") || normalizedPosition.includes("tester") || normalizedPosition.includes("test")) return FaBug;
+  if (normalizedPosition.includes("mobile")) return FaMobileAlt;
+  if (normalizedPosition.includes("system") || normalizedPosition.includes("devops") || normalizedPosition.includes("administrator")) return FaServer;
+  if (normalizedPosition.includes("support")) return FaHeadset;
+  if (normalizedPosition.includes("developer") || normalizedPosition.includes("engineer")) return FaCode;
+  return FaBriefcase;
+}
+
 function CoopContent() {
   const navigate = useNavigate();
-  const langContext = typeof useLanguage === "function" ? useLanguage() : null;
-  const lang = langContext?.lang || "th";
-  const toggleLanguage = langContext?.toggleLanguage || (() => {});
+  const { lang, toggleLanguage } = useLanguage();
   const currentUser = JSON.parse(localStorage.getItem("user") || "null");
 
   // ===== ข้อมูลจริงจากฐานข้อมูล =====
@@ -46,20 +68,26 @@ function CoopContent() {
 
   // ===== ช่องค้นหาด้านบน =====
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedPosition, setSelectedPosition] = useState("");
+  const [positionOptions, setPositionOptions] = useState([]);
 
-  // ดึงวิดีโอที่เผยแพร่แล้วทั้งหมด + รายการโปรดของผู้ใช้
+  // ดึงรายการตำแหน่งมาตรฐานจาก Position และรายการโปรดของผู้ใช้
   useEffect(() => {
     const fetchData = async () => {
-      setIsLoading(true);
       try {
-        const requests = [fetch(`${API_BASE}/api/videos/search`)];
+        const requests = [
+          fetch(`${API_BASE}/api/videos/filters`)
+        ];
         if (currentUser?.uid) {
           requests.push(fetch(`${API_BASE}/api/favorites/${currentUser.uid}`));
         }
 
         const responses = await Promise.all(requests);
-        const videosData = await responses[0].json();
-        setCoopItems(Array.isArray(videosData) ? videosData : []);
+        if (!responses[0].ok) {
+          throw new Error("Failed to load position options");
+        }
+        const filterData = await responses[0].json();
+        setPositionOptions(Array.isArray(filterData.positions) ? filterData.positions : []);
 
         if (responses[1]) {
           const favData = await responses[1].json();
@@ -67,13 +95,33 @@ function CoopContent() {
         }
       } catch (err) {
         console.error("Fetch coop content error:", err);
-      } finally {
-        setIsLoading(false);
       }
     };
 
     fetchData();
   }, [currentUser?.uid]);
+
+  // ส่ง PositionName ที่เลือกไปกรอง Summary.Position ผ่าน API
+  useEffect(() => {
+    const fetchVideos = async () => {
+      setIsLoading(true);
+      try {
+        const params = new URLSearchParams();
+        if (selectedPosition) params.set("position", selectedPosition);
+        const query = params.toString();
+        const res = await fetch(`${API_BASE}/api/videos/search${query ? `?${query}` : ""}`);
+        if (!res.ok) throw new Error("Failed to load published videos");
+        const videosData = await res.json();
+        setCoopItems(Array.isArray(videosData) ? videosData : []);
+      } catch (err) {
+        console.error("Fetch coop content error:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchVideos();
+  }, [selectedPosition]);
 
   const formatUploadDate = (dateStr) => {
     if (!dateStr) return "-";
@@ -203,32 +251,39 @@ function CoopContent() {
   };
 
   return (
-    <div className="admin-purple-container">
+    <div className="admin-purple-container admin-dashboard-page student-dashboard-container student-content-page">
       {/* ===== Sidebar ===== */}
       <aside className="sidebar-purple">
         <div>
-          <div
-            className="brand-logo-purple"
-            onClick={() => navigate("/dashboard")}
-            style={{ cursor: "pointer" }}
-          >
-            <div className="avatar-student" style={{ marginRight: "10px" }}>ICT</div>
-            <span>ICT Cooperative</span>
-          </div>
+          <button type="button" className="brand-logo-purple" onClick={() => navigate("/dashboard")}>
+            <img className="brand-logo-image" src="/video-summary-logo.png" alt="" />
+            <span>ICT Video Summary</span>
+          </button>
 
-          <div className="user-profile-student">
-            <div className="avatar-student">
-              <FaUserGraduate />
+          <div className="student-account-actions">
+            <div className="user-profile-student">
+              <div className="avatar-purple">
+                {(currentUser?.firstName || currentUser?.username || "S").charAt(0).toUpperCase()}
+              </div>
+              <div className="user-info-purple">
+                <h4>
+                  {currentUser
+                    ? [currentUser.firstName, currentUser.lastName].filter(Boolean).join(" ") || currentUser.username || (lang === "en" ? "User" : "ผู้ใช้")
+                    : lang === "en" ? "User" : "ผู้ใช้"}
+                </h4>
+                <span className="role-tag">{lang === "en" ? "Student" : "นักศึกษา"}</span>
+              </div>
             </div>
-            <div className="user-info-student">
-              <h4>{lang === "en" ? "Student & Advisor" : "นักศึกษาและอาจารย์"}</h4>
-              <span className="role-tag-student">{currentUser?.username || "User Panel"}</span>
-            </div>
+            <button
+              type="button"
+              className="student-profile-logout"
+              onClick={handleLogout}
+              aria-label={lang === "en" ? "Log out" : "ออกจากระบบ"}
+              title={lang === "en" ? "Log out" : "ออกจากระบบ"}
+            >
+              <FaSignOutAlt aria-hidden="true" />
+            </button>
           </div>
-
-          <p style={{ color: "#6b7280", fontSize: "12px", marginBottom: "8px", paddingLeft: "4px" }}>
-            {lang === "en" ? "Main Menu" : "เมนูหลัก"}
-          </p>
 
           <nav className="menu-list-purple">
             <button className="menu-item-purple" onClick={() => navigate("/dashboard")}>
@@ -248,47 +303,59 @@ function CoopContent() {
           </nav>
         </div>
 
-        <div className="sidebar-footer-purple">
-          <button className="logout-btn-purple" onClick={handleLogout}>
-            <FaSignOutAlt />
-            <span>{lang === "en" ? "Logout" : "ออกจากระบบ"}</span>
-          </button>
-        </div>
       </aside>
 
       {/* ===== Main Content ===== */}
       <main className="main-content-purple">
-        <header
-          className="top-header-purple"
-          style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}
-        >
-          <div className="header-title" style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-            <div
-              className="avatar-purple"
-              style={{
-                background: "rgba(139, 92, 246, 0.2)",
-                color: "#7c3aed",
-                border: "1px solid rgba(139, 92, 246, 0.4)"
-              }}
-            >
-              <FaFileAlt />
+        <header className="top-header-purple dashboard-page-header">
+          <div className="header-title">
+            <div className="header-icon-box dashboard-title-icon content-title-icon" aria-hidden="true">
+              <img className="content-header-image" src="/coop-book.png" alt="" />
             </div>
             <div>
-              <h2 style={{ margin: 0, fontSize: "18px", color: "#4c1d95" }}>
+              <h2 className="main-title-text">
                 {viewingItem
                   ? (lang === "en" ? "Summary Details" : "รายละเอียดสรุป")
                   : (lang === "en" ? "Co-op Content" : "เนื้อหาสหกิจศึกษา")}
               </h2>
-              {!viewingItem && (
-                <p className="subtitle-purple">
-                  {lang === "en" ? "All Summary Content" : "สรุปเนื้อหาทั้งหมด"}
-                </p>
-              )}
+              <p className="subtitle-purple">
+                {viewingItem
+                  ? (lang === "en" ? "Review the selected video summary" : "รายละเอียดสรุปวิดีโอที่เลือก")
+                  : (lang === "en" ? "Browse published co-op video summaries" : "เลือกชมวิดีโอและสรุปเนื้อหาสหกิจศึกษา")}
+              </p>
             </div>
           </div>
 
-          <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-            <div className="search-box-purple">
+          <div className="dashboard-header-actions">
+            <span className="dashboard-date">
+              {new Date().toLocaleDateString(lang === "th" ? "th-TH" : "en-GB", {
+                day: "numeric",
+                month: "long",
+                year: "numeric"
+              })}
+            </span>
+            <button type="button" className="lang-toggle-purple" onClick={toggleLanguage}>
+              <FaGlobe size={14} aria-hidden="true" />
+              <span>{lang.toUpperCase()}</span>
+            </button>
+          </div>
+        </header>
+
+        {!viewingItem && (
+          <div className="content-page-toolbar">
+            <select
+              className="coop-position-filter"
+              aria-label={lang === "en" ? "Filter by position" : "กรองตามตำแหน่งงาน"}
+              value={selectedPosition}
+              onChange={(e) => setSelectedPosition(e.target.value)}
+            >
+              <option value="">{lang === "en" ? "All" : "ทั้งหมด"}</option>
+              {positionOptions.map((position) => (
+                <option key={position} value={position}>{position}</option>
+              ))}
+            </select>
+
+            <div className="search-box-purple coop-search-box">
               <FaSearch style={{ color: "#7c3aed" }} />
               <input
                 type="text"
@@ -297,55 +364,8 @@ function CoopContent() {
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
-
-            <button
-              type="button"
-              onClick={toggleLanguage}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-                background: "rgba(139, 92, 246, 0.2)",
-                border: "1px solid rgba(139, 92, 246, 0.4)",
-                borderRadius: "999px",
-                padding: "8px 16px",
-                color: "#4c1d95",
-                fontWeight: "600",
-                fontSize: "13px",
-                cursor: "pointer",
-                whiteSpace: "nowrap"
-              }}
-            >
-              <FaLanguage size={16} />
-              <span>{lang ? lang.toUpperCase() : "EN"}</span>
-            </button>
           </div>
-        </header>
-
-        <div style={{ margin: "16px 0" }}>
-          <button
-            type="button"
-            onClick={() => (viewingItem ? handleBackFromSummary() : navigate("/dashboard"))}
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "8px",
-              background: "rgba(139, 92, 246, 0.12)",
-              border: "1px solid rgba(139, 92, 246, 0.4)",
-              borderRadius: "999px",
-              padding: "8px 16px",
-              color: "#7c3aed",
-              fontWeight: 600,
-              fontSize: "13px",
-              cursor: "pointer"
-            }}
-          >
-            <FaArrowLeft />{" "}
-            {viewingItem
-              ? (lang === "en" ? "Back" : "ย้อนกลับ")
-              : (lang === "en" ? "Back to Dashboard" : "กลับไปหน้าแดชบอร์ด")}
-          </button>
-        </div>
+        )}
 
         {viewingItem ? (
           <div
@@ -357,8 +377,20 @@ function CoopContent() {
               padding: "28px clamp(20px, 4vw, 40px)"
             }}
           >
+            <button
+              type="button"
+              className="summary-back-button"
+              data-html2canvas-ignore="true"
+              onClick={handleBackFromSummary}
+            >
+              <FaArrowLeft aria-hidden="true" />
+              {lang === "en" ? "Back to Co-op Content" : "กลับไปหน้าเนื้อหาสหกิจศึกษา"}
+            </button>
             <div style={{ display: "flex", alignItems: "center", gap: "10px", margin: "0 0 6px" }}>
-              <FaFileAlt style={{ color: "#7c3aed" }} size={20} />
+              {React.createElement(getPositionIcon(viewingItem.Position), {
+                className: "coop-position-icon",
+                "aria-hidden": true
+              })}
               <h2 style={{ margin: 0, fontSize: "20px", fontWeight: 700, color: "#1f2937" }}>
                 {`${lang === "en" ? "Position" : "ตำแหน่ง"} ${viewingItem.Position || viewingItem.VideoTitle} | ${viewingItem.CompanyName || "-"}`}
               </h2>
@@ -443,9 +475,15 @@ function CoopContent() {
                     <div key={item.VideoID} className="coop-card">
                       <div className="coop-card-top">
                         <div>
-                          <h3 className="coop-card-title">
-                            {`${lang === "en" ? "Position" : "ตำแหน่ง"} ${item.Position || item.VideoTitle} | ${item.CompanyName || "-"}`}
-                          </h3>
+                          <div className="coop-card-title-row">
+                            {React.createElement(getPositionIcon(item.Position), {
+                              className: "coop-position-icon",
+                              "aria-hidden": true
+                            })}
+                            <h3 className="coop-card-title">
+                              {`${lang === "en" ? "Position" : "ตำแหน่ง"} ${item.Position || item.VideoTitle} | ${item.CompanyName || "-"}`}
+                            </h3>
+                          </div>
                           <div className="coop-card-meta">
                             <span className="coop-meta-item">
                               <FaCalendarAlt style={{ color: "#7c3aed" }} />{" "}

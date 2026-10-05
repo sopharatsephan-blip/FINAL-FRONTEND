@@ -84,7 +84,7 @@ export default function Register() {
       {/* ฝั่งซ้าย */}
       <div className="register-left">
         <div className="brand-section">
-          <div className="logo-icon">✻</div>
+          <img className="auth-brand-image" src="/video-summary-logo.png" alt="" />
           <h1>Video<br />Summary System</h1>
           <p>
             Platform for teachers to upload lesson videos and students to

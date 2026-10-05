@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "../LanguageContext";
 import html2pdf from "html2pdf.js";
@@ -11,8 +11,7 @@ import {
   FaHeart,
   FaSignOutAlt,
   FaSearch,
-  FaUserGraduate,
-  FaLanguage,
+  FaGlobe,
   FaCalendarAlt,
   FaEye,
   FaDownload,
@@ -23,9 +22,7 @@ const API_BASE = "http://localhost:5000";
 
 function Favorites() {
   const navigate = useNavigate();
-  const langContext = typeof useLanguage === "function" ? useLanguage() : null;
-  const lang = langContext?.lang || "th";
-  const toggleLanguage = langContext?.toggleLanguage || (() => {});
+  const { lang, toggleLanguage } = useLanguage();
   const currentUser = JSON.parse(localStorage.getItem("user") || "null");
 
   // ===== ข้อมูลจริงจากฐานข้อมูล =====
@@ -165,32 +162,39 @@ function Favorites() {
   });
 
   return (
-    <div className="admin-purple-container">
+    <div className="admin-purple-container admin-dashboard-page student-dashboard-container student-content-page">
       {/* ===== Sidebar ===== */}
       <aside className="sidebar-purple">
         <div>
-          <div
-            className="brand-logo-purple"
-            onClick={() => navigate("/dashboard")}
-            style={{ cursor: "pointer" }}
-          >
-            <div className="avatar-student" style={{ marginRight: "10px" }}>ICT</div>
-            <span>ICT Cooperative</span>
-          </div>
+          <button type="button" className="brand-logo-purple" onClick={() => navigate("/dashboard")}>
+            <img className="brand-logo-image" src="/video-summary-logo.png" alt="" />
+            <span>ICT Video Summary</span>
+          </button>
 
-          <div className="user-profile-student">
-            <div className="avatar-student">
-              <FaUserGraduate />
+          <div className="student-account-actions">
+            <div className="user-profile-student">
+              <div className="avatar-purple">
+                {(currentUser?.firstName || currentUser?.username || "S").charAt(0).toUpperCase()}
+              </div>
+              <div className="user-info-purple">
+                <h4>
+                  {currentUser
+                    ? [currentUser.firstName, currentUser.lastName].filter(Boolean).join(" ") || currentUser.username || (lang === "en" ? "User" : "ผู้ใช้")
+                    : lang === "en" ? "User" : "ผู้ใช้"}
+                </h4>
+                <span className="role-tag">{lang === "en" ? "Student" : "นักศึกษา"}</span>
+              </div>
             </div>
-            <div className="user-info-student">
-              <h4>{lang === "en" ? "Student & Advisor" : "นักศึกษาและอาจารย์"}</h4>
-              <span className="role-tag-student">{currentUser?.username || "User Panel"}</span>
-            </div>
+            <button
+              type="button"
+              className="student-profile-logout"
+              onClick={handleLogout}
+              aria-label={lang === "en" ? "Log out" : "ออกจากระบบ"}
+              title={lang === "en" ? "Log out" : "ออกจากระบบ"}
+            >
+              <FaSignOutAlt aria-hidden="true" />
+            </button>
           </div>
-
-          <p style={{ color: "#6b7280", fontSize: "12px", marginBottom: "8px", paddingLeft: "4px" }}>
-            {lang === "en" ? "Main Menu" : "เมนูหลัก"}
-          </p>
 
           <nav className="menu-list-purple">
             <button className="menu-item-purple" onClick={() => navigate("/dashboard")}>
@@ -210,48 +214,48 @@ function Favorites() {
           </nav>
         </div>
 
-        <div className="sidebar-footer-purple">
-          <button className="logout-btn-purple" onClick={handleLogout}>
-            <FaSignOutAlt />
-            <span>{lang === "en" ? "Logout" : "ออกจากระบบ"}</span>
-          </button>
-        </div>
       </aside>
 
       {/* ===== Main Content ===== */}
       <main className="main-content-purple">
-        <header
-          className="top-header-purple"
-          style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}
-        >
-          <div className="header-title" style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-            <div
-              className="avatar-purple"
-              style={{
-                background: "rgba(239, 68, 68, 0.2)",
-                color: "#ef4444",
-                border: "1px solid rgba(239, 68, 68, 0.4)"
-              }}
-            >
-              <FaHeart />
+        <header className="top-header-purple dashboard-page-header">
+          <div className="header-title">
+            <div className="header-icon-box dashboard-title-icon content-title-icon favorites-title-icon" aria-hidden="true">
+              <img className="content-header-image" src="/favorites-heart.png" alt="" />
             </div>
             <div>
-              <h2 style={{ margin: 0, fontSize: "18px", color: "#4c1d95", display: "flex", alignItems: "center", gap: "8px" }}>
+              <h2 className="main-title-text">
                 {viewingItem
                   ? (lang === "en" ? "Summary Details" : "รายละเอียดสรุป")
                   : (lang === "en" ? "Favorites" : "รายการโปรด")}
-                {!viewingItem && (
-                  <span style={{ fontSize: "13px", color: "#6b7280", fontWeight: "normal" }}>
-                    {lang === "en" ? "Saved by you" : "ที่คุณบันทึกไว้"}
-                  </span>
-                )}
               </h2>
+              <p className="subtitle-purple">
+                {viewingItem
+                  ? (lang === "en" ? "Review the selected video summary" : "รายละเอียดสรุปวิดีโอที่เลือก")
+                  : (lang === "en" ? "Your saved co-op video summaries" : "วิดีโอและสรุปสหกิจศึกษาที่คุณบันทึกไว้")}
+              </p>
             </div>
           </div>
 
-          <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+          <div className="dashboard-header-actions">
+            <span className="dashboard-date">
+              {new Date().toLocaleDateString(lang === "th" ? "th-TH" : "en-GB", {
+                day: "numeric",
+                month: "long",
+                year: "numeric"
+              })}
+            </span>
+            <button type="button" className="lang-toggle-purple" onClick={toggleLanguage}>
+              <FaGlobe size={14} aria-hidden="true" />
+              <span>{lang.toUpperCase()}</span>
+            </button>
+          </div>
+        </header>
+
+        {!viewingItem && (
+          <div className="content-page-toolbar favorites-page-toolbar">
             <div className="search-box-purple">
-              <FaSearch style={{ color: "#7c3aed" }} />
+              <FaSearch aria-hidden="true" />
               <input
                 type="text"
                 placeholder={lang === "en" ? "Search summary, position..." : "ค้นหาสรุป, ตำแหน่งงาน..."}
@@ -259,52 +263,8 @@ function Favorites() {
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
-
-            <button
-              type="button"
-              onClick={toggleLanguage}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-                background: "rgba(139, 92, 246, 0.2)",
-                border: "1px solid rgba(139, 92, 246, 0.4)",
-                borderRadius: "999px",
-                padding: "8px 16px",
-                color: "#4c1d95",
-                fontWeight: "600",
-                fontSize: "13px",
-                cursor: "pointer",
-                whiteSpace: "nowrap"
-              }}
-            >
-              <FaLanguage size={16} />
-              <span>{lang ? lang.toUpperCase() : "EN"}</span>
-            </button>
           </div>
-        </header>
-
-        <div style={{ margin: "16px 0" }}>
-          <button
-            type="button"
-            onClick={() => navigate("/dashboard")}
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "8px",
-              background: "rgba(139, 92, 246, 0.12)",
-              border: "1px solid rgba(139, 92, 246, 0.4)",
-              borderRadius: "999px",
-              padding: "8px 16px",
-              color: "#7c3aed",
-              fontWeight: 600,
-              fontSize: "13px",
-              cursor: "pointer"
-            }}
-          >
-            <FaArrowLeft /> {lang === "en" ? "Back to Dashboard" : "กลับไปหน้าแดชบอร์ด"}
-          </button>
-        </div>
+        )}
 
         {viewingItem ? (
           <div
@@ -317,23 +277,12 @@ function Favorites() {
             }}
           >
             <button
+              type="button"
+              className="summary-back-button"
               data-html2canvas-ignore="true"
               onClick={handleBackFromSummary}
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "8px",
-                background: "rgba(139, 92, 246, 0.12)",
-                border: "1px solid rgba(139, 92, 246, 0.4)",
-                borderRadius: "999px",
-                padding: "8px 16px",
-                color: "#7c3aed",
-                fontWeight: 600,
-                fontSize: "13px",
-                cursor: "pointer"
-              }}
             >
-              <FaArrowLeft /> {lang === "en" ? "Back" : "ย้อนกลับ"}
+              <FaArrowLeft aria-hidden="true" /> {lang === "en" ? "Back" : "ย้อนกลับ"}
             </button>
 
             <div style={{ display: "flex", alignItems: "center", gap: "10px", margin: "24px 0 6px" }}>

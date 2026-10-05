@@ -20,7 +20,7 @@ import CoopContent from './student/CoopContent.jsx';
 import Favorites from './student/Favorites.jsx';
 import VideoPlayer from './student/Videoplayer.jsx';
 import Register from './Register.jsx'
-import ForgotPassword from './ForgotPassword.jsx';
+import ForgotPassword from './Forgotpassword.jsx';
 import './index.css';
 
 ReactDOM.createRoot(document.getElementById('root')).render(

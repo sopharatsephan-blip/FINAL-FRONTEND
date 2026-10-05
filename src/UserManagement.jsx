@@ -12,7 +12,6 @@ import {
   FaUsers, 
   FaSignOutAlt, 
   FaSearch, 
-  FaAsterisk,
   FaUserShield,
   FaUserMinus,
   FaLock,
@@ -197,13 +196,13 @@ export default function UserManagement() {
   const canRemoveAdmin = !!selectedUser && selectedUser.role === 'Admin' && !isLastAdmin;
 
   return (
-    <div className="admin-purple-container">
+    <div className="admin-purple-container admin-workspace-page">
       
       {/* ===== Sidebar ม่วงเข้ม ===== */}
       <aside className="sidebar-purple">
         <div>
           <div className="brand-logo-purple" onClick={() => navigate('/admin')} style={{ cursor: 'pointer' }}>
-            <FaAsterisk className="logo-icon" style={{ color: '#7c3aed', marginRight: '8px' }} />
+            <img className="brand-logo-image" src="/video-summary-logo.png" alt="" />
             <span>{t.appName || 'ICT Video Summary'}</span>
           </div>
 
@@ -212,7 +211,9 @@ export default function UserManagement() {
               {currentUser && currentUser.firstName ? currentUser.firstName.charAt(0) : 'S'}
             </div>
             <div className="user-info-purple">
-              <h4>{currentUser ? `${currentUser.firstName} ${currentUser.lastName}` : 'Somchai Jaidee'}</h4>
+              <h4>
+                {currentUser ? `${currentUser.firstName} ${currentUser.lastName}` : 'Somchai Jaidee'}
+              </h4>
               <span className="role-tag">Admin</span>
             </div>
           </div>
@@ -257,8 +258,8 @@ export default function UserManagement() {
       <main className="main-content-purple">
         <header className="top-header-purple">
           <div className="header-title">
-            <div className="header-icon-box" style={{ background: 'rgba(139, 92, 246, 0.2)', color: '#7c3aed', padding: '8px', borderRadius: '8px', display: 'flex' }}>
-              <FaUsers size={18} />
+            <div className="header-icon-box user-management-title-icon" aria-hidden="true">
+              <img src="/user-management-icon.png" alt="" />
             </div>
             <div>
               <h2 style={{ margin: 0, color: '#4c1d95' }}>{lang === 'en' ? 'User Management' : 'จัดการผู้ใช้งาน'}</h2>

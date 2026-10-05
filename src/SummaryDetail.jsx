@@ -11,7 +11,6 @@ import {
   FaUsers, 
   FaSignOutAlt, 
   FaSearch, 
-  FaAsterisk,
   FaArrowLeft,
   FaFileAlt,
   FaGlobeAmericas
@@ -80,12 +79,12 @@ export default function SummaryDetail() {
   };
 
   return (
-    <div className="admin-purple-container">
+    <div className="admin-purple-container admin-workspace-page">
       {/* ===== Sidebar ===== */}
       <aside className="sidebar-purple">
         <div>
           <div className="brand-logo-purple" onClick={() => navigate('/admin')} style={{ cursor: 'pointer' }}>
-            <FaAsterisk style={{ color: '#7c3aed' }} />
+            <img className="brand-logo-image" src="/video-summary-logo.png" alt="" />
             <span>{t.appName || 'ICT Video Summary'}</span>
           </div>
 
@@ -94,7 +93,9 @@ export default function SummaryDetail() {
               {currentUser ? currentUser.firstName.charAt(0) : 'S'}
             </div>
             <div className="user-info-purple">
-              <h4>{currentUser ? `${currentUser.firstName} ${currentUser.lastName}` : 'Somchai Jaidee'}</h4>
+              <h4>
+                {currentUser ? `${currentUser.firstName} ${currentUser.lastName}` : 'Somchai Jaidee'}
+              </h4>
               <span className="role-tag">Admin</span>
             </div>
           </div>

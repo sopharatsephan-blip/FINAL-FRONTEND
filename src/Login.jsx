@@ -80,7 +80,7 @@ function Login() {
       {/* ฝั่งซ้าย: แผงข้อมูล */}
       <div className="info-panel">
         <div className="content-wrapper">
-          <div className="logo-icon" onClick={() => navigate("/")} style={{ cursor: "pointer" }}>✻</div>
+          <img className="auth-brand-image" src="/video-summary-logo.png" alt="" />
           <h1>
             Video <br />
             Summary System

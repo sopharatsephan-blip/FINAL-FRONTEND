@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from "../LanguageContext";
 import './StudentDashboard.css';
@@ -9,16 +9,22 @@ import {
   FaHeart,
   FaSignOutAlt,
   FaSearch,
-  FaUserGraduate,
-  FaSlidersH,
-  FaArrowUp,
-  FaLanguage
+  FaGlobe
 } from 'react-icons/fa';
 
 function StudentDashboard() {
   const navigate = useNavigate();
   const { t, lang, toggleLanguage } = useLanguage();
-  const [currentUser, setCurrentUser] = useState(null);
+  const [currentUser] = useState(() => {
+    const savedUser = localStorage.getItem('user');
+    if (!savedUser) return null;
+    try {
+      return JSON.parse(savedUser);
+    } catch (error) {
+      console.error('Saved user data is invalid:', error);
+      return null;
+    }
+  });
 
   const [hasSearched, setHasSearched] = useState(false);
   const resultRef = useRef(null);
@@ -39,47 +45,54 @@ function StudentDashboard() {
 
   const [videoResults, setVideoResults] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-
-  // ===== ช่องค้นหาด้านบน (Header Search) — ค้นหาแบบรวดเร็วโดยไม่ผูกกับ Data Filters =====
-  const [headerSearchQuery, setHeaderSearchQuery] = useState('');
-
-  // ===== ข้อมูลจริงสำหรับ "Popular Video Rank" และ "Weekly Video Summaries" =====
-  const [popularVideo, setPopularVideo] = useState(null);
-  const [weeklyVideos, setWeeklyVideos] = useState([]);
-  const [isDashboardLoading, setIsDashboardLoading] = useState(true);
+  const [searchError, setSearchError] = useState(false);
+  const [dashboardStats, setDashboardStats] = useState(null);
+  const [popularVideos, setPopularVideos] = useState([]);
+  const [dashboardLoading, setDashboardLoading] = useState(true);
+  const [dashboardError, setDashboardError] = useState(false);
+  const maxPopularVideoViews = Math.max(0, ...popularVideos.map((video) => Number(video.ViewCount) || 0));
+  const selectedWorkTypeCount = filterOptions.workTypes.filter((type) => workTypes[type]).length;
+  const selectedFilterCount = [
+    businessType,
+    location,
+    position,
+    keyword.trim(),
+  ].filter(Boolean).length + Number(selectedWorkTypeCount < filterOptions.workTypes.length);
 
   useEffect(() => {
-    const savedUser = localStorage.getItem('user');
-    if (!savedUser) {
+    if (!currentUser) {
       navigate('/login');
       return;
     }
-    const user = JSON.parse(savedUser);
-    if (user.roleId === 'R001') {
+    if (currentUser.roleId === 'R001') {
       navigate('/admin');
-      return;
     }
-    setCurrentUser(user);
-  }, [navigate]);
+  }, [currentUser, navigate]);
 
-  // ดึงข้อมูลจริงจากฐานข้อมูลมาแสดงในการ์ด "ยอดฮิต" และ "สรุปประจำสัปดาห์"
+  // Keep the student dashboard metrics and popular-video chart consistent with Admin.
   useEffect(() => {
     const fetchDashboardData = async () => {
-      setIsDashboardLoading(true);
       try {
-        const [topRes, weeklyRes] = await Promise.all([
-          fetch('http://localhost:5000/api/videos/top'),
-          fetch('http://localhost:5000/api/videos/weekly?limit=3')
+        setDashboardLoading(true);
+        const [statsRes, popularRes] = await Promise.all([
+          fetch('http://localhost:5000/api/dashboard/stats'),
+          fetch('http://localhost:5000/api/dashboard/popular-video'),
         ]);
-        const topData = await topRes.json();
-        const weeklyData = await weeklyRes.json();
-
-        setPopularVideo(topData || null);
-        setWeeklyVideos(Array.isArray(weeklyData) ? weeklyData : []);
+        if (!statsRes.ok || !popularRes.ok) {
+          throw new Error('Dashboard request failed');
+        }
+        const statsData = await statsRes.json();
+        const popularData = await popularRes.json();
+        setDashboardStats(statsData.data || null);
+        setPopularVideos(Array.isArray(popularData.data) ? popularData.data : []);
+        setDashboardError(false);
       } catch (err) {
         console.error('Dashboard data fetch error:', err);
+        setDashboardStats(null);
+        setPopularVideos([]);
+        setDashboardError(true);
       } finally {
-        setIsDashboardLoading(false);
+        setDashboardLoading(false);
       }
     };
 
@@ -108,28 +121,6 @@ function StudentDashboard() {
     fetchFilterOptions();
   }, []);
 
-  // แปลง Duration รูปแบบ "mm:ss" จาก DB ให้อยู่ในรูปแบบข้อความอ่านง่าย
-  const formatDuration = (duration) => {
-    if (!duration) return '-';
-    return duration;
-  };
-
-  // แปลงวันที่ให้ตรงกับภาษาที่เลือก (EN / TH)
-  const formatUploadDate = (dateStr) => {
-    if (!dateStr) return '-';
-    const d = new Date(dateStr);
-    if (isNaN(d.getTime())) return '-';
-
-    if (lang === 'en') {
-      return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
-    }
-    const thaiMonths = [
-      'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
-      'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'
-    ];
-    return `วันที่ ${d.getDate()} เดือน${thaiMonths[d.getMonth()]} ${d.getFullYear() + 543}`;
-  };
-
   const handleLogout = () => {
     localStorage.removeItem('user');
     navigate('/login');
@@ -148,23 +139,41 @@ function StudentDashboard() {
     setPosition('');
     setKeyword('');
     setHasSearched(false);
+    setSearchError(false);
+    setVideoResults([]);
   };
 
   const handleSearch = async () => {
+    if (filterOptions.workTypes.length > 0 && selectedWorkTypeCount === 0) {
+      return;
+    }
+
     setIsLoading(true);
+    setSearchError(false);
+    setHasSearched(true);
+    setVideoResults([]);
     try {
       const workTypeList = Object.keys(workTypes).filter((wt) => workTypes[wt]);
 
       const params = new URLSearchParams({
         businessType,
         location,
-        workType: workTypeList.join(','),
         position,
         keyword
       });
+      const allWorkTypesSelected = filterOptions.workTypes.every((wt) => workTypes[wt]);
+      if (!allWorkTypesSelected) {
+        params.set('workType', workTypeList.join(','));
+      }
 
       const res = await fetch(`http://localhost:5000/api/videos/search?${params}`);
+      if (!res.ok) {
+        throw new Error('Video search request failed');
+      }
       const data = await res.json();
+      if (!Array.isArray(data)) {
+        throw new Error('Unexpected video search response');
+      }
       setVideoResults(data);
       setHasSearched(true);
 
@@ -173,62 +182,49 @@ function StudentDashboard() {
       }, 100);
     } catch (err) {
       console.error('Search error:', err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // ค้นหาแบบรวดเร็วจากช่องค้นหาด้านบน (ไม่ผูกกับตัวกรองด้านล่าง ใช้ keyword อย่างเดียว)
-  const handleHeaderSearch = async () => {
-    if (!headerSearchQuery.trim()) return;
-    setIsLoading(true);
-    try {
-      const params = new URLSearchParams({ keyword: headerSearchQuery.trim() });
-      const res = await fetch(`http://localhost:5000/api/videos/search?${params}`);
-      const data = await res.json();
-      setVideoResults(data);
+      setSearchError(true);
       setHasSearched(true);
-
-      setTimeout(() => {
-        resultRef.current?.scrollIntoView({ behavior: 'smooth' });
-      }, 100);
-    } catch (err) {
-      console.error('Header search error:', err);
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const handleHeaderSearchKeyDown = (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      handleHeaderSearch();
     }
   };
 
   return (
-    <div className="admin-purple-container">
+    <div className={`admin-purple-container admin-dashboard-page student-dashboard-container${hasSearched ? ' has-search-results' : ''}`}>
       {/* ===== Sidebar ===== */}
       <aside className="sidebar-purple">
         <div>
-          <div className="brand-logo-purple" onClick={() => navigate('/dashboard')} style={{ cursor: 'pointer' }}>
-            <div className="avatar-student" style={{ marginRight: '10px' }}>ICT</div>
-            <span>ICT Cooperative</span>
-          </div>
+          <button type="button" className="brand-logo-purple" onClick={() => navigate('/dashboard')}>
+            <img className="brand-logo-image" src="/video-summary-logo.png" alt="" />
+            <span>ICT Video Summary</span>
+          </button>
 
-          <div className="user-profile-student">
-            <div className="avatar-student">
-              <FaUserGraduate />
+          <div className="student-account-actions">
+            <div className="user-profile-student">
+              <div className="avatar-purple">
+                {currentUser
+                  ? (currentUser.firstName || currentUser.username || 'S').charAt(0).toUpperCase()
+                  : 'S'}
+              </div>
+              <div className="user-info-purple">
+                <h4>
+                  {currentUser
+                    ? [currentUser.firstName, currentUser.lastName].filter(Boolean).join(' ') || currentUser.username || (lang === 'en' ? 'User' : 'ผู้ใช้')
+                    : lang === 'en' ? 'User' : 'ผู้ใช้'}
+                </h4>
+                <span className="role-tag">{lang === 'en' ? 'Student' : 'นักศึกษา'}</span>
+              </div>
             </div>
-            <div className="user-info-student">
-              <h4>{lang === 'en' ? 'Student & Advisor' : 'นักศึกษาและอาจารย์'}</h4>
-              <span className="role-tag-student">{currentUser?.username || 'User Panel'}</span>
-            </div>
+            <button
+              type="button"
+              className="student-profile-logout"
+              onClick={handleLogout}
+              aria-label={lang === 'en' ? 'Log out' : 'ออกจากระบบ'}
+              title={lang === 'en' ? 'Log out' : 'ออกจากระบบ'}
+            >
+              <FaSignOutAlt aria-hidden="true" />
+            </button>
           </div>
-
-          <p style={{ color: '#6b7280', fontSize: '12px', marginBottom: '8px', paddingLeft: '4px' }}>
-            {lang === 'en' ? 'Main Menu' : 'เมนูหลัก'}
-          </p>
 
           <nav className="menu-list-purple">
             <button className="menu-item-purple active" onClick={() => navigate('/dashboard')}>
@@ -242,244 +238,260 @@ function StudentDashboard() {
             </button>
 
             <button className="menu-item-purple" onClick={() => navigate('/favorites')}>
-              <FaHeart style={{ color: '#ef4444' }} />
+              <FaHeart />
               <span>{lang === 'en' ? 'Favorites' : 'รายการโปรด'}</span>
             </button>
           </nav>
         </div>
 
-        <div className="sidebar-footer-purple">
-          <button className="logout-btn-purple" onClick={handleLogout}>
-            <FaSignOutAlt />
-            <span>{lang === 'en' ? 'Logout' : 'ออกจากระบบ'}</span>
-          </button>
-        </div>
       </aside>
 
       {/* ===== Main Content ===== */}
       <main className="main-content-purple">
-        <header className="top-header-purple" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div className="header-title" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div className="avatar-purple" style={{ background: 'rgba(139, 92, 246, 0.2)', color: '#7c3aed', border: '1px solid rgba(139, 92, 246, 0.4)' }}>
-              <FaHome />
+        <header className="top-header-purple dashboard-page-header">
+          <div className="header-title">
+            <div className="header-icon-box dashboard-title-icon" aria-hidden="true">
+              <img className="dashboard-home-image" src="/dashboard-home.png" alt="" />
             </div>
             <div>
-              <h2 style={{ margin: 0, fontSize: '18px', color: '#4c1d95' }}>
+              <h2 className="main-title-text">
                 {lang === 'en' ? 'Dashboard' : 'แดชบอร์ด'}
               </h2>
-              <p className="subtitle-purple">
-                {lang === 'en' ? 'Weekly Summary Data - March 2026' : 'ข้อมูลสรุปประจำสัปดาห์ - มีนาคม 2569'}
-              </p>
+              <p className="subtitle-purple">{t.dashboardOverview || 'A clear overview of your public video library and activity.'}</p>
             </div>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-            <div className="search-box-purple">
-              <FaSearch
-                style={{ color: '#7c3aed', cursor: 'pointer' }}
-                onClick={handleHeaderSearch}
-              />
-              <input
-                type="text"
-                placeholder={lang === 'en' ? 'Search summary, position...' : 'ค้นหาสรุป, ตำแหน่งงาน...'}
-                value={headerSearchQuery}
-                onChange={(e) => setHeaderSearchQuery(e.target.value)}
-                onKeyDown={handleHeaderSearchKeyDown}
-              />
-            </div>
-
-            {/* ปุ่มสลับภาษาด้านขวาบน */}
+          <div className="dashboard-header-actions">
+            <span className="dashboard-date">
+              {new Date().toLocaleDateString(lang === 'th' ? 'th-TH' : 'en-GB', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric',
+              })}
+            </span>
             <button
               type="button"
+              className="lang-toggle-purple"
               onClick={toggleLanguage}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                background: 'rgba(139, 92, 246, 0.2)',
-                border: '1px solid rgba(139, 92, 246, 0.4)',
-                borderRadius: '999px',
-                padding: '8px 16px',
-                color: '#4c1d95',
-                fontWeight: '600',
-                fontSize: '13px',
-                cursor: 'pointer',
-                whiteSpace: 'nowrap'
-              }}
             >
-              <FaLanguage size={16} />
+              <FaGlobe size={14} />
               <span>{lang ? lang.toUpperCase() : 'EN'}</span>
             </button>
           </div>
         </header>
 
-        {/* แถวที่ 1: ยอดฮิต + สรุปประจำสัปดาห์ */}
-        <div className="grid-row-2">
-          <div className="purple-card">
-            <h3 className="card-title-purple" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ width: '8px', height: '8px', background: '#22c55e', borderRadius: '50%', display: 'inline-block' }}></span> 
-              {lang === 'en' ? 'Popular Video Rank' : 'อันดับวิดีโอยอดฮิต'}
-            </h3>
-            {isDashboardLoading && (
-              <p style={{ color: '#6b7280' }}>{lang === 'en' ? 'Loading...' : 'กำลังโหลด...'}</p>
-            )}
-
-            {!isDashboardLoading && !popularVideo && (
-              <p style={{ color: '#6b7280' }}>
-                {lang === 'en' ? 'No video data yet.' : 'ยังไม่มีข้อมูลวิดีโอ'}
-              </p>
-            )}
-
-            {!isDashboardLoading && popularVideo && (
-              <div className="hero-banner-purple">
-                <span className="top-badge">
-                  {lang === 'en' ? '👑 Rank 1 This Week' : '👑 อันดับ 1 สัปดาห์นี้'}
-                </span>
-                <div className="hero-details">
-                  <h4>
-                    {`${lang === 'en' ? 'Position' : 'ตำแหน่ง'} ${popularVideo.Position || popularVideo.VideoTitle} | ${popularVideo.CompanyName || '-'}`}
-                  </h4>
-                  <p>{[popularVideo.CategoryName, popularVideo.WorkType].filter(Boolean).join(' · ')}</p>
-                </div>
-                <div className="chart-icon">
-                  <FaArrowUp />
-                </div>
-              </div>
-            )}
-          </div>
-
-          <div className="purple-card">
-            <h3 className="card-title-purple" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ width: '8px', height: '8px', background: '#3b82f6', borderRadius: '50%', display: 'inline-block' }}></span> 
-              {lang === 'en' ? 'Weekly Video Summaries' : 'สรุปวิดีโอประจำสัปดาห์'}
-            </h3>
-            {isDashboardLoading && (
-              <p style={{ color: '#6b7280' }}>{lang === 'en' ? 'Loading...' : 'กำลังโหลด...'}</p>
-            )}
-
-            {!isDashboardLoading && weeklyVideos.length === 0 && (
-              <p style={{ color: '#6b7280' }}>
-                {lang === 'en' ? 'No videos this week.' : 'ยังไม่มีวิดีโอในสัปดาห์นี้'}
-              </p>
-            )}
-
-            {!isDashboardLoading && weeklyVideos.length > 0 && (
-              <ul className="weekly-list-purple">
-                {weeklyVideos.map((item) => (
-                  <li key={item.VideoID}>
-                    <div>
-                      <strong>
-                        {`${lang === 'en' ? 'Position' : 'ตำแหน่ง'} ${item.Position || item.VideoTitle} | ${item.CompanyName || '-'}`}
-                      </strong>
-                      <p>{formatUploadDate(item.UploadDate)}</p>
-                    </div>
-                    <span className="purple-badge">{item.CategoryName || '-'}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        </div>
-
-        {/* แถวที่ 2: ตัวกรอง */}
-        <div className="purple-card filter-section-purple">
-          <div className="result-header-purple">
-            <h3 className="card-title-purple" style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}>
-              <FaSlidersH style={{ color: '#3b82f6' }} /> {lang === 'en' ? 'Data Filters' : 'ตัวกรอง'}
-            </h3>
-            <button type="button" className="reset-btn-purple" onClick={handleResetFilter}>
-              🔄 {lang === 'en' ? 'Reset Filters' : 'ล้างตัวกรอง'}
-            </button>
-          </div>
-
-          <div className="filter-grid-purple">
-            <div className="filter-col">
-              <div className="form-group-purple">
-                <label>{lang === 'en' ? 'Business Type' : 'ประเภทธุรกิจ'}</label>
-                <select
-                  className="dark-purple-input"
-                  value={businessType}
-                  onChange={(e) => setBusinessType(e.target.value)}
-                >
-                  <option value="">{lang === 'en' ? 'All' : 'ทั้งหมด'}</option>
-                  {filterOptions.businessTypes.map((bt) => (
-                    <option key={bt} value={bt}>{bt}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="form-group-purple">
-                <label>{lang === 'en' ? 'Location' : 'สถานที่ปฏิบัติงาน'}</label>
-                <select
-                  className="dark-purple-input"
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                >
-                  <option value="">{lang === 'en' ? 'All' : 'ทั้งหมด'}</option>
-                  {filterOptions.locations.map((loc) => (
-                    <option key={loc.en} value={loc.en}>{lang === 'en' ? loc.en : loc.th}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="form-group-purple">
-                <label>{lang === 'en' ? 'Position' : 'ตำแหน่งงาน'}</label>
-                <select
-                  className="dark-purple-input"
-                  value={position}
-                  onChange={(e) => setPosition(e.target.value)}
-                >
-                  <option value="">{lang === 'en' ? 'All' : 'ทั้งหมด'}</option>
-                  {filterOptions.positions.map((pos) => (
-                    <option key={pos} value={pos}>{pos}</option>
-                  ))}
-                </select>
-              </div>
+        <section className="dashboard-metrics" aria-label={t.dashboardMetrics || 'Dashboard metrics'}>
+          <article className="dashboard-metric-card">
+            <span className="dashboard-metric-icon metric-icon-videos">
+              <img src="/dashboard-metric-videos.png" alt="" />
+            </span>
+            <div>
+              <p>{t.totalPublicVideos || 'Public videos'}</p>
+              <strong>{dashboardLoading ? '—' : new Intl.NumberFormat(lang === 'th' ? 'th-TH' : 'en-US').format(Number(dashboardStats?.totalVideos) || 0)}</strong>
+              <span>{t.availableInLibrary || 'Available in the library'}</span>
             </div>
+          </article>
+          <article className="dashboard-metric-card">
+            <span className="dashboard-metric-icon metric-icon-views">
+              <img src="/dashboard-metric-views.png" alt="" />
+            </span>
+            <div>
+              <p>{t.totalViews || 'Total views'}</p>
+              <strong>{dashboardLoading ? '—' : new Intl.NumberFormat(lang === 'th' ? 'th-TH' : 'en-US').format(Number(dashboardStats?.totalViews) || 0)}</strong>
+              <span>{t.acrossPublicVideos || 'Across public videos'}</span>
+            </div>
+          </article>
+          <article className="dashboard-metric-card">
+            <span className="dashboard-metric-icon metric-icon-week">
+              <img src="/dashboard-metric-week.png" alt="" />
+            </span>
+            <div>
+              <p>{t.uploadedThisWeek || 'Added this week'}</p>
+              <strong>{dashboardLoading ? '—' : new Intl.NumberFormat(lang === 'th' ? 'th-TH' : 'en-US').format(Number(dashboardStats?.weeklyUploads) || 0)}</strong>
+              <span>{t.inTheLastSevenDays || 'In the last 7 days'}</span>
+            </div>
+          </article>
+          <article className="dashboard-metric-card dashboard-metric-featured">
+            <span className="dashboard-metric-icon metric-icon-top">
+              <img src="/dashboard-metric-leader.png" alt="" />
+            </span>
+            <div>
+              <p>{t.leadingVideoViews || 'Leader views'}</p>
+              <strong>
+                {dashboardLoading
+                  ? '—'
+                  : new Intl.NumberFormat(lang === 'th' ? 'th-TH' : 'en-US').format(Number(popularVideos[0]?.ViewCount) || 0)}
+              </strong>
+              <span>{t.mostViewedVideo || 'Most-viewed video'}</span>
+            </div>
+          </article>
+        </section>
 
-            <div className="filter-col">
-              <label>{lang === 'en' ? 'Work Style' : 'รูปแบบการทำงาน'}</label>
-              <div className="checkbox-group-purple">
-                {filterOptions.workTypes.map((wt) => (
-                  <label key={wt}>
-                    <input type="checkbox" name={wt} checked={!!workTypes[wt]} onChange={handleCheckboxChange} /> {wt}
-                  </label>
-                ))}
+        <div className="admin-dashboard-top-row">
+          <section className="purple-card top-videos-card">
+            <div className="top-videos-heading">
+              <div className="top-videos-heading-copy">
+                <h3 className="card-title-purple">{t.topVideosByViews || 'Top 5 Videos by Views'}</h3>
               </div>
-
-              <div className="form-group-purple">
-                <label>{lang === 'en' ? 'Detailed Search' : 'ค้นหาอย่างละเอียด'}</label>
-                <input
-                  type="text"
-                  className="dark-purple-input"
-                  placeholder={lang === 'en' ? 'Type keyword or student name...' : 'พิมพ์คีย์เวิร์ด หรือชื่อนักศึกษา...'}
-                  value={keyword}
-                  onChange={(e) => setKeyword(e.target.value)}
-                />
+              <span className="top-videos-period">{t.topVideosPeriod || 'ALL-TIME VIEWS'}</span>
+            </div>
+            {dashboardLoading ? (
+              <div className="dashboard-chart-message" role="status">
+                {t.dashboardLoading || 'Loading dashboard data...'}
               </div>
+            ) : dashboardError ? (
+              <div className="dashboard-chart-message dashboard-chart-error" role="alert">
+                {t.dashboardLoadError || 'Could not load dashboard data.'}
+              </div>
+            ) : popularVideos.length > 0 ? (
+              <ol className="top-videos-chart" aria-label={t.topVideosByViews || 'Top 5 Videos by Views'}>
+                {popularVideos.map((video, index) => {
+                  const views = Number(video.ViewCount) || 0;
+                  const barWidth = maxPopularVideoViews > 0 ? (views / maxPopularVideoViews) * 100 : 0;
+                  return (
+                    <li className={`top-video-chart-item${index === 0 ? ' is-leading' : ''}`} key={video.VideoID}>
+                      <div className="top-video-chart-label">
+                        <span className="top-video-rank" aria-hidden="true">
+                          {String(index + 1).padStart(2, '0')}
+                        </span>
+                        <span className="top-video-title" title={video.VideoTitle}>
+                          {video.VideoTitle || t.untitledVideo || 'Untitled video'}
+                        </span>
+                        <span className="top-video-views">
+                          {index === 0 && <span className="top-video-crown" aria-hidden="true">👑</span>}
+                          {new Intl.NumberFormat(lang === 'th' ? 'th-TH' : 'en-US').format(views)} {t.viewsCount || 'views'}
+                        </span>
+                      </div>
+                      <div className="top-video-bar-track" aria-hidden="true">
+                        <div className="top-video-bar" style={{ width: `${barWidth}%` }} />
+                      </div>
+                    </li>
+                  );
+                })}
+              </ol>
+            ) : (
+              <div className="dashboard-chart-message">
+                {t.noPopularVideos || 'No public videos yet.'}
+              </div>
+            )}
+          </section>
 
-              <button type="button" className="btn-search-purple" onClick={handleSearch}>
-                {lang === 'en' ? 'Search Data' : 'ค้นหา'}
+          <section className="purple-card filter-section-purple dashboard-search-panel">
+            <div className="dashboard-search-heading">
+              <div>
+                <span className="section-eyebrow">{t.exploreLibrary || 'EXPLORE THE LIBRARY'}</span>
+                <h3 className="card-title-purple">{t.filterTitle || 'Find a video summary'}</h3>
+                <p>{t.searchPanelDescription || 'Narrow down opportunities by role, location, or work style.'}</p>
+              </div>
+              <button type="button" className="reset-btn-purple" onClick={handleResetFilter}>
+                {t.resetFilter || 'Reset Filters'}
               </button>
             </div>
-          </div>
+            <form
+              className="dashboard-filter-form"
+              aria-busy={isLoading}
+              onSubmit={(event) => {
+                event.preventDefault();
+                handleSearch();
+              }}
+            >
+              <div className="dashboard-filter-selects">
+                <div className="form-group-purple">
+                  <label htmlFor="student-filter-business-type">{t.businessType || 'Business Type'}</label>
+                  <select id="student-filter-business-type" className="dark-purple-input" value={businessType} onChange={(e) => setBusinessType(e.target.value)}>
+                    <option value="">{t.all || 'All'}</option>
+                    {filterOptions.businessTypes.map((bt) => <option key={bt} value={bt}>{bt}</option>)}
+                  </select>
+                </div>
+                <div className="form-group-purple">
+                  <label htmlFor="student-filter-location">{lang === 'en' ? 'Location' : 'สถานที่ปฏิบัติงาน'}</label>
+                  <select id="student-filter-location" className="dark-purple-input" value={location} onChange={(e) => setLocation(e.target.value)}>
+                    <option value="">{t.all || 'All'}</option>
+                    {filterOptions.locations.map((loc) => <option key={loc.en} value={loc.en}>{lang === 'en' ? loc.en : loc.th}</option>)}
+                  </select>
+                </div>
+                <div className="form-group-purple">
+                  <label htmlFor="student-filter-position">{lang === 'en' ? 'Position' : 'ตำแหน่งงาน'}</label>
+                  <select id="student-filter-position" className="dark-purple-input" value={position} onChange={(e) => setPosition(e.target.value)}>
+                    <option value="">{t.all || 'All'}</option>
+                    {filterOptions.positions.map((pos) => <option key={pos} value={pos}>{pos}</option>)}
+                  </select>
+                </div>
+              </div>
+              <fieldset className="dashboard-workstyle-fieldset">
+                <legend>{t.workStyle || 'Work Style'}</legend>
+                <p className="dashboard-field-hint">{t.workStyleHint || 'Choose one or more, or keep all selected.'}</p>
+                <div className="checkbox-group-purple">
+                  {filterOptions.workTypes.map((wt) => (
+                    <label className="workstyle-chip" key={wt}>
+                      <input type="checkbox" name={wt} checked={!!workTypes[wt]} onChange={handleCheckboxChange} /> {wt}
+                    </label>
+                  ))}
+                </div>
+                {filterOptions.workTypes.length > 0 && selectedWorkTypeCount === 0 && (
+                  <p className="dashboard-validation-hint" role="status">
+                    {t.selectWorkStyleHint || 'Select at least one work style to search.'}
+                  </p>
+                )}
+              </fieldset>
+              <div className="dashboard-filter-submit">
+                <div className="form-group-purple dashboard-keyword-field">
+                  <label htmlFor="student-filter-keyword">{lang === 'en' ? 'Keyword' : 'คำค้นหา'}</label>
+                  <input
+                    id="student-filter-keyword"
+                    type="text"
+                    className="dark-purple-input"
+                    placeholder={lang === 'en' ? 'Title, company, or position' : 'ชื่อวิดีโอ บริษัท หรือตำแหน่งงาน'}
+                    value={keyword}
+                    onChange={(e) => setKeyword(e.target.value)}
+                  />
+                </div>
+                {selectedFilterCount > 0 && (
+                  <span className="dashboard-filter-count" aria-live="polite">
+                    {lang === 'en' ? `${selectedFilterCount} filters selected` : `เลือกตัวกรอง ${selectedFilterCount} รายการ`}
+                  </span>
+                )}
+                <button
+                  type="submit"
+                  className="btn-search-purple"
+                  disabled={isLoading || (filterOptions.workTypes.length > 0 && selectedWorkTypeCount === 0)}
+                >
+                  <FaSearch aria-hidden="true" />
+                  {isLoading
+                    ? (t.searching || 'Searching...')
+                    : (t.searchButton || (lang === 'en' ? 'Search Data' : 'ค้นหาข้อมูล'))}
+                </button>
+              </div>
+            </form>
+          </section>
         </div>
 
         {/* แถวที่ 3: ผลลัพธ์การค้นหา */}
         {hasSearched && (
-          <div ref={resultRef} className="purple-card" style={{ marginBottom: '20px' }}>
-            <div className="result-header-purple" style={{ marginBottom: '16px' }}>
+          <section ref={resultRef} className="purple-card result-section-purple dashboard-results-card">
+            <div className="result-header-purple">
               <h3 className="card-title-purple" style={{ margin: 0 }}>
-                ⚙️ {lang === 'en' ? `Filter found ${videoResults.length} positions` : `ตัวกรองพบ ${videoResults.length} ตำแหน่งงาน`}
+                {isLoading
+                  ? (t.searching || 'Searching...')
+                  : searchError
+                    ? (t.searchResults || 'Search results')
+                    : lang === 'en'
+                      ? `Found ${videoResults.length} results`
+                      : `พบ ${videoResults.length} รายการ`}
               </h3>
             </div>
 
             <div className="cards-grid-purple">
-              {isLoading && <p style={{ color: '#6b7280' }}>{lang === 'en' ? 'Loading...' : 'กำลังโหลด...'}</p>}
-              {!isLoading && videoResults.length === 0 && (
-                <p style={{ color: '#6b7280' }}>{lang === 'en' ? 'No results found.' : 'ไม่พบข้อมูลที่ตรงกับตัวกรอง'}</p>
+              {searchError && (
+                <p className="dashboard-search-error" role="alert">
+                  {t.searchError || 'Could not complete the search. Please try again.'}
+                </p>
               )}
-              {videoResults.map((item) => (
+              {isLoading && <p role="status">{t.searching || 'Searching...'}</p>}
+              {!searchError && !isLoading && videoResults.length === 0 && (
+                <p>{lang === 'en' ? 'No results found.' : 'ไม่พบข้อมูลที่ตรงกับตัวกรอง'}</p>
+              )}
+              {!searchError && !isLoading && videoResults.map((item) => (
                 <div className="job-card-purple" key={item.VideoID}>
                   <div className="card-banner-purple">
                     <span>{item.UploadDate ? new Date(item.UploadDate).getFullYear() : '2026'}</span>
@@ -502,7 +514,7 @@ function StudentDashboard() {
                 </div>
               ))}
             </div>
-          </div>
+          </section>
         )}
       </main>
     </div>

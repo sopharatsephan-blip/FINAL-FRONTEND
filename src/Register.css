@@ -1,15 +1,13 @@
-* {
+.register-container,
+.register-container * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
   font-weight: 600;
 }
 
-body {
+.register-container {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
   background-color: #ffffff;
   color: #1f2937;
 }
@@ -17,18 +15,22 @@ body {
 /* Container เต็มจอ ไร้กรอบ */
 .register-container {
   display: flex;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100svh;
+  height: auto;
   background: #ffffff;
+  overflow-x: hidden;
 }
 
 /* --- ฝั่งซ้าย --- */
 /* --- ฝั่งซ้าย (จัดให้อยู่กึ่งกลางของพื้นที่ฝั่งซ้าย) --- */
 .register-left {
-  flex: 1;
+  flex: 1 1 50%;
+  min-width: 0;
   background: #f5edfc;
   color: #4c1d95;
-  padding: 60px 60px 60px 100px;
+  padding: 60px clamp(32px, 7vw, 100px);
   display: flex;
   flex-direction: column;
   justify-content: center; /* จัดกึ่งกลางแนวตั้ง */
@@ -44,10 +46,11 @@ body {
   margin-left: 90px;         /* ดึงให้อยู่กึ่งกลางกล่อง */
 }
 
-.register-left .logo-icon {
-  font-size: 48px;
+.register-left .auth-brand-image {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
   margin-bottom: 30px;
-  color: #8b5cf6;
 }
 
 .register-left h1 {
@@ -73,7 +76,8 @@ body {
 }
 /* --- ฝั่งขวา (จัดกึ่งกลางพอดีในพื้นที่ฝั่งขวา) --- */
 .register-right {
-  flex: 1;
+  flex: 1 1 50%;
+  min-width: 0;
   background: #ffffff;
   padding: 40px 80px;
   display: flex;
@@ -193,4 +197,102 @@ body {
 
 .btn-signup:hover {
   opacity: 0.9;
+}
+
+@media (max-width: 900px) {
+  .brand-section {
+    margin-left: 0;
+  }
+
+  .register-left {
+    padding: 48px clamp(28px, 5vw, 56px);
+  }
+
+  .register-right {
+    padding: 40px clamp(28px, 5vw, 56px);
+  }
+
+  .register-left h1 {
+    font-size: clamp(36px, 5vw, 44px);
+  }
+}
+
+.brand-section {
+  margin-left: 0;
+}
+
+@media (max-width: 700px) {
+  .register-container {
+    flex-direction: column;
+    min-height: 100vh;
+    min-height: 100svh;
+  }
+
+  .register-left {
+    flex: 0 0 auto;
+    min-height: 250px;
+    padding: 28px 24px 24px;
+    border-right: 0;
+    border-bottom: 1px solid #e7ddf1;
+  }
+
+  .brand-section {
+    max-width: 520px;
+  }
+
+  .register-left .auth-brand-image {
+    width: 56px;
+    height: 56px;
+    margin-bottom: 12px;
+  }
+
+  .register-left h1 {
+    margin-bottom: 8px;
+    font-size: 30px;
+    line-height: 1.12;
+  }
+
+  .register-left p {
+    max-width: 48ch;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .register-right {
+    flex: 1 0 auto;
+    justify-content: flex-start;
+    padding: 36px 24px 48px;
+  }
+
+  .lang-btn {
+    top: 16px;
+    right: 16px;
+    min-height: 44px;
+    padding: 8px 14px;
+  }
+
+  .form-container-box {
+    width: 100%;
+    max-width: 440px;
+    margin: 0 auto;
+  }
+
+  .register-right h3 {
+    font-size: 28px;
+  }
+
+  .register-right input {
+    min-height: 48px;
+  }
+}
+
+@media (max-width: 380px) {
+  .register-left {
+    min-height: 230px;
+    padding: 24px 20px 20px;
+  }
+
+  .register-right {
+    padding: 32px 20px 40px;
+  }
 }

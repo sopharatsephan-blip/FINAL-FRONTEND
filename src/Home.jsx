@@ -10,7 +10,7 @@ function Home() {
       {/* Header */}
       <header className="home-header">
         <div className="logo-area">
-          <span className="logo-star">✻</span>
+          <img className="brand-logo-image" src="/video-summary-logo.png" alt="" />
           <span className="logo-text">Video Summary</span>
         </div>
         <nav className="nav-links">

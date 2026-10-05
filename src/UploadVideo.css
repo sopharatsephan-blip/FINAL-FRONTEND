@@ -12,23 +12,23 @@
   --border-subtle: rgba(139, 92, 246, 0.2);
 }
 
-* {
+.upload-video-container,
+.upload-video-container * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-body {
+.upload-video-container {
   background-color: var(--bg-dark);
   color: var(--text-white);
   font-family: 'Kanit', sans-serif, system-ui;
 }
 
-.admin-purple-container {
+.upload-video-container {
   display: flex;
-  height: 100vh;
-  width: 100vw;
-  overflow: hidden;
+  min-height: 100vh;
+  width: 100%;
   background-color: var(--bg-dark);
 }
 
@@ -151,7 +151,7 @@ body {
 }
 
 /* ===== Main Content Area ===== */
-.main-content-purple {
+.upload-video-container .main-content-purple {
   flex: 1;
   display: flex;
   flex-direction: column;

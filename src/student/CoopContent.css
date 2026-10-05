@@ -157,6 +157,29 @@
   color: #8b5cf6;
 }
 
+.coop-search-box {
+  width: 300px;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.coop-position-filter {
+  min-width: 160px;
+  max-width: 210px;
+  padding: 10px 14px;
+  border: 1px solid rgba(139, 92, 246, 0.25);
+  border-radius: 999px;
+  background: #f5edfc;
+  color: #374151;
+  font: inherit;
+  font-size: 14px;
+}
+
+.coop-position-filter:focus-visible {
+  outline: 2px solid #8b5cf6;
+  outline-offset: 2px;
+}
+
 /* Card Section Outer Box */
 .coop-card-wrapper {
   background: #ffffff;
@@ -215,6 +238,24 @@
   font-weight: 600;
   color: #1f2937;
   margin: 0 0 8px 0;
+}
+
+.coop-card-title-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.coop-position-icon {
+  box-sizing: content-box;
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  padding: 9px;
+  border-radius: 10px;
+  background: rgba(139, 92, 246, 0.14);
+  color: #7c3aed;
 }
 
 .coop-card-meta {
@@ -334,4 +375,178 @@
 .btn-download-pdf:hover {
   opacity: 0.92;
   box-shadow: 0 0 16px rgba(16, 185, 129, 0.45);
+}
+
+.student-content-page .coop-card-wrapper {
+  box-sizing: border-box;
+  min-width: 0;
+  margin-top: 0;
+  padding: 22px 24px;
+  border: 1px solid #e7e0ed;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 4px 16px rgba(51, 35, 68, 0.045);
+}
+
+.student-content-page .coop-section-head {
+  margin: 0 0 18px;
+  color: #36264a;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.student-content-page .coop-status-dot {
+  background: #8b65bd;
+  box-shadow: none;
+}
+
+.student-content-page .coop-card-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  gap: 16px;
+}
+
+.student-content-page .coop-card {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  padding: 18px;
+  border-color: #e7e0ed;
+  border-radius: 14px;
+  background: #fff;
+  transition: border-color 150ms ease, box-shadow 150ms ease, transform 150ms ease;
+}
+
+.student-content-page .coop-card:hover {
+  transform: translateY(-1px);
+  border-color: #cbb7e3;
+  box-shadow: 0 8px 22px rgba(69, 42, 107, 0.08);
+}
+
+.student-content-page .coop-card-top {
+  gap: 12px;
+}
+
+.student-content-page .coop-card-top > div {
+  min-width: 0;
+}
+
+.student-content-page .coop-card-title {
+  overflow-wrap: anywhere;
+  color: #36264a;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.student-content-page .coop-position-icon {
+  background: #f1eafa;
+  color: #7042ad;
+}
+
+.student-content-page .coop-card-meta {
+  flex-wrap: wrap;
+  color: #766a84;
+  font-size: 12px;
+}
+
+.student-content-page .coop-fav-btn {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  place-items: center;
+  border-radius: 10px;
+  color: #897d96;
+}
+
+.student-content-page .coop-fav-btn:hover,
+.student-content-page .coop-fav-btn.active {
+  color: #e45568;
+}
+
+.student-content-page .coop-actions {
+  gap: 10px;
+  margin-top: auto;
+  padding-top: 14px;
+}
+
+.student-content-page .coop-actions button {
+  min-height: 42px;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 13px;
+  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease, transform 150ms ease;
+}
+
+.student-content-page .btn-view-video {
+  border-color: #e2d5f1;
+  background: #f3edf9;
+  color: #593785;
+}
+
+.student-content-page .btn-view-video:hover {
+  border-color: #cbb7e3;
+  background: #eae0f5;
+  color: #4b2e76;
+  box-shadow: none;
+}
+
+.student-content-page .btn-view-summary,
+.student-content-page .btn-download-pdf {
+  background: #7042ad;
+  box-shadow: 0 3px 8px rgba(93, 54, 148, 0.15);
+}
+
+.student-content-page .btn-view-summary:hover,
+.student-content-page .btn-download-pdf:hover {
+  background: #5f358f;
+  box-shadow: 0 4px 10px rgba(93, 54, 148, 0.2);
+}
+
+.student-content-page .coop-card button:focus-visible {
+  outline: 3px solid rgba(112, 66, 173, 0.4);
+  outline-offset: 2px;
+}
+
+.student-content-page .purple-card[style*="max-width"] {
+  box-sizing: border-box;
+  border-color: #e7e0ed;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(51, 35, 68, 0.045);
+}
+
+.student-content-page .summary-back-button {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border: 1px solid #e2d5f1;
+  border-radius: 10px;
+  background: #f3edf9;
+  color: #593785;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.student-content-page .summary-back-button:hover {
+  border-color: #cbb7e3;
+  background: #eae0f5;
+}
+
+.student-content-page .summary-back-button:focus-visible {
+  outline: 3px solid rgba(112, 66, 173, 0.4);
+  outline-offset: 2px;
+}
+
+@media (max-width: 560px) {
+  .student-content-page .coop-card-wrapper {
+    padding: 18px;
+  }
+
+  .student-content-page .coop-actions {
+    flex-direction: column;
+  }
 }

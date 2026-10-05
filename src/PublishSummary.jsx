@@ -14,7 +14,6 @@ import {
   FaUserAlt,
   FaLock,
   FaChevronRight,
-  FaAsterisk,
   FaCheck,
   FaArrowLeft
 } from 'react-icons/fa';
@@ -136,13 +135,13 @@ export default function PublishSummary() {
   };
 
   return (
-    <div className="admin-purple-container">
+    <div className="admin-purple-container admin-workspace-page">
       {/* ===== Sidebar ม่วงเข้ม (สไตล์ Admin Dashboard) ===== */}
       <aside className="sidebar-purple">
         <div>
           {/* Brand Logo */}
           <div className="brand-logo-purple" onClick={() => navigate('/admin')} style={{ cursor: 'pointer' }}>
-            <FaAsterisk className="logo-icon" style={{ color: '#7c3aed', marginRight: '8px' }} size={18} />
+            <img className="brand-logo-image" src="/video-summary-logo.png" alt="" />
             <span>{t.appName || 'ICT Video Summary'}</span>
           </div>
 
@@ -152,7 +151,9 @@ export default function PublishSummary() {
               {currentUser && currentUser.firstName ? currentUser.firstName.charAt(0) : 'S'}
             </div>
             <div className="user-info-purple">
-              <h4>{currentUser ? `${currentUser.firstName} ${currentUser.lastName}` : 'Somchai Jaidee'}</h4>
+              <h4>
+                {currentUser ? `${currentUser.firstName} ${currentUser.lastName}` : 'Somchai Jaidee'}
+              </h4>
               <span className="role-tag">Admin</span>
             </div>
           </div>
