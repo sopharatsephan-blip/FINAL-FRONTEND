@@ -263,9 +263,6 @@ export default function UserManagement() {
             </div>
             <div>
               <h2 style={{ margin: 0, color: '#4c1d95' }}>{lang === 'en' ? 'User Management' : 'จัดการผู้ใช้งาน'}</h2>
-              <p className="subtitle-purple" style={{ margin: 0 }}>
-                {lang === 'en' ? 'Manage user roles and system privileges' : 'จัดการบทบาทและสิทธิ์ผู้ใช้งานระบบ'}
-              </p>
             </div>
           </div>
 

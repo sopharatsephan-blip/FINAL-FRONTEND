@@ -336,9 +336,6 @@ export default function EditSummary() {
             </div>
             <div>
               <h2 style={{ margin: 0 }}>{t.editSummary || 'Edit Summary'}</h2>
-              <p className="subtitle-purple" style={{ margin: 0 }}>
-                {lang === 'en' ? 'Edit and update video summary data' : 'แก้ไขและอัปเดตข้อมูลสรุปวิดีโอ'}
-              </p>
             </div>
           </div>
 

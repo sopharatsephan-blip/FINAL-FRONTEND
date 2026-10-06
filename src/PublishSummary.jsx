@@ -209,9 +209,6 @@ export default function PublishSummary() {
               <h2 style={{ margin: 0, color: '#4c1d95' }}>
                 {lang === 'en' ? 'Publish Summary' : 'เผยแพร่สรุปเนื้อหา'}
               </h2>
-              <p className="subtitle-purple" style={{ margin: '4px 0 0 0' }}>
-                {lang === 'en' ? 'Review details and set audience target' : 'ตรวจสอบรายละเอียดและกำหนดกลุ่มผู้รับชม'}
-              </p>
             </div>
           </div>
 

@@ -245,7 +245,6 @@ function AdminDashboard() {
             </div>
             <div>
               <h2 className="main-title-text">{t.dashboard || 'Dashboard'}</h2>
-              <p className="subtitle-purple">{t.dashboardOverview || 'Your video library at a glance'}</p>
             </div>
           </div>
 

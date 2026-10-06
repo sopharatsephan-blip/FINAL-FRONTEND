@@ -229,11 +229,6 @@ function Favorites() {
                   ? (lang === "en" ? "Summary Details" : "รายละเอียดสรุป")
                   : (lang === "en" ? "Favorites" : "รายการโปรด")}
               </h2>
-              <p className="subtitle-purple">
-                {viewingItem
-                  ? (lang === "en" ? "Review the selected video summary" : "รายละเอียดสรุปวิดีโอที่เลือก")
-                  : (lang === "en" ? "Your saved co-op video summaries" : "วิดีโอและสรุปสหกิจศึกษาที่คุณบันทึกไว้")}
-              </p>
             </div>
           </div>
 

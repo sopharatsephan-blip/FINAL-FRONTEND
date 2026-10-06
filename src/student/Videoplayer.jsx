@@ -8,7 +8,6 @@ import {
   FaFileAlt,
   FaHeart,
   FaSignOutAlt,
-  FaUserGraduate,
   FaArrowLeft
 } from "react-icons/fa";
 
@@ -59,33 +58,42 @@ function VideoPlayer() {
     : null;
 
   return (
-    <div className="admin-purple-container">
+    <div className="admin-purple-container student-dashboard-container student-content-page admin-dashboard-page">
       {/* ===== Sidebar ===== */}
       <aside className="sidebar-purple">
         <div>
-          <div
+          <button
+            type="button"
             className="brand-logo-purple"
             onClick={() => navigate("/dashboard")}
-            style={{ cursor: "pointer" }}
           >
-            <div className="avatar-student" style={{ marginRight: "10px" }}>ICT</div>
-            <span>ICT Cooperative</span>
-          </div>
+            <img className="brand-logo-image" src="/video-summary-logo.png" alt="" />
+            <span>ICT Video Summary</span>
+          </button>
 
-          <div className="user-profile-student">
-            <div className="avatar-student">
-              <FaUserGraduate />
+          <div className="student-account-actions">
+            <div className="user-profile-student">
+              <div className="avatar-purple">
+                {(currentUser?.firstName || currentUser?.username || "S").charAt(0).toUpperCase()}
+              </div>
+              <div className="user-info-purple">
+                <h4>
+                  {currentUser
+                    ? [currentUser.firstName, currentUser.lastName].filter(Boolean).join(" ") || currentUser.username || (lang === "en" ? "User" : "ผู้ใช้")
+                    : lang === "en" ? "User" : "ผู้ใช้"}
+                </h4>
+                <span className="role-tag">{lang === "en" ? "Student" : "นักศึกษา"}</span>
+              </div>
             </div>
-            <div className="user-info-student">
-              <h4 style={{ color: "#000000" }}>
-                {currentUser
-                  ? [currentUser.firstName, currentUser.lastName].filter(Boolean).join(" ") || currentUser.username || (lang === "en" ? "User" : "ผู้ใช้")
-                  : lang === "en" ? "User" : "ผู้ใช้"}
-              </h4>
-              <span className="role-tag-student" style={{ color: "#000000" }}>
-                {currentUser?.username || "User Panel"}
-              </span>
-            </div>
+            <button
+              type="button"
+              className="student-profile-logout"
+              onClick={handleLogout}
+              aria-label={lang === "en" ? "Log out" : "ออกจากระบบ"}
+              title={lang === "en" ? "Log out" : "ออกจากระบบ"}
+            >
+              <FaSignOutAlt aria-hidden="true" />
+            </button>
           </div>
 
           <nav className="menu-list-purple">
@@ -105,57 +113,38 @@ function VideoPlayer() {
             </button>
           </nav>
         </div>
-
-        <div className="sidebar-footer-purple">
-          <button className="logout-btn-purple" onClick={handleLogout}>
-            <FaSignOutAlt />
-            <span>{lang === "en" ? "Logout" : "ออกจากระบบ"}</span>
-          </button>
-        </div>
       </aside>
 
       {/* ===== Main Content ===== */}
-      <main className="main-content-purple">
-        <div style={{ margin: "0 0 20px" }}>
+      <main className="main-content-purple student-video-main">
+        <div className="student-video-toolbar">
           <button
             type="button"
             onClick={() => navigate("/coop-content")}
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "8px",
-              background: "rgba(139, 92, 246, 0.12)",
-              border: "1px solid rgba(139, 92, 246, 0.4)",
-              borderRadius: "999px",
-              padding: "8px 16px",
-              color: "#7c3aed",
-              fontWeight: 600,
-              fontSize: "13px",
-              cursor: "pointer"
-            }}
+            className="student-video-back"
           >
             <FaArrowLeft /> {lang === "en" ? "Back to Co-op Content" : "กลับไปหน้าเนื้อหาสหกิจศึกษา"}
           </button>
         </div>
 
         {isLoading && (
-          <p style={{ color: "#6b7280" }}>{lang === "en" ? "Loading video..." : "กำลังโหลดวิดีโอ..."}</p>
+          <p className="student-video-message" role="status">{lang === "en" ? "Loading video..." : "กำลังโหลดวิดีโอ..."}</p>
         )}
 
         {!isLoading && notFound && (
-          <div className="purple-card">
-            <p style={{ color: "#6b7280", margin: 0 }}>
+          <div className="purple-card student-video-card">
+            <p className="student-video-message">
               {lang === "en" ? "Video not found." : "ไม่พบวิดีโอนี้ในระบบ"}
             </p>
           </div>
         )}
 
         {!isLoading && video && !notFound && (
-          <div className="purple-card" style={{ maxWidth: "900px", margin: "0 auto" }}>
-            <h2 style={{ margin: "0 0 4px", fontSize: "18px", color: "#1f2937" }}>
+          <article className="purple-card student-video-card">
+            <h1 className="student-video-title">
               {`${lang === "en" ? "Position" : "ตำแหน่ง"} ${video.Position || video.VideoTitle} | ${video.CompanyName || "-"}`}
-            </h2>
-            <p style={{ margin: "0 0 20px", color: "#6b7280", fontSize: "13px" }}>
+            </h1>
+            <p className="student-video-meta">
               {video.CategoryName || "-"}
               {video.UploadDate ? ` · ${new Date(video.UploadDate).toLocaleDateString(lang === "en" ? "en-GB" : "th-TH")}` : ""}
             </p>
@@ -164,12 +153,7 @@ function VideoPlayer() {
               <video
                 key={videoUrl}
                 controls
-                style={{
-                  width: "100%",
-                  borderRadius: "12px",
-                  background: "#000",
-                  maxHeight: "520px"
-                }}
+                className="student-video-element"
               >
                 <source src={videoUrl} />
                 {lang === "en"
@@ -177,22 +161,22 @@ function VideoPlayer() {
                   : "เบราว์เซอร์ของคุณไม่รองรับการเล่นวิดีโอ"}
               </video>
             ) : (
-              <p style={{ color: "#6b7280" }}>
+              <p className="student-video-message">
                 {lang === "en" ? "No video file available." : "ไม่พบไฟล์วิดีโอ"}
               </p>
             )}
 
             {video.SummaryText && (
-              <div style={{ marginTop: "24px" }}>
-                <h3 style={{ color: "#7c3aed", fontSize: "15px", fontWeight: 700, margin: "0 0 8px" }}>
+              <section className="student-video-summary">
+                <h2>
                   {lang === "en" ? "Summary" : "สรุปเนื้อหา"}
-                </h3>
-                <p style={{ margin: 0, color: "#374151", lineHeight: 1.8, whiteSpace: "pre-wrap" }}>
+                </h2>
+                <p>
                   {video.SummaryText}
                 </p>
-              </div>
+              </section>
             )}
-          </div>
+          </article>
         )}
       </main>
     </div>

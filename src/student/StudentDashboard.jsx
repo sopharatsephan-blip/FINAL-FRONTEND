@@ -257,7 +257,6 @@ function StudentDashboard() {
               <h2 className="main-title-text">
                 {lang === 'en' ? 'Dashboard' : 'แดชบอร์ด'}
               </h2>
-              <p className="subtitle-purple">{t.dashboardOverview || 'A clear overview of your public video library and activity.'}</p>
             </div>
           </div>
 

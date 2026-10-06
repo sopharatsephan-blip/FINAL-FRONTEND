@@ -158,9 +158,6 @@ export default function EditList() {
               <h2 style={{ margin: 0, color: '#4c1d95' }}>
                 {lang === 'en' ? 'Edit Summary Data' : 'แก้ไขข้อมูลสรุปเนื้อหา'}
               </h2>
-              <p className="subtitle-purple" style={{ margin: '4px 0 0 0' }}>
-                {lang === 'en' ? 'Edit and manage video summary details' : 'จัดการและแก้ไขข้อมูลสรุปเนื้อหาวิดีโอ'}
-              </p>
             </div>
           </div>
 

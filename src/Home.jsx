@@ -31,12 +31,11 @@ function Home() {
             <span className="highlight">For Teachers and Students</span>
           </h1>
           <p>
-            A central platform enabling teachers to upload lesson videos while allowing 
-            students to watch videos, read text summaries, and download notes for effective review.
+            Upload lesson videos, explore AI summaries, and revisit key ideas whenever you need.
           </p>
           <div className="hero-actions">
             <button className="btn-glow" onClick={() => navigate("/login")}>
-              Login to Get Started 🎓
+              Login to Get Started
             </button>
           </div>
         </div>
@@ -44,16 +43,12 @@ function Home() {
         {/* Role-based Features Grid */}
         <div className="features-grid">
           <div className="feature-card">
-            <h3>👨‍🏫 For Teachers</h3>
-            <p>Upload lesson videos, manage contents, and automatically generate text summaries using AI.</p>
+            <h3>For Teachers</h3>
+            <p>Upload lesson videos and create summaries with AI.</p>
           </div>
           <div className="feature-card">
-            <h3>👨‍🎓 For Students</h3>
-            <p>Watch recorded video lessons, read key insights, and download summaries to review anytime.</p>
-          </div>
-          <div className="feature-card">
-            <h3>⚡ Efficient & Fast</h3>
-            <p>Save time on reviewing materials and enhance the overall teaching and learning experience.</p>
+            <h3>For Students</h3>
+            <p>Watch lessons, review summaries, and download notes anytime.</p>
           </div>
         </div>
       </main>

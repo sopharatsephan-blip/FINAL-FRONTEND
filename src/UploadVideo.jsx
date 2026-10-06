@@ -203,9 +203,6 @@ export default function UploadVideo() {
               <h2 style={{ margin: 0, color: '#4c1d95' }}>
                 {t.uploadVideo || 'Upload Video'}
               </h2>
-              <p className="subtitle-purple">
-                {lang === 'en' ? 'Upload a video to generate a summary' : 'อัปโหลดวิดีโอเพื่อสร้างบทสรุป'}
-              </p>
             </div>
           </div>
 

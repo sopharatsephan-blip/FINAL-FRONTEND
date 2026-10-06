@@ -318,11 +318,6 @@ function CoopContent() {
                   ? (lang === "en" ? "Summary Details" : "รายละเอียดสรุป")
                   : (lang === "en" ? "Co-op Content" : "เนื้อหาสหกิจศึกษา")}
               </h2>
-              <p className="subtitle-purple">
-                {viewingItem
-                  ? (lang === "en" ? "Review the selected video summary" : "รายละเอียดสรุปวิดีโอที่เลือก")
-                  : (lang === "en" ? "Browse published co-op video summaries" : "เลือกชมวิดีโอและสรุปเนื้อหาสหกิจศึกษา")}
-              </p>
             </div>
           </div>
 
@@ -368,24 +363,26 @@ function CoopContent() {
         )}
 
         {viewingItem ? (
-          <div
-            ref={summaryRef}
-            className="purple-card"
-            style={{
-              maxWidth: "820px",
-              margin: "24px auto 0",
-              padding: "28px clamp(20px, 4vw, 40px)"
-            }}
-          >
+          <div style={{ maxWidth: "820px", margin: "24px auto 0" }}>
             <button
               type="button"
               className="summary-back-button"
               data-html2canvas-ignore="true"
               onClick={handleBackFromSummary}
+              style={{ marginBottom: "14px" }}
             >
               <FaArrowLeft aria-hidden="true" />
               {lang === "en" ? "Back to Co-op Content" : "กลับไปหน้าเนื้อหาสหกิจศึกษา"}
             </button>
+            <div
+              ref={summaryRef}
+              className="purple-card"
+              style={{
+                maxWidth: "820px",
+                margin: "0 auto",
+                padding: "28px clamp(20px, 4vw, 40px)"
+              }}
+            >
             <div style={{ display: "flex", alignItems: "center", gap: "10px", margin: "0 0 6px" }}>
               {React.createElement(getPositionIcon(viewingItem.Position), {
                 className: "coop-position-icon",
@@ -443,6 +440,7 @@ function CoopContent() {
                 ? (lang === "en" ? "Preparing..." : "กำลังเตรียมไฟล์...")
                 : (lang === "en" ? "Download PDF" : "ดาวน์โหลด PDF")}
             </button>
+            </div>
           </div>
         ) : (
           <div className="coop-card-wrapper">
