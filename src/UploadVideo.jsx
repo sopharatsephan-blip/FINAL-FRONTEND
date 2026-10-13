@@ -13,7 +13,7 @@ import {
   FaCloudUploadAlt, 
   FaArrowLeft
 } from 'react-icons/fa';
-
+//component UploadVideo เป็นหน้าสำหรับอัปโหลดวิดีโอใหม่ และเรียกสรุปเนื้อหาจากวิดีโอด้วย Whisper + Typhoon
 export default function UploadVideo() {
   const navigate = useNavigate();
   const { t, lang, toggleLanguage } = useLanguage();
@@ -30,21 +30,21 @@ export default function UploadVideo() {
       try { setCurrentUser(JSON.parse(savedUser)); } catch (e) {}
     }
   }, []);
-
+  // ฟังก์ชันจัดการการออกจากระบบ (Logout) - ลบข้อมูลผู้ใช้ใน localStorage และ navigate ไปหน้า Login
   const handleLogout = () => {
     localStorage.removeItem('user');
     navigate('/login');
   };
-
+ // ฟังก์ชันจัดการการลากและวางไฟล์วิดีโอ (Drag & Drop) - เมื่อผู้ใช้ลากไฟล์เข้ามาในพื้นที่ Drop Zone
   const handleDragOver = (e) => {
     e.preventDefault();
     setIsDragging(true);
   };
-
+ // ฟังก์ชันจัดการเมื่อผู้ใช้ลากไฟล์ออกจากพื้นที่ Drop Zone
   const handleDragLeave = () => {
     setIsDragging(false);
   };
-
+ // ฟังก์ชันจัดการเมื่อผู้ใช้ปล่อยไฟล์ลงในพื้นที่ Drop Zone
   const handleDrop = (e) => {
     e.preventDefault();
     setIsDragging(false);
@@ -52,7 +52,7 @@ export default function UploadVideo() {
       setSelectedFile(e.dataTransfer.files[0]);
     }
   };
-
+  // ฟังก์ชันจัดการเมื่อผู้ใช้เลือกไฟล์วิดีโอด้วยปุ่ม "Select File" - เมื่อผู้ใช้เลือกไฟล์จาก File Dialog
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files[0]) {
       setSelectedFile(e.target.files[0]);
@@ -125,7 +125,8 @@ export default function UploadVideo() {
   };
 
   const isBusy = isUploading || isSummarizing;
-
+  
+  // ฟังก์ชันนี้จะเปลี่ยนข้อความบนปุ่มตามสถานะการอัปโหลดและสรุปวิดีโอ
   const getButtonLabel = () => {
     if (isUploading) return lang === 'en' ? 'Uploading...' : 'กำลังอัปโหลด...';
     if (isSummarizing) return lang === 'en' ? 'Summarizing...' : 'กำลังสรุปเนื้อหา...';

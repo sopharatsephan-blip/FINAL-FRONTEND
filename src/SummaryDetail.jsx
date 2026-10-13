@@ -15,7 +15,7 @@ import {
   FaFileAlt,
   FaGlobeAmericas
 } from 'react-icons/fa';
-
+//component SummaryDetailเเสดง สรุปเนื้อหาที่ดึงจากฐานข้อมูลจริง (Typhoon) ตาม videoId ที่ส่งมาจากหน้า SummaryResult
 export default function SummaryDetail() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -47,7 +47,7 @@ export default function SummaryDetail() {
       setError(lang === 'en' ? 'No video selected.' : 'ไม่พบข้อมูลวิดีโอที่เลือก');
       return;
     }
-
+   // ฟังก์ชันดึงข้อมูลสรุปจาก backend ตาม videoId
     const fetchSummary = async () => {
       try {
         setLoading(true);
@@ -72,7 +72,7 @@ export default function SummaryDetail() {
 
     fetchSummary();
   }, [videoId, lang]);
-
+  // ฟังก์ชันจัดการการออกจากระบบ (Logout) - ลบข้อมูลผู้ใช้ใน localStorage และ navigate ไปหน้า Login
   const handleLogout = () => {
     localStorage.removeItem('user');
     navigate('/login');

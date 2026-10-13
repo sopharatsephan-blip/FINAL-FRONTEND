@@ -27,7 +27,7 @@ import {
 } from 'react-icons/fa';
 
 const API_BASE = 'http://localhost:5000/api';
-
+// ฟังก์ชันเลือกไอคอนตามตำแหน่งงาน (Position) เพื่อให้การ์ดวิดีโอดูน่าสนใจมากขึ้นเหมือนกับ EditList.jsx
 function getPositionIcon(position) {
   const normalizedPosition = (position || '').toLowerCase();
 
@@ -42,7 +42,7 @@ function getPositionIcon(position) {
   if (normalizedPosition.includes('developer') || normalizedPosition.includes('engineer')) return FaCode;
   return FaBriefcase;
 }
-
+// ฟังก์ชันนี้จะถูกเรียกเมื่อผู้ใช้คลิกปุ่มย้อนกลับ (Back) เพื่อกลับไปยังหน้าเดิม
 export default function PublishList() {
   const navigate = useNavigate();
   const { t, lang, toggleLanguage } = useLanguage();
@@ -68,6 +68,7 @@ export default function PublishList() {
   }, []);
 
   // ✅ ดึงวิดีโอทั้งหมดจากฐานข้อมูลจริง แล้วกรองเฉพาะรายการที่มีสรุปแล้ว (SummaryID ไม่ว่าง)
+  //fetchVideos ฟังก์ชันนี้จะถูกเรียกเมื่อหน้า PublishList ถูกโหลดครั้งแรก
   useEffect(() => {
     const fetchVideos = async () => {
       try {
@@ -97,7 +98,7 @@ export default function PublishList() {
     localStorage.removeItem('user');
     navigate('/login');
   };
-
+  //ฟังก์ชันนี้จะถูกเรียกเมื่อผู้ใช้คลิกปุ่มค้นหา (Search) เพื่อกรองรายการวิดีโอที่มีสรุปแล้ว
   // 🗑️ คลิกถังขยะ -> เปิด modal ยืนยันก่อน (ยังไม่ลบจริง)
   const handleDeleteClick = (e, video) => {
     e.stopPropagation(); // กันไม่ให้ trigger การคลิกที่การ์ด (ซึ่งจะ navigate ไปหน้า publish-summary)

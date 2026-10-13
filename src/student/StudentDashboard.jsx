@@ -11,7 +11,7 @@ import {
   FaSearch,
   FaGlobe
 } from 'react-icons/fa';
-
+// StudentDashboard component สำหรับแสดงแดชบอร์ดของนักศึกษา
 function StudentDashboard() {
   const navigate = useNavigate();
   const { t, lang, toggleLanguage } = useLanguage();
@@ -100,6 +100,7 @@ function StudentDashboard() {
   }, []);
 
   // ✅ ดึงตัวเลือกตัวกรอง (Business Type, Location, Work Style, Position) จาก DB จริง เหมือนหน้า Admin Dashboard
+  // ฟังก์ชันนี้จะถูกเรียกเมื่อ component ถูก mount เพื่อดึงตัวเลือกตัวกรองจาก backend  
   useEffect(() => {
     const fetchFilterOptions = async () => {
       try {
@@ -120,16 +121,17 @@ function StudentDashboard() {
     };
     fetchFilterOptions();
   }, []);
-
+  // ฟังก์ชันจัดการการออกจากระบบ (Logout) - ลบข้อมูลผู้ใช้ใน localStorage และ navigate ไปหน้า Login
   const handleLogout = () => {
     localStorage.removeItem('user');
     navigate('/login');
   };
-
+  // ฟังก์ชันจัดการการเปลี่ยนแปลงของ checkbox สำหรับ Work Style
   const handleCheckboxChange = (e) => {
     setWorkTypes({ ...workTypes, [e.target.name]: e.target.checked });
   };
 
+  // ฟังก์ชันจัดการการเปลี่ยนแปลงของ select สำหรับ Business Type, Location, Position
   const handleResetFilter = () => {
     const allWorkTypesOn = {};
     filterOptions.workTypes.forEach((wt) => { allWorkTypesOn[wt] = true; });
@@ -142,7 +144,7 @@ function StudentDashboard() {
     setSearchError(false);
     setVideoResults([]);
   };
-
+  // ฟังก์ชันจัดการการค้นหาวิดีโอสรุปตามตัวกรองที่เลือก
   const handleSearch = async () => {
     if (filterOptions.workTypes.length > 0 && selectedWorkTypeCount === 0) {
       return;
@@ -346,7 +348,7 @@ function StudentDashboard() {
               <ol className="top-videos-chart" aria-label={t.topVideosByViews || 'Top 5 Videos by Views'}>
                 {popularVideos.map((video, index) => {
                   const views = Number(video.ViewCount) || 0;
-                  const barWidth = maxPopularVideoViews > 0 ? (views / maxPopularVideoViews) * 100 : 0;
+                  const barWidth = maxPopularVideoViews > 0 ? (views / maxPopularVideoViews) * 100 : 0;// Calculate the width of the bar relative to the video with the most views
                   return (
                     <li className={`top-video-chart-item${index === 0 ? ' is-leading' : ''}`} key={video.VideoID}>
                       <div className="top-video-chart-label">

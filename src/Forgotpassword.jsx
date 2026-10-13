@@ -18,10 +18,13 @@ export default function ForgotPassword() {
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const isValidEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+  // ฟังก์ชันตรวจสอบรูปแบบอีเมล
+  const isValidEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value); // ฟังก์ชันตรวจสอบรูปแบบอีเมล
 
+  
+  //ฟังก์ชันจัดการการตรวจสอบอีเมล
   // ขั้นที่ 1: เช็คว่ามีอีเมลนี้ในระบบไหม
-  const handleCheckEmail = async (e) => {
+  const handleCheckEmail = async (e) => { //ฟังก์ชันจัดการการตรวจสอบอีเมล
     e.preventDefault();
     setError('');
     setSuccess('');
@@ -60,10 +63,10 @@ export default function ForgotPassword() {
       setLoading(false);
     }
   };
-
-  // ขั้นที่ 2: ตั้งรหัสผ่านใหม่
-  const handleResetPassword = async (e) => {
-    e.preventDefault();
+  //ฟังก์ชันจัดการการตั้งรหัสผ่านใหม่
+  // ขั้นที่ 2: ตั้งรหัสผ่านใหม่ ฟังก์ชันนี้จะถูกเรียกเมื่อผู้ใช้กรอกรหัสผ่านใหม่และยืนยันรหัสผ่าน
+  const handleResetPassword = async (e) => { //ฟังก์ชันจัดการการตั้งรหัสผ่านใหม่
+    e.preventDefault(); 
     setError('');
     setSuccess('');
 

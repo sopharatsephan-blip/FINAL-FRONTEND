@@ -22,6 +22,7 @@ const API_BASE = 'http://localhost:5000/api';
 const SERVER_ORIGIN = API_BASE.replace(/\/api\/?$/, ''); // ตัด /api ออกให้เหลือ origin ของ backend เช่น http://localhost:5000
 
 // ✅ สร้าง URL ของไฟล์วิดีโอจริงจากข้อมูลที่ backend ส่งมา รองรับหลายชื่อฟิลด์เผื่อ backend ใช้ชื่อไม่ตรงกัน
+// ฟังก์ชันนี้จะถูกเรียกเมื่อหน้า PublishSummary ถูกโหลดครั้งแรกresolveVideoSrc
 function resolveVideoSrc(video) {
   if (!video) return '';
   const path =
@@ -33,6 +34,7 @@ function resolveVideoSrc(video) {
   return `${SERVER_ORIGIN}${path.startsWith('/') ? '' : '/'}${path}`;
 }
 
+// ✅ ฟังก์ชันนี้จะถูกเรียกเมื่อหน้า PublishSummary ถูกโหลดครั้งแรก component
 export default function PublishSummary() {
   const navigate = useNavigate();
   const { videoId } = useParams(); // route: /publish-summary/:videoId
@@ -97,6 +99,7 @@ export default function PublishSummary() {
     fetchVideo();
   }, [videoId, lang]);
 
+  // ✅ ฟังก์ชันจัดการการออกจากระบบ (Logout) -> ลบ localStorage และ navigate ไปหน้า Login
   const handleLogout = () => {
     localStorage.removeItem('user');
     navigate('/login');
@@ -128,7 +131,7 @@ export default function PublishSummary() {
       setPublishing(false);
     }
   };
-
+  // ✅ ฟังก์ชันปิดป๊อปอัปแจ้งเผยแพร่สำเร็จ และ navigate ไปหน้า Publish List
   const handleCloseModal = () => {
     setShowSuccessModal(false);
     navigate('/admin');

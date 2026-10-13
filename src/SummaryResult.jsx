@@ -43,7 +43,7 @@ const SUMMARY_TOPIC_HINTS = [
   ['แนะนำรุ่นน้อง', 'ควรจะให้รุ่นน้อง', 'หน่วยงานที่นักศึกษา'],
   ['ข้อเสนอแนะ'],
 ];
-
+ //component SummaryResult
 export default function SummaryResult() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -121,12 +121,12 @@ export default function SummaryResult() {
       setPanelHeight(summaryContentRef.current.scrollHeight);
     }
   }, [dbSummary, dbLoading, dbError, isSummaryOpen]);
-
+ // ฟังก์ชันจัดการการออกจากระบบ (Logout) - ลบข้อมูลผู้ใช้ใน localStorage และ navigate ไปหน้า Login
   const handleLogout = () => {
     localStorage.removeItem('user');
     navigate('/login');
   };
-
+  // ฟังก์ชันจัดการการลบสรุปเนื้อหา (Delete) - แสดง modal ยืนยันการลบ และเมื่อยืนยันแล้วจะเปลี่ยนสถานะเป็น isDeleted และ navigate กลับไปหน้า UploadVideo
   const confirmDelete = () => {
     setIsDeleted(true);
     setTimeout(() => {
@@ -158,8 +158,9 @@ export default function SummaryResult() {
     .split(/\r?\n/)
     .map(line => line.trim())
     .filter(Boolean);
+    // สร้าง array สำหรับเก็บคำตอบของแต่ละคำถาม (index ตรงกับ SUMMARY_QUESTIONS)summaryAnswers
   const summaryAnswers = Array(SUMMARY_QUESTIONS.length).fill('');
-  let activeSummaryQuestion = null;
+  let activeSummaryQuestion = null; // ตัวแปรชั่วคราวเพื่อเก็บ index ของคำถามที่กำลัง active อยู่
 
   for (const line of summaryLines) {
     const numberedLine = line.match(/^(\d+)[.)]\s*(.*)$/);
@@ -391,7 +392,7 @@ export default function SummaryResult() {
                       </h5>
                       {summaryAnswers.length > 0 ? (
                         <div className="summary-question-answer-list">
-                          {SUMMARY_QUESTIONS.map((question, index) => (
+                          {SUMMARY_QUESTIONS.map((question, index) => ( // ✅ แสดงคำถามและคำตอบตามลำดับ
                             <div className="summary-question-answer" key={question}>
                               <h6>{index + 1}. {question}</h6>
                               <p>{summaryAnswers[index] || (lang === 'en' ? '(No answer)' : '(ไม่มีคำตอบ)')}</p>

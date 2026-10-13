@@ -62,6 +62,7 @@ export default function UserManagement() {
   }, []);
 
   // ดึงรายชื่อผู้ใช้งานจากฐานข้อมูลผ่าน API
+  // ฟังก์ชันนี้จะถูกเรียกเมื่อ component ถูก mount และเมื่อมีการเปลี่ยนแปลงของ selectedUserId4
   const fetchUsers = async () => {
     setLoading(true);
     setError(null);
@@ -120,6 +121,7 @@ export default function UserManagement() {
   };
 
   // เปิด modal สำหรับยืนยันรหัสผ่านก่อนแต่งตั้ง/ถอด Admin
+  //ฟังก์ชัน openConfirm จะตรวจสอบเงื่อนไขก่อนเปิด modal เช่น ตรวจสอบว่ามีผู้ใช้ถูกเลือกหรือไม่, ตรวจสอบว่าผู้ใช้ที่เลือกเป็น Admin หรือไม่, และตรวจสอบว่าผู้ใช้ที่เลือกเป็น Admin คนสุดท้ายหรือไม่
   const openConfirm = (action) => {
     if (!selectedUser) return;
 
@@ -131,7 +133,7 @@ export default function UserManagement() {
     setConfirmPassword('');
     setConfirmError('');
   };
-
+   //ฟังก์ชัน closeConfirm จะใช้สำหรับปิด modal ยืนยันรหัสผ่าน โดยจะตรวจสอบว่ากำลังอยู่ในสถานะ loading หรือไม่ หากกำลัง loading อยู่จะไม่สามารถปิด modal ได้ และเมื่อ modal ถูกปิดจะรีเซ็ตค่าของ confirmAction, confirmPassword และ confirmError ให้เป็นค่าเริ่มต้น
   const closeConfirm = () => {
     if (confirmLoading) return;
     setConfirmAction(null);
@@ -139,7 +141,8 @@ export default function UserManagement() {
     setConfirmError('');
   };
 
-  // ยืนยันการเปลี่ยนสิทธิ์ผู้ใช้
+  // ฟังก์ชันยืนยันการเปลี่ยนสิทธิ์ผู้ใช้
+  //ฟังก์ชัน handleConfirmSubmit จะถูกเรียกเมื่อผู้ใช้กดปุ่มยืนยันใน modal ยืนยันรหัสผ่าน โดยจะตรวจสอบว่ามีผู้ใช้ถูกเลือกและมี action ที่ต้องการดำเนินการหรือไม่ จากนั้นจะตรวจสอบว่าผู้ใช้ที่ล็อกอินอยู่มีข้อมูลหรือไม่ และตรวจสอบว่าผู้ใช้กรอกรหัสผ่านหรือไม่ หากผ่านการตรวจสอบทั้งหมด จะส่งคำขอ PATCH ไปยัง backend เพื่อเปลี่ยนสิทธิ์ผู้ใช้ และเมื่อสำเร็จจะเรียก fetchUsers() เพื่ออัปเดตรายชื่อผู้ใช้งาน
   const handleConfirmSubmit = async (e) => {
     e.preventDefault();
     if (!selectedUser || !confirmAction) return;
@@ -193,7 +196,7 @@ export default function UserManagement() {
   };
 
   const canMakeAdmin = !!selectedUser && selectedUser.role !== 'Admin';
-  const canRemoveAdmin = !!selectedUser && selectedUser.role === 'Admin' && !isLastAdmin;
+  const canRemoveAdmin = !!selectedUser && selectedUser.role === 'Admin' && !isLastAdmin;// ตรวจสอบว่าผู้ใช้ที่เลือกเป็น Admin และไม่ใช่ Admin คนสุดท้าย
 
   return (
     <div className="admin-purple-container admin-workspace-page">

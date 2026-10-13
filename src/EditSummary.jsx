@@ -11,6 +11,7 @@ import {
 
 const API_BASE = 'http://localhost:5000/api'; // เปลี่ยนเป็น base URL จริงของ backend คุณ
 
+// ฟังก์ชันดึงชื่อสรุปจากเนื้อหาสรุป (SummaryContent) โดยใช้หัวข้อคำถามเป็นตัวช่วย
 const getSummaryName = (summaryContent = '') => {
   const lines = summaryContent.split(/\r?\n/).map(line => line.trim());
   const topicHeadings = [
@@ -42,7 +43,7 @@ const getSummaryName = (summaryContent = '') => {
 
   return answers.filter(Boolean).join(' - ');
 };
-
+// ฟังก์ชันขอคำแนะนำจาก Typhoon AI เพื่อเติมค่าใน dropdown fields (Province, Work Style, Position, Business Type)  
 const requestFieldSuggestions = async (id, lang, setSuggestionStatus, setFormData) => {
   setSuggestionStatus(lang === 'en' ? 'Typhoon is suggesting dropdown values...' : 'Typhoon กำลังแนะนำค่าใน Dropdown...');
   try {
@@ -70,7 +71,7 @@ const requestFieldSuggestions = async (id, lang, setSuggestionStatus, setFormDat
   }
 };
 
-export default function EditSummary() {
+export default function EditSummary() { // หน้าแก้ไขสรุปของวิดีโอแต่ละตัว (Edit Summary Detail)
   const navigate = useNavigate();
   const { videoId } = useParams(); // route: /edit-summary-detail/:videoId
   const { t, lang, toggleLanguage } = useLanguage();
@@ -112,6 +113,7 @@ export default function EditSummary() {
   }, []);
 
   // ✅ ดึงตัวเลือก Category / Work Style จาก DB จริง (ตัวเลือกชุดเดียวกับหน้า Dashboard)
+  //โหลดตัวเลือกdropdown จาก API ของ backend
   useEffect(() => {
     const fetchFilterOptions = async () => {
       try {
@@ -138,7 +140,7 @@ export default function EditSummary() {
       setLoading(false);
       return;
     }
-
+    // ฟังก์ชันดึงข้อมูลสรุปจาก API ของ backend
     const fetchSummary = async () => {
       setLoading(true);
       setError(null);
@@ -170,12 +172,12 @@ export default function EditSummary() {
 
     fetchSummary();
   }, [videoId, lang]);
-
+  // ✅ ฟังก์ชันจัดการการออกจากระบบ
   const handleLogout = () => {
     localStorage.removeItem('user');
     navigate('/login');
   };
-
+  // ✅ ฟังก์ชันจัดการการเปลี่ยนค่าในฟอร์ม
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -184,7 +186,7 @@ export default function EditSummary() {
     }));
     if (shareError) setShareError(''); // เคลียร์ข้อความเตือนทันทีที่ผู้ใช้เริ่มแก้ไข
   };
-
+  // ✅ ฟังก์ชันจัดการการบันทึกข้อมูล (Save) -> PUT /api/summaries/:summaryId
   const handleSave = async (e) => {
     e.preventDefault();
     if (!summaryId) {
@@ -214,12 +216,13 @@ export default function EditSummary() {
       setSaving(false);
     }
   };
-
+  // ✅ ฟังก์ชันปิดป๊อปอัปแจ้งบันทึกสำเร็จ
   const handleCloseSuccessModal = () => {
     setShowSuccessModal(false);
   };
 
   // ✅ ปุ่ม Share -> ต้องกรอก dropdown ให้ครบก่อน แล้วค่อยบันทึก Position ลงฐานข้อมูล แล้วไปยังหน้า Public Summary
+  // ฟังก์ชันนี้จะถูกเรียกเมื่อผู้ใช้คลิกปุ่ม Share
   const handleShare = async () => {
     if (!formData.province || !formData.workStyle || !formData.position || !formData.businessType) {
       setShareError(

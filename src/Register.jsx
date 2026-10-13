@@ -20,12 +20,14 @@ export default function Register() {
   const [loading, setLoading] = useState(false);
 
   // ตรวจสอบรูปแบบอีเมลเบื้องต้น ต้องมี "@" และมีโดเมนตามหลัง
+  // ฟังก์ชันนี้จะถูกเรียกเมื่อผู้ใช้กรอกอีเมลในฟอร์ม
   const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
+  // ฟังก์ชันจัดการการเปลี่ยนแปลงของฟอร์ม (เมื่อผู้ใช้กรอกข้อมูล)
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
-
+  //ฟังก์ชันจัดการการส่งฟอร์มสมัครสมาชิก (เมื่อผู้ใช้คลิกปุ่ม Sign Up)
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');

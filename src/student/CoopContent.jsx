@@ -31,22 +31,22 @@ import {
 } from "react-icons/fa";
 
 const API_BASE = "http://localhost:5000";
-
+// ฟังก์ชัน getPositionIcon ใช้สำหรับเลือกไอคอนที่เหมาะสมตามตำแหน่งงาน (Position) ที่ส่งเข้ามา
 function getPositionIcon(position) {
-  const normalizedPosition = (position || "").toLowerCase();
+  const normalizedPosition = (position || "").toLowerCase();//quick fix: ตรวจสอบว่าตำแหน่งงานเป็น string และแปลงเป็นตัวพิมพ์เล็ก
 
-  if (normalizedPosition.includes("network")) return FaNetworkWired;
-  if (normalizedPosition.includes("data") || normalizedPosition.includes("database")) return FaDatabase;
-  if (normalizedPosition.includes("ai") || normalizedPosition.includes("ml")) return FaRobot;
-  if (normalizedPosition.includes("ux") || normalizedPosition.includes("ui") || normalizedPosition.includes("graphic") || normalizedPosition.includes("design")) return FaPalette;
-  if (normalizedPosition.includes("qa") || normalizedPosition.includes("tester") || normalizedPosition.includes("test")) return FaBug;
-  if (normalizedPosition.includes("mobile")) return FaMobileAlt;
-  if (normalizedPosition.includes("system") || normalizedPosition.includes("devops") || normalizedPosition.includes("administrator")) return FaServer;
-  if (normalizedPosition.includes("support")) return FaHeadset;
-  if (normalizedPosition.includes("developer") || normalizedPosition.includes("engineer")) return FaCode;
+  if (normalizedPosition.includes("network")) return FaNetworkWired;// ถ้าตำแหน่งงานมีคำว่า "network" ให้ใช้ไอคอน FaNetworkWired
+  if (normalizedPosition.includes("data") || normalizedPosition.includes("database")) return FaDatabase;// ถ้าตำแหน่งงานมีคำว่า "data" หรือ "database" ให้ใช้ไอคอน FaDatabase
+  if (normalizedPosition.includes("ai") || normalizedPosition.includes("ml")) return FaRobot;// ถ้าตำแหน่งงานมีคำว่า "ai" หรือ "ml" ให้ใช้ไอคอน FaRobot
+  if (normalizedPosition.includes("ux") || normalizedPosition.includes("ui") || normalizedPosition.includes("graphic") || normalizedPosition.includes("design")) return FaPalette;// ถ้าตำแหน่งงานมีคำว่า "ux", "ui", "graphic" หรือ "design" ให้ใช้ไอคอน FaPalette
+  if (normalizedPosition.includes("qa") || normalizedPosition.includes("tester") || normalizedPosition.includes("test")) return FaBug;// ถ้าตำแหน่งงานมีคำว่า "qa", "tester" หรือ "test" ให้ใช้ไอคอน FaBug
+  if (normalizedPosition.includes("mobile")) return FaMobileAlt;// ถ้าตำแหน่งงานมีคำว่า "mobile" ให้ใช้ไอคอน FaMobileAlt
+  if (normalizedPosition.includes("system") || normalizedPosition.includes("devops") || normalizedPosition.includes("administrator")) return FaServer;// ถ้าตำแหน่งงานมีคำว่า "system", "devops" หรือ "administrator" ให้ใช้ไอคอน FaServer
+  if (normalizedPosition.includes("support")) return FaHeadset;// ถ้าตำแหน่งงานมีคำว่า "support" ให้ใช้ไอคอน FaHeadset
+  if (normalizedPosition.includes("developer") || normalizedPosition.includes("engineer")) return FaCode; // ถ้าตำแหน่งงานมีคำว่า "developer" หรือ "engineer" ให้ใช้ไอคอน FaCode
   return FaBriefcase;
 }
-
+//component CoopContent สำหรับแสดงเนื้อหาสหกิจศึกษา (Co-op Content) ของนักศึกษา
 function CoopContent() {
   const navigate = useNavigate();
   const { lang, toggleLanguage } = useLanguage();
@@ -60,7 +60,7 @@ function CoopContent() {
   // ===== หน้ารายละเอียดสรุป (View Summary) =====
   const [viewingItem, setViewingItem] = useState(null); // ข้อมูลการ์ดที่กำลังดู (เพื่อโชว์ชื่อ/บริษัท)
   const [summaryData, setSummaryData] = useState(null); // ข้อมูลสรุปจริงจาก API
-  const [isSummaryLoading, setIsSummaryLoading] = useState(false);
+  const [isSummaryLoading, setIsSummaryLoading] = useState(false);// State สำหรับการโหลดสรุป
 
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
@@ -123,6 +123,7 @@ function CoopContent() {
     fetchVideos();
   }, [selectedPosition]);
 
+//ฟังก์ชัน formatUploadDate ใช้สำหรับแปลงวันที่อัปโหลดจากฐานข้อมูลให้อยู่ในรูปแบบที่อ่านง่าย (ภาษาไทยหรืออังกฤษ)
   const formatUploadDate = (dateStr) => {
     if (!dateStr) return "-";
     const d = new Date(dateStr);
@@ -137,7 +138,7 @@ function CoopContent() {
     ];
     return `${d.getDate()} ${thaiMonthsShort[d.getMonth()]}${d.getFullYear() + 543}`;
   };
-
+// ฟังก์ชัน toggleFavorite ใช้สำหรับเพิ่มหรือลบวิดีโอจากรายการโปรดของผู้ใช้
   const toggleFavorite = async (videoId) => {
     if (!currentUser?.uid) return;
     const isFav = favoriteIds.includes(videoId);
@@ -167,7 +168,7 @@ function CoopContent() {
       );
     }
   };
-
+ // ฟังก์ชัน handleLogout ใช้สำหรับจัดการการออกจากระบบ (Logout) โดยลบข้อมูลผู้ใช้ใน localStorage และนำผู้ใช้ไปยังหน้า Login
   const handleLogout = () => {
     localStorage.removeItem("user");
     navigate("/login");
@@ -193,17 +194,18 @@ function CoopContent() {
       setIsSummaryLoading(false);
     }
   };
-
+ // ฟังก์ชัน handleBackFromSummary ใช้สำหรับกลับไปยังหน้ารายการสรุป (Co-op Content) จากหน้ารายละเอียดสรุป
   const handleBackFromSummary = () => {
     setViewingItem(null);
     setSummaryData(null);
   };
-
+  // ฟังก์ชัน handleWatchVideo ใช้สำหรับนำผู้ใช้ไปยังหน้าวิดีโอที่เลือก
   const handleWatchVideo = (item) => {
     navigate(`/video/${item.VideoID}`);
   };
 
   // กรองรายการตามคำค้นหาจากช่องด้านบน (ค้นหาจากตำแหน่ง, ชื่อวิดีโอ, บริษัท, หมวดหมู่, คีย์เวิร์ด)
+  //ค่าที่คำนวณาเป็นตัวพิมพ์เล็กทั้งหมดเพื่อให้การค้นหาไม่ขึ้นกับตัวพิมพ์ใหญ่/เล็ก
   const filteredCoopItems = coopItems.filter((item) => {
     if (!searchQuery.trim()) return true;
     const q = searchQuery.trim().toLowerCase();
@@ -219,7 +221,7 @@ function CoopContent() {
       .toLowerCase();
     return haystack.includes(q);
   });
-
+  // ฟังก์ชัน handleDownload ใช้สำหรับดาวน์โหลดสรุปวิดีโอ
   const handleDownload = () => {
     const node = summaryRef.current;
     if (!node || !viewingItem) return;

@@ -23,7 +23,7 @@ import Register from './Register.jsx'
 import ForgotPassword from './Forgotpassword.jsx';
 import './index.css';
 
-ReactDOM.createRoot(document.getElementById('root')).render(
+ReactDOM.createRoot(document.getElementById('root')).render( // Render แอปพลิเคชัน React
   <React.StrictMode>
     <LanguageProvider> 
       <BrowserRouter>

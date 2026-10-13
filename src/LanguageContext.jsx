@@ -7,7 +7,7 @@ export function LanguageProvider({ children }) {
   // 1. ตั้งค่าเริ่มต้นเป็น 'en' (ภาษาอังกฤษ)
   const [lang, setLang] = useState('en');
 
-  // 2. ฟังก์ชันสลับภาษา EN <-> TH
+  // 2. ฟังก์ชันสลับภาษา EN <-> TH  ฟังก์ชันนี้จะถูกเรียกเมื่อผู้ใช้คลิกปุ่มสลับภาษา
   const toggleLanguage = () => {
     setLang((prev) => (prev === 'en' ? 'th' : 'en'));
   };

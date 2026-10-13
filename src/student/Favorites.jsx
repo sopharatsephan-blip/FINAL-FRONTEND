@@ -19,7 +19,7 @@ import {
 } from "react-icons/fa";
 
 const API_BASE = "http://localhost:5000";
-
+// Component Favorites สำหรับแสดงรายการโปรดของนักศึกษา
 function Favorites() {
   const navigate = useNavigate();
   const { lang, toggleLanguage } = useLanguage();
@@ -58,6 +58,7 @@ function Favorites() {
     fetchFavorites();
   }, [currentUser?.uid]);
 
+  // ฟังก์ชัน formatUploadDate ใช้สำหรับแปลงวันที่อัปโหลดจากฐานข้อมูลให้อยู่ในรูปแบบที่อ่านง่าย (ภาษาไทยหรืออังกฤษ)
   const formatUploadDate = (dateStr) => {
     if (!dateStr) return "-";
     const d = new Date(dateStr);
@@ -72,7 +73,7 @@ function Favorites() {
     ];
     return `${d.getDate()} ${thaiMonthsShort[d.getMonth()]}${d.getFullYear() + 543}`;
   };
-
+  // ฟังก์ชัน toggleFavorite ใช้สำหรับลบรายการโปรดออกจากรายการโปรดของนักศึกษา
   const toggleFavorite = async (videoId) => {
     if (!currentUser?.uid) return;
     // เอาออกจากรายการโปรดทันที (optimistic update)
@@ -86,16 +87,16 @@ function Favorites() {
       console.error("Remove favorite error:", err);
     }
   };
-
+  // ฟังก์ชัน handleLogout ใช้สำหรับจัดการการออกจากระบบ (Logout) โดยลบข้อมูลผู้ใช้ใน localStorage และนำผู้ใช้ไปยังหน้า Login
   const handleLogout = () => {
     localStorage.removeItem("user");
     navigate("/login");
   };
-
+  // ฟังก์ชัน handleWatchVideo ใช้สำหรับนำผู้ใช้ไปยังหน้าวิดีโอที่เลือก
   const handleWatchVideo = (item) => {
     navigate(`/video/${item.VideoID}`);
   };
-
+  // ฟังก์ชัน handleOpenSummary ใช้สำหรับเปิดหน้ารายละเอียดสรุปของวิดีโอที่เลือก
   const handleOpenSummary = async (item) => {
     setViewingItem(item);
     setSummaryData(null);
@@ -115,12 +116,12 @@ function Favorites() {
       setIsSummaryLoading(false);
     }
   };
-
+  // ฟังก์ชัน handleBackFromSummary ใช้สำหรับกลับไปยังหน้ารายการโปรดจากหน้ารายละเอียดสรุป
   const handleBackFromSummary = () => {
     setViewingItem(null);
     setSummaryData(null);
   };
-
+  // ฟังก์ชัน handleDownload ใช้สำหรับดาวน์โหลดสรุปวิดีโอเป็นไฟล์ PDF
   const handleDownload = () => {
     const node = summaryRef.current;
     if (!node || !viewingItem) return;
@@ -145,9 +146,9 @@ function Favorites() {
   };
 
   // กรองรายการโปรดตามคำค้นหาจากช่องด้านบน
-  const filteredItems = favoriteItems.filter((item) => {
-    if (!searchQuery.trim()) return true;
-    const q = searchQuery.trim().toLowerCase();
+  const filteredItems = favoriteItems.filter((item) => { // ค่าที่คำนวณาเป็นตัวพิมพ์เล็กทั้งหมดเพื่อให้การค้นหาไม่ขึ้นกับตัวพิมพ์ใหญ่/เล็ก
+    if (!searchQuery.trim()) return true;// ถ้าไม่มีคำค้นหา ให้แสดงรายการทั้งหมด
+    const q = searchQuery.trim().toLowerCase();// แปลงคำค้นหาเป็นตัวพิมพ์เล็ก
     const haystack = [
       item.Position,
       item.VideoTitle,

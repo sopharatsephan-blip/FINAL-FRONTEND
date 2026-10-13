@@ -12,7 +12,8 @@ import {
 } from "react-icons/fa";
 
 const API_BASE = "http://localhost:5000";
-
+// VideoPlayer component สำหรับแสดงวิดีโอและสรุปเนื้อหาของนักศึกษา
+//component VideoPlayer ใช้สำหรับแสดงวิดีโอและสรุปเนื้อหาของนักศึกษา โดยดึงข้อมูลจาก backend ตาม videoId ที่ส่งมาจาก URL
 function VideoPlayer() {
   const navigate = useNavigate();
   const { id } = useParams();
@@ -46,7 +47,8 @@ function VideoPlayer() {
 
     if (id) fetchVideo();
   }, [id]);
-
+  
+  // ฟังก์ชัน handleLogout ใช้สำหรับจัดการการออกจากระบบ (Logout) โดยลบข้อมูลผู้ใช้ใน localStorage และนำผู้ใช้ไปยังหน้า Login
   const handleLogout = () => {
     localStorage.removeItem("user");
     navigate("/login");

@@ -13,7 +13,7 @@ import {
 
 const API_BASE = 'http://localhost:5000/api';
 
-function getPositionIcon(position) {
+function getPositionIcon(position) { // ฟังก์ชันเลือกไอคอนตามตำแหน่งงาน
   const normalizedPosition = (position || '').toLowerCase();
 
   if (normalizedPosition.includes('network')) return FaNetworkWired;
@@ -28,7 +28,7 @@ function getPositionIcon(position) {
   return FaBriefcase;
 }
 
-export default function EditList() {
+export default function EditList() { // หน้าแสดงรายการวิดีโอทั้งหมดที่สามารถแก้ไขสรุปได้
   const navigate = useNavigate();
   const { t, lang, toggleLanguage } = useLanguage();
   const [currentUser, setCurrentUser] = useState(null);
@@ -47,7 +47,7 @@ export default function EditList() {
 
   // ✅ ดึงวิดีโอทั้งหมดจาก API
   useEffect(() => {
-    const fetchVideos = async () => {
+    const fetchVideos = async () => { // ฟังก์ชันดึงรายการวิดีโอทั้งหมดจาก API
       try {
         setLoading(true);
         const res = await fetch(`${API_BASE}/videos`);
@@ -62,18 +62,20 @@ export default function EditList() {
     fetchVideos();
   }, []);
 
+  // ✅ ฟังก์ชันจัดการการออกจากระบบ
   const handleLogout = () => {
     localStorage.removeItem('user');
     navigate('/login');
   };
 
   // 🗑️ คลิกถังขยะ -> เปิด modal ยืนยันก่อน (ยังไม่ลบจริง)
+  //ฟังชันนี้จะถูกเรียกเมื่อผู้ใช้คลิกปุ่มลบวิดีโอ (ถังขยะ) เพื่อเปิด modal ยืนยันการลบ
   const handleDeleteClick = (e, video) => {
     e.stopPropagation(); // กันไม่ให้ trigger การคลิกที่การ์ด (ซึ่งจะ navigate ไปหน้า edit)
     setVideoToDelete(video);
   };
 
-  // ✅ กดยืนยันใน modal -> ลบจริง
+  // ✅ ฟังก์ชันกดยืนยันใน modal -> ลบจริง
   const confirmDelete = async () => {
     if (!videoToDelete) return;
     const video = videoToDelete;
@@ -99,12 +101,12 @@ export default function EditList() {
     }
   };
 
-  // ❌ กดยกเลิกใน modal
+  // ❌ ฟังก์ชันกดยกเลิกใน modal
   const cancelDelete = () => {
     setVideoToDelete(null);
   };
 
-  // กรองตาม search
+  // ค่าคำนวณกรองตาม search
   const filtered = videos.filter((v) =>
     v.VideoTitle?.toLowerCase().includes(search.toLowerCase()) ||
     v.Position?.toLowerCase().includes(search.toLowerCase()) ||

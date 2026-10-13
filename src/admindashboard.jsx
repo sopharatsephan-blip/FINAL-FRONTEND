@@ -13,7 +13,7 @@ import {
   FaSearch
 } from 'react-icons/fa';
 
-function AdminDashboard() {
+function AdminDashboard() { //component สำหรับหน้าแดชบอร์ดของผู้ดูแลระบบ
   const navigate = useNavigate();
   const { t, lang, toggleLanguage } = useLanguage();
   const [currentUser, setCurrentUser] = useState(null);
@@ -113,7 +113,8 @@ function AdminDashboard() {
     position,
     keyword.trim(),
   ].filter(Boolean).length + Number(selectedWorkTypeCount < filterOptions.workTypes.length);
-
+  
+  // ✅ ฟังก์ชันค้นหาวิดีโอด้วยตัวกรอง
   const handleSearch = async () => {
     if (filterOptions.workTypes.length > 0 && selectedWorkTypeCount === 0) {
       return;
@@ -159,12 +160,14 @@ function AdminDashboard() {
       setIsLoading(false);
     }
   };
-
+   
+  // ✅ ฟังก์ชันจัดการการออกจากระบบ
   const handleLogout = () => {
     localStorage.removeItem('user');
     navigate('/login');
   };
 
+  // ✅ ฟังก์ชันจัดการการเปลี่ยนแปลงของ checkbox สำหรับ Work Types
   const handleCheckboxChange = (e) => {
     setWorkTypes({ ...workTypes, [e.target.name]: e.target.checked });
   };
@@ -333,7 +336,7 @@ function AdminDashboard() {
               <ol className="top-videos-chart" aria-label={t.topVideosByViews || 'Top 5 Videos by Views'}>
                 {popularVideos.map((video, index) => {
                   const views = Number(video.ViewCount) || 0;
-                  const barWidth = maxPopularVideoViews > 0 ? (views / maxPopularVideoViews) * 100 : 0;
+                  const barWidth = maxPopularVideoViews > 0 ? (views / maxPopularVideoViews) * 100 : 0; // คำนวณความกว้างของแถบกราฟตามจำนวนวิวของวิดีโอแต่ละตัวเทียบกับจำนวนวิวสูงสุด
 
                   return (
                     <li className={`top-video-chart-item${index === 0 ? ' is-leading' : ''}`} key={video.VideoID}>
@@ -370,7 +373,7 @@ function AdminDashboard() {
                 <h3 className="card-title-purple">{t.filterTitle || 'Find a video summary'}</h3>
                 <p>{t.searchPanelDescription || 'Narrow down opportunities by role, location, or work style.'}</p>
               </div>
-              <button type="button" className="reset-btn-purple" onClick={handleResetFilter}>
+              <button type="button" className="reset-btn-purple" onClick={handleResetFilter}> //ฟังก์ชันรีเซ็ตตัวกรอง
                 {t.resetFilter || 'Reset Filters'}
               </button>
             </div>

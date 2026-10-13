@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useLanguage } from './LanguageContext';
 
+// Sidebar component สำหรับแสดงเมนูด้านข้างของแอปพลิเคชัน
 export default function Sidebar() {
   const { t, lang, toggleLanguage } = useLanguage();
   const navigate = useNavigate();
